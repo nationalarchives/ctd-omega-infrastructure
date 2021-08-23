@@ -105,39 +105,45 @@ module "dev_workstation_secuirty_group" {
 
   vpc_id = module.vpc.vpc_id
 
-  ingress_with_cidr_blocks = [
+  computed_ingress_with_cidr_blocks = [
     {
       description = "SSH"
       from_port   = 0
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks
+      #cidr_blocks = "${module.vpc.private_subnets_cidr_blocks}"    # TODO(AR) why can't we use private subnet here?
+      cidr_blocks = module.vpc.vpc_cidr_block
     },
     {
       description = "RDP"
       from_port   = 0
       to_port     = 3389
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks
+      #cidr_blocks = "${module.vpc.private_subnets_cidr_blocks}"   # TODO(AR) why can't we use private subnet here?
+      cidr_blocks = module.vpc.vpc_cidr_block
     }
   ]
+  number_of_computed_ingress_with_cidr_blocks = 1
 
-  ingress_with_ipv6_cidr_blocks = [
+  computed_ingress_with_ipv6_cidr_blocks = [
     {
       description      = "SSH (IPv6)"
       from_port        = 0
       to_port          = 22
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks
+      #ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks
+      ipv6_cidr_blocks = module.vpc.vpc_ipv6_cidr_block
     },
     {
       description = "RDP (IPv6)"
       from_port   = 0
       to_port     = 3389
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks
+      #ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks # TODO(AR) why can't we use private subnet here?
+      ipv6_cidr_blocks = module.vpc.vpc_ipv6_cidr_block # TODO(AR) why can't we use private subnet here?
     }
   ]
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 1
 
   egress_with_cidr_blocks = [
     {
