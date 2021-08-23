@@ -13,9 +13,14 @@ terraform {
   required_version = ">= 0.14.9"
 }
 
+locals {
+  aws_region = "eu-west-2"
+  aws_azs = ["${local.aws_region}a"]
+}
+
 provider "aws" {
   profile = "tna-ct-omega"
-  region  = "eu-west-2"
+  region  = local.aws_region
 }
 
 resource "aws_eip" "nat" {
@@ -54,6 +59,8 @@ module "vpc" {
   name = "tna_ct_omega_vpc"
 
   cidr = "10.128.238.0/24"
+
+  azs = local.aws_azs
 
   private_subnets = ["10.128.238.0/29"]   # dev_private_subnet
   intra_subnets   = ["10.128.238.248/29"] # dev_internal_subnet
