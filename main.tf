@@ -35,6 +35,7 @@ resource "aws_customer_gateway" "tna_ct_omega_gateway" {
 
 module "vpn_gateway" {
   source = "terraform-aws-modules/vpn-gateway/aws"
+  version = "2.11.0"
 
   vpn_gateway_id      = module.vpc.vgw_id
   customer_gateway_id = aws_customer_gateway.tna_ct_omega_gateway.id
@@ -48,6 +49,7 @@ module "vpn_gateway" {
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
+  version = "3.6.0"
 
   name = "tna_ct_omega_vpc"
 
@@ -94,6 +96,7 @@ data "aws_ami" "amazon_linux_2" {
 
 module "dev_workstation_secuirty_group" {
   source = "terraform-aws-modules/security-group/aws"
+  version = "4.3.0"
 
   name        = "dev_workstation_security_group"
   description = "Security group for Development Workstation ports open within VPC"
