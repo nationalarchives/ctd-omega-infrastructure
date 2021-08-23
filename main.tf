@@ -173,7 +173,7 @@ module "dev_workstation_secuirty_group" {
 
 resource "aws_network_interface" "dev_workstation_1_private_interface" {
   description        = "Private Subnet Interface for Dev Workstation 1"
-  subnet_id          = module.vpc.private_subnets[0].id
+  subnet_id          = module.vpc.private_subnets[0]
   private_ips        = ["10.128.238.0"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
@@ -186,7 +186,7 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
 
 resource "aws_network_interface" "dev_workstation_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev Workstation 1"
-  subnet_id          = module.vpc.intra_subnets[0].id
+  subnet_id          = module.vpc.intra_subnets[0]
   private_ips        = ["10.128.238.248"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
@@ -239,7 +239,7 @@ resource "aws_instance" "dev_workstation_1" {
 
 resource "aws_network_interface" "dev_mssql_server_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev MS SQL Server 1"
-  subnet_id          = module.vpc.intra_subnets[0].id
+  subnet_id          = module.vpc.intra_subnets[0]
   private_ips        = ["10.128.238.255"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
