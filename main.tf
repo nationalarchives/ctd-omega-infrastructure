@@ -177,6 +177,10 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
   private_ips        = ["10.128.238.0"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
+  security_groups = [
+      "dev_workstation_secuirty_group"
+  ]
+
   tags = {
     Name        = "primary_network_interface"
     Network     = "private"
@@ -226,10 +230,6 @@ resource "aws_instance" "dev_workstation_1" {
       Environment = "dev"
     }
   }
-
-  security_groups = [
-    "dev_workstation_secuirty_group"
-  ]
 
   tags = {
     Name        = "dev_workstation"
