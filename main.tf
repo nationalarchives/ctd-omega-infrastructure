@@ -205,8 +205,15 @@ module "vpc" {
 
   azs = local.aws_azs
 
-  private_subnets = ["10.128.238.0/29"]   # dev_private_subnet
-  intra_subnets   = ["10.128.238.248/29"] # dev_internal_subnet
+  # NOTE: Smalles subnet possible in a VPC is a '/28'
+  # NOTE: The first four IP addresses and the last IP address in each subnet
+  # CIDR block are not available for you to use, and cannot be assigned to
+  # an instance.
+  # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv4
+  # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv6
+
+  private_subnets = ["10.128.238.0/28"]     # dev_private_subnet
+  intra_subnets   = ["10.128.238.240/28"]   # dev_internal_subnet
 
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
@@ -319,7 +326,7 @@ module "dev_workstation_secuirty_group" {
 resource "aws_network_interface" "dev_workstation_1_private_interface" {
   description        = "Private Subnet Interface for Dev Workstation 1"
   subnet_id          = module.vpc.private_subnets[0]
-  private_ips        = ["10.128.238.0"]
+  private_ips        = ["10.128.238.4"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
@@ -336,7 +343,7 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
 resource "aws_network_interface" "dev_workstation_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev Workstation 1"
   subnet_id          = module.vpc.intra_subnets[0]
-  private_ips        = ["10.128.238.248"]
+  private_ips        = ["10.128.238.244"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -385,7 +392,7 @@ resource "aws_instance" "dev_workstation_1" {
 resource "aws_network_interface" "dev_mssql_server_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev MS SQL Server 1"
   subnet_id          = module.vpc.intra_subnets[0]
-  private_ips        = ["10.128.238.255"]
+  private_ips        = ["10.128.238.254"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
