@@ -37,8 +37,30 @@ provider "aws" {
 #  --- Need a Cert per User
 #  --- AWS will provide OVPN files for users
 
+resource "aws_route53_zone" "omega_dns" {
+  name = "cat.nationalarchives.gov.uk"
+
+  tags = {
+    name = "dns_zone"
+  }
+}
+
+resource "aws_route53_record" "nameservers" {
+  allow_overwrite = true
+  name = "cat.nationalarchives.gov.uk"
+  ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can increase this to 24 or 48 hours
+  type            = "NS"
+  zone_id         = aws_route53_zone.omega_dns.zone_id
+  records = aws_route53_zone.omega_dns.name_servers
+}
+
+output "omega_dns_servers" {
+  description = "DNS Servers for Omega"
+  value = aws_route53_zone.omega_dns.name_servers
+}
+
 resource "aws_acm_certificate" "vpn_server" {
-  domain_name = "omega.nationalarchives.com"
+  domain_name = "cat.nationalarchives.com"
   validation_method = "DNS"
 
   lifecycle {
@@ -54,9 +76,29 @@ resource "aws_acm_certificate" "vpn_server" {
 
 resource "aws_acm_certificate_validation" "vpn_server" {
   certificate_arn = aws_acm_certificate.vpn_server.arn
+
+  validation_record_fqdns = [for record in aws_route53_record.omega_dns_record_vpn_server : record.fqdn]
+
   timeouts {
-    create = "1m"
+    create = "60m"
   }
+}
+
+resource "aws_route53_record" "omega_dns_record_vpn_server" {
+  for_each = {
+    for dvo in aws_acm_certificate.vpn_server.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can reduce this to 1 or 2 minutes
+  type            = each.value.type
+  zone_id         = resource.aws_route53_zone.omega_dns.zone_id
 }
 
 resource "aws_acm_certificate" "vpn_client_root" {
@@ -64,7 +106,7 @@ resource "aws_acm_certificate" "vpn_client_root" {
   #certificate_body = file("certs/client-vpn-ca.crt")
   #certificate_chain = file("certs/ca-chain.crt")
 
-  domain_name = "omega.nationalarchives.com"
+  domain_name = "cat.nationalarchives.com"
   validation_method = "DNS"
 
   lifecycle {
@@ -80,9 +122,29 @@ resource "aws_acm_certificate" "vpn_client_root" {
 
 resource "aws_acm_certificate_validation" "vpn_client_root" {
   certificate_arn = aws_acm_certificate.vpn_client_root.arn
+  
+  validation_record_fqdns = [for record in aws_route53_record.omega_dns_record_vpn_client : record.fqdn]
+
   timeouts {
-    create = "1m"
+    create = "60m"
   }
+}
+
+resource "aws_route53_record" "omega_dns_record_vpn_client" {
+  for_each = {
+    for dvo in aws_acm_certificate.vpn_client_root.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can reduce this to 1 or 2 minutes
+  type            = each.value.type
+  zone_id         = resource.aws_route53_zone.omega_dns.zone_id
 }
 
 module "vpn_access_security_group" {
