@@ -215,6 +215,12 @@ resource "aws_cloudwatch_log_group" "client_vpn_log_group" {
   }
 }
 
+resource "aws_cloudwatch_log_stream" "client_vpn_log_stream" {
+  name = "client_vpn"
+  log_group_name = aws_cloudwatch_log_group.client_vpn_log_group.name
+}
+
+
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description = "Omega Client VPN"
   
@@ -231,6 +237,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   connection_log_options {
     enabled = true
     cloudwatch_log_group = aws_cloudwatch_log_group.client_vpn_log_group.name
+    cloudwatch_log_stream = aws_cloudwatch_log_stream.client_vpn_log_stream.name
   }
 
   tags = {
