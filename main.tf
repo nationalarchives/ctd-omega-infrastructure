@@ -246,6 +246,11 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   }
 }
 
+output "omega_client_vpn_endpoint" {
+  description = "Client VPN Endpoint for Omega"
+  value = aws_ec2_client_vpn_endpoint.vpn.dns_name
+}
+
 data "aws_subnet_ids" "vpc_subnet_ids" {
   vpc_id = module.vpc.vpc_id
 }
