@@ -320,6 +320,11 @@ module "vpc" {
   }
 }
 
+output "omega_vpc" {
+  description = "Omega VPC"
+  value = module.vpc.vpc_id
+}
+
 data "aws_ami" "amazon_linux_2" {
 
   # Likely to be AMI with id: ami-0d26eb3972b7f8c96
