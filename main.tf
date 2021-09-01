@@ -60,7 +60,7 @@ output "omega_dns_servers" {
 }
 
 resource "aws_acm_certificate" "vpn_server" {
-  domain_name = "cat.nationalarchives.com"
+  domain_name = "cat.nationalarchives.gov.uk"
   validation_method = "DNS"
 
   lifecycle {
@@ -106,7 +106,7 @@ resource "aws_acm_certificate" "vpn_client_root" {
   #certificate_body = file("certs/client-vpn-ca.crt")
   #certificate_chain = file("certs/ca-chain.crt")
 
-  domain_name = "cat.nationalarchives.com"
+  domain_name = "cat.nationalarchives.gov.uk"
   validation_method = "DNS"
 
   lifecycle {
