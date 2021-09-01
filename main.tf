@@ -277,15 +277,17 @@ module "vpc" {
 
   azs = local.aws_azs
 
-  # NOTE: Smalles subnet possible in a VPC is a '/28'
+  # NOTE: Smallest subnet possible in a VPC is a '/28',
+  #       however for a VPN connection the smallest possible subnet is '/27'
   # NOTE: The first four IP addresses and the last IP address in each subnet
   # CIDR block are not available for you to use, and cannot be assigned to
   # an instance.
   # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv4
   # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv6
+  # Planning tool: https://tidalmigrations.com/subnet-builder/
 
-  private_subnets = ["10.128.238.0/28"]     # dev_private_subnet
-  intra_subnets   = ["10.128.238.240/28"]   # dev_internal_subnet
+  private_subnets = ["10.128.238.0/27"]     # dev_private_subnet
+  intra_subnets   = ["10.128.238.224/27"]   # dev_internal_subnet
 
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
@@ -415,7 +417,7 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
 resource "aws_network_interface" "dev_workstation_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev Workstation 1"
   subnet_id          = module.vpc.intra_subnets[0]
-  private_ips        = ["10.128.238.244"]
+  private_ips        = ["10.128.238.228"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
