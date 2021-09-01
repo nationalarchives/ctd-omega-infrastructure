@@ -259,7 +259,7 @@ resource "aws_ec2_client_vpn_network_association" "vpn_subnets" {
   count = 1
 
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
-  subnet_id = tolist(data.aws_subnet_ids.vpc_subnet_ids.ids)[count.index]  #TODO(AR) is this the private or internal subnet
+  subnet_id = tolist(data.aws_subnet_ids.vpc_subnet_ids.ids)[count.index]  # This is the dev_private_subnet
   security_groups = [
     module.vpn_access_security_group.security_group_id
   ]
