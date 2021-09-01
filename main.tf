@@ -446,7 +446,7 @@ resource "aws_instance" "dev_workstation_1" {
     encrypted             = false
     volume_type           = "gp3"
     iops                  = 3000
-    throughput            = 120 # 120 MiB/s == ~125 MBps
+    throughput            = 125 # MiB/s
     volume_size           = 500 # GiB
 
     tags = {
@@ -492,7 +492,7 @@ resource "aws_instance" "mssql_server_1" {
     encrypted             = false
     volume_type           = "gp3"
     iops                  = 3000
-    throughput            = 120 # 120 MiB/s == ~125 MBps
+    throughput            = 125 # MiB/s
     volume_size           = 60  # GiB
 
     tags = {
@@ -507,7 +507,7 @@ resource "aws_instance" "mssql_server_1" {
     encrypted             = false
     volume_type           = "gp3" # TODO(AR) consider upgrading to io2 and/or more IOPS
     iops                  = 3000
-    throughput            = 120 # 120 MiB/s == ~125 MBps
+    throughput            = 125 # MiB/s
     volume_size           = 150 # GiB
 
     tags = {
@@ -522,7 +522,7 @@ resource "aws_instance" "mssql_server_1" {
     encrypted             = false
     volume_type           = "gp3" # TODO(AR) consider upgrading to io2 and/or more IOPS
     iops                  = 3000
-    throughput            = 120 # 120 MiB/s == ~125 MBps
+    throughput            = 125 # MiB/s
     volume_size           = 75  # GiB
 
     tags = {
@@ -537,7 +537,7 @@ resource "aws_instance" "mssql_server_1" {
     encrypted             = false
     volume_type           = "gp3" # TODO(AR) consider upgrading to io2 and/or more IOPS
     iops                  = 3000
-    throughput            = 120 # 120 MiB/s == ~125 MBps
+    throughput            = 125 # MiB/s
     volume_size           = 150 # GiB
 
     tags = {
