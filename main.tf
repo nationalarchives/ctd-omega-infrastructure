@@ -206,6 +206,15 @@ module "vpn_access_security_group" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "client_vpn_log_group" {
+  name = "client_vpn"
+  retention_in_days = 60
+  tags = {
+    Name = "log_group"
+    Environment = "vpn"
+  }
+}
+
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description = "Omega Client VPN"
   
@@ -221,6 +230,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
 
   connection_log_options {
     enabled = true
+    cloudwatch_log_group = aws_cloudwatch_log_group.client_vpn_log_group.name
   }
 
   tags = {
