@@ -17,6 +17,8 @@ locals {
   aws_region = "eu-west-2"
   aws_azs = ["${local.aws_region}a"]
 
+
+  public_dns_domain = "cat.nationalarchives.gov.uk"
   private_dns_domain = "in.cat.nationalarchives.gov.uk"
 }
 
@@ -43,7 +45,7 @@ data "aws_partition" "current" {}
 #  --- AWS will provide OVPN files for users
 
 resource "aws_route53_zone" "omega_public_dns" {
-  name = "cat.nationalarchives.gov.uk"
+  name = local.public_dns_domain
 
   tags = {
     name = "dns_zone"
@@ -52,7 +54,7 @@ resource "aws_route53_zone" "omega_public_dns" {
 
 resource "aws_route53_record" "omega_public_dns_nameservers" {
   allow_overwrite = true
-  name = "cat.nationalarchives.gov.uk"
+  name = local.public_dns_domain
   ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can increase this to 24 or 48 hours
   type            = "NS"
   zone_id         = aws_route53_zone.omega_public_dns.zone_id
@@ -60,7 +62,7 @@ resource "aws_route53_record" "omega_public_dns_nameservers" {
 }
 
 output "omega_public_dns_servers" {
-  description = "DNS Servers for Omega"
+  description = "Public DNS Servers for Omega"
   value = aws_route53_zone.omega_public_dns.name_servers
 }
 
@@ -92,7 +94,7 @@ resource "aws_acmpca_certificate_authority" "omega_ca" {
     signing_algorithm = "SHA512WITHRSA"
 
     subject {
-      common_name = "cat.nationalarchives.gov.uk"
+      common_name = local.public_dns_domain
       organizational_unit = "Project Omega"
       organization = "The National Archives"
       locality = "Kew"
@@ -116,7 +118,7 @@ resource "tls_cert_request" "vpn_server_certificate_signing_request" {
   private_key_pem = tls_private_key.vpn_server_certificate_private_key.private_key_pem
 
   subject {
-    common_name = "vpn-server.cat.nationalarchives.gov.uk"
+    common_name = "vpn-server.${local.public_dns_domain}"
     organizational_unit = "Project Omega"
     organization = "The National Archives"
     street_address = ["Bessant Drive"]
@@ -205,7 +207,7 @@ resource "tls_cert_request" "root_vpn_client_certificate_signing_request" {
   private_key_pem = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
 
   subject {
-    common_name = "root.vpn-client.cat.nationalarchives.gov.uk"
+    common_name = "root.vpn-client.${local.public_dns_domain}"
     organizational_unit = "Project Omega"
     organization = "The National Archives"
     street_address = ["Bessant Drive"]
@@ -637,7 +639,7 @@ resource "aws_instance" "dev_workstation_1" {
 
 resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
   zone_id = aws_route53_zone.omega_private_dns.zone_id
-  name    = "dev1.in.cat.nationalarchives.gov.uk"
+  name    = "dev1.${local.private_dns_domain}"
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.dev_workstation_1_private_interface.private_ips
@@ -742,7 +744,7 @@ resource "aws_instance" "mssql_server_1" {
 
 resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
   zone_id = aws_route53_zone.omega_private_dns.zone_id
-  name    = "mssql1.in.cat.nationalarchives.gov.uk"
+  name    = "mssql1.${local.private_dns_domain}"
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.dev_mssql_server_1_internal_interface.private_ips
