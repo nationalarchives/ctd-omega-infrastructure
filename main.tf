@@ -411,12 +411,19 @@ module "vpc" {
   # Planning tool: https://tidalmigrations.com/subnet-builder/
 
   private_subnets = ["10.128.238.0/27"]     # dev_private_subnet
-  intra_subnets   = ["10.128.238.224/27"]   # dev_internal_subnet
+  private_subnet_ipv6_prefixes    = [0]
+  private_subnet_tags = {
+    Name = "dev_private_subnet"
+  }
+
+  intra_subnets   = ["10.128.238.224/27"]   # dev_intra_subnet
+  intra_subnet_ipv6_prefixes      = [16]
+  intra_subnet_tags = {
+      Name = "dev_intra_subnet"
+  }
 
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
-  private_subnet_ipv6_prefixes    = [0]
-  intra_subnet_ipv6_prefixes      = [16]
 
   # TODO (AR) are these needed still
   #enable_nat_gateway  = true
