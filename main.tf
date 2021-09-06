@@ -40,7 +40,7 @@ data "aws_partition" "current" {}
 #  --- Need a Cert per User
 #  --- AWS will provide OVPN files for users
 
-resource "aws_route53_zone" "omega_dns" {
+resource "aws_route53_zone" "omega_public_dns" {
   name = "cat.nationalarchives.gov.uk"
 
   tags = {
@@ -48,18 +48,18 @@ resource "aws_route53_zone" "omega_dns" {
   }
 }
 
-resource "aws_route53_record" "nameservers" {
+resource "aws_route53_record" "omega_public_dns_nameservers" {
   allow_overwrite = true
   name = "cat.nationalarchives.gov.uk"
   ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can increase this to 24 or 48 hours
   type            = "NS"
-  zone_id         = aws_route53_zone.omega_dns.zone_id
-  records = aws_route53_zone.omega_dns.name_servers
+  zone_id         = aws_route53_zone.omega_public_dns.zone_id
+  records = aws_route53_zone.omega_public_dns.name_servers
 }
 
-output "omega_dns_servers" {
+output "omega_public_dns_servers" {
   description = "DNS Servers for Omega"
-  value = aws_route53_zone.omega_dns.name_servers
+  value = aws_route53_zone.omega_public_dns.name_servers
 }
 
 resource "aws_acmpca_certificate_authority_certificate" "omega_ca_certificate_association" {
