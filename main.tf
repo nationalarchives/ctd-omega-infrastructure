@@ -31,12 +31,10 @@ provider "aws" {
 
 data "aws_partition" "current" {}
 
-
-# TODO(AR) is this still needed
-#resource "aws_eip" "nat" {
-#  count = 1
-#  vpc   = true
-#}
+resource "aws_eip" "vpc_subnet_nats" {
+  count = 1  # TODO(AR) must match the number of private subnets in the VPC
+  vpc   = true
+}
 
 
 # TODO - Security Group for VPN -- should be SSH and RDP
@@ -416,22 +414,150 @@ module "vpc" {
     Name = "dev_private_subnet"
   }
 
-  intra_subnets   = ["10.128.238.224/27"]   # dev_intra_subnet
+  intra_subnets   = ["10.128.238.96/27"]   # dev_intra_subnet
   intra_subnet_ipv6_prefixes      = [16]
   intra_subnet_tags = {
       Name = "dev_intra_subnet"
+  }
+
+  public_subnets = ["10.128.238.224/27"]   # public_subnet
+  public_subnet_ipv6_prefixes      = [128]
+  public_subnet_tags = {
+      Name = "public_subnet"
   }
 
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
 
   manage_default_network_acl = true
-  
-  # TODO (AR) are these needed still
-  #enable_nat_gateway  = true
-  #single_nat_gateway  = false
-  #reuse_nat_ips       = true             # <= Skip creation of EIPs for the NAT Gateways
-  #external_nat_ip_ids = aws_eip.nat.*.id # <= IPs specified here as input to the module
+
+  private_dedicated_network_acl     = true
+
+  private_inbound_acl_rules       = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 22
+      to_port   = 22
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnet
+    },
+    {
+      rule_number = 160
+      rule_action = "allow"
+      from_port   = 22
+      to_port   = 22
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnet
+    },
+    {
+      rule_number = 200
+      rule_action = "allow"
+      from_port   = 3389
+      to_port   = 3389
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnetsubnet
+    },
+    {
+      rule_number = 260
+      rule_action = "allow"
+      from_port   = 3389
+      to_port   = 3389
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnet
+    },
+    {
+      # allow results from outgoing IPv4 internet traffic
+      rule_number = 900
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      # allow results from outgoing IPv6 internet traffic
+      rule_number = 960
+      rule_action = "allow"
+      from_port   = 1024
+      to_port     = 65535
+      protocol    = "tcp"
+      ipv6_cidr_block = "::/0"
+    }
+  ]
+
+  private_outbound_acl_rules       = [
+    {
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 22
+      to_port   = 22
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnetsubnet
+    },
+    {
+      rule_number = 160
+      rule_action = "allow"
+      from_port   = 22
+      to_port   = 22
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnet
+    },
+    {
+      rule_number = 200
+      rule_action = "allow"
+      from_port   = 3389
+      to_port   = 3389
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnetsubnet
+    },
+    {
+      rule_number = 260
+      rule_action = "allow"
+      from_port   = 3389
+      to_port   = 3389
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # TODO(AR) ideally this should be only the Client VPN network interface(s) in this subnet
+    },
+    {
+      rule_number = 300
+      rule_action = "allow"
+      from_port   = 80
+      to_port   = 80
+      protocol    = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_number = 360
+      rule_action = "allow"
+      from_port   = 80
+      to_port   = 80
+      protocol    = "tcp"
+      ipv6_cidr_block = "::/0"
+    },
+    {
+      rule_number = 400
+      rule_action = "allow"
+      from_port   = 443
+      to_port   = 443
+      protocol    = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_number = 460
+      rule_action = "allow"
+      from_port   = 443
+      to_port   = 443
+      protocol    = "tcp"
+      ipv6_cidr_block = "::/0"
+    }
+  ]
+
+  enable_nat_gateway  = true
+  single_nat_gateway  = false
+  one_nat_gateway_per_az = false
+  reuse_nat_ips       = true             # <= Skip creation of EIPs for the NAT Gateways
+  external_nat_ip_ids = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
   vpc_tags = {
     Name = "vpc"
@@ -649,7 +775,7 @@ data "aws_network_interface" "dev_workstation_1_private_interface" {
 resource "aws_network_interface" "dev_workstation_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev Workstation 1"
   subnet_id          = module.vpc.intra_subnets[0]
-  private_ips        = ["10.128.238.228"]
+  private_ips        = ["10.128.238.100"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -720,7 +846,7 @@ resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
 resource "aws_network_interface" "dev_mssql_server_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev MS SQL Server 1"
   subnet_id          = module.vpc.intra_subnets[0]
-  private_ips        = ["10.128.238.254"]
+  private_ips        = ["10.128.238.126"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
