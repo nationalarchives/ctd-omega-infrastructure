@@ -20,6 +20,8 @@ locals {
 
   public_dns_domain = "cat.nationalarchives.gov.uk"
   private_dns_domain = "in.cat.nationalarchives.gov.uk"
+
+  vpn_client_cidr_block = "10.255.252.0/22"
 }
 
 provider "aws" {
@@ -333,7 +335,7 @@ resource "aws_cloudwatch_log_stream" "client_vpn_log_stream" {
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description = "Omega Client VPN"
   
-  client_cidr_block = "10.255.252.0/22"
+  client_cidr_block = local.vpn_client_cidr_block
   split_tunnel = true
 
   server_certificate_arn = aws_acm_certificate.vpn_server.arn
