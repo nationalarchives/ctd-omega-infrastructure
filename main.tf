@@ -23,6 +23,9 @@ provider "aws" {
   region  = local.aws_region
 }
 
+data "aws_partition" "current" {}
+
+
 # TODO(AR) is this still needed
 #resource "aws_eip" "nat" {
 #  count = 1
@@ -59,9 +62,83 @@ output "omega_dns_servers" {
   value = aws_route53_zone.omega_dns.name_servers
 }
 
+resource "aws_acmpca_certificate_authority_certificate" "omega_ca_certificate_association" {
+  certificate_authority_arn = aws_acmpca_certificate_authority.omega_ca.arn
+
+  certificate       = aws_acmpca_certificate.omega_ca_certificate.certificate
+  certificate_chain = aws_acmpca_certificate.omega_ca_certificate.certificate_chain
+}
+
+resource "aws_acmpca_certificate" "omega_ca_certificate" {
+  certificate_authority_arn   = aws_acmpca_certificate_authority.omega_ca.arn
+  certificate_signing_request = aws_acmpca_certificate_authority.omega_ca.certificate_signing_request
+  signing_algorithm           = "SHA512WITHRSA"
+
+  template_arn = "arn:${data.aws_partition.current.partition}:acm-pca:::template/RootCACertificate/V1"
+
+  validity {
+    type  = "YEARS"
+    value = 3
+  }
+}
+
+resource "aws_acmpca_certificate_authority" "omega_ca" {
+  type = "ROOT"
+
+  certificate_authority_configuration {
+    key_algorithm     = "RSA_4096"
+    signing_algorithm = "SHA512WITHRSA"
+
+    subject {
+      common_name = "cat.nationalarchives.gov.uk"
+      organizational_unit = "Project Omega"
+      organization = "The National Archives"
+      locality = "Kew"
+      state = "Surrey"
+      country = "GB"
+    }
+  }
+
+  tags = {
+      Name = "certificate_authority"
+  }
+}
+
+resource "tls_private_key" "vpn_server_certificate_private_key" {
+  algorithm   = "RSA"
+  rsa_bits = "2048"
+}
+
+resource "tls_cert_request" "vpn_server_certificate_signing_request" {
+  key_algorithm   = "RSA"
+  private_key_pem = tls_private_key.vpn_server_certificate_private_key.private_key_pem
+
+  subject {
+    common_name = "vpn-server.cat.nationalarchives.gov.uk"
+    organizational_unit = "Project Omega"
+    organization = "The National Archives"
+    street_address = ["Bessant Drive"]
+    locality = "Kew"
+    province = "Surrey"
+    country = "GB"
+    postal_code = "TW9 4DU"
+  }
+}
+
+resource "aws_acmpca_certificate" "vpn_server_certificate" {
+  certificate_authority_arn   = aws_acmpca_certificate_authority.omega_ca.arn
+  certificate_signing_request = tls_cert_request.vpn_server_certificate_signing_request.cert_request_pem
+  signing_algorithm           = "SHA512WITHRSA"
+  validity {
+    type  = "YEARS"
+    value = 1
+  }
+}
+
 resource "aws_acm_certificate" "vpn_server" {
-  domain_name = "cat.nationalarchives.gov.uk"
-  validation_method = "DNS"
+  private_key = tls_private_key.vpn_server_certificate_private_key.private_key_pem
+  certificate_body = aws_acmpca_certificate.vpn_server_certificate.certificate
+  certificate_chain = aws_acmpca_certificate.vpn_server_certificate.certificate_chain
 
   lifecycle {
     create_before_destroy = true
@@ -74,40 +151,83 @@ resource "aws_acm_certificate" "vpn_server" {
   }
 }
 
-resource "aws_acm_certificate_validation" "vpn_server" {
-  certificate_arn = aws_acm_certificate.vpn_server.arn
+resource "aws_acmpca_certificate_authority_certificate" "vpn_client_ca_certificate_association" {
+  certificate_authority_arn = aws_acmpca_certificate_authority.vpn_client_ca.arn
 
-  validation_record_fqdns = [for record in aws_route53_record.omega_dns_record_vpn_server : record.fqdn]
+  certificate       = aws_acmpca_certificate.vpn_client_ca_certificate.certificate
+  certificate_chain = aws_acmpca_certificate.vpn_client_ca_certificate.certificate_chain
+}
 
-  timeouts {
-    create = "60m"
+resource "aws_acmpca_certificate" "vpn_client_ca_certificate" {
+  certificate_authority_arn   = aws_acmpca_certificate_authority.omega_ca.arn
+  certificate_signing_request = aws_acmpca_certificate_authority.vpn_client_ca.certificate_signing_request
+  signing_algorithm           = "SHA512WITHRSA"
+
+  template_arn = "arn:${data.aws_partition.current.partition}:acm-pca:::template/SubordinateCACertificate_PathLen0/V1"
+
+  validity {
+    type  = "YEARS"
+    value = 2
   }
 }
 
-resource "aws_route53_record" "omega_dns_record_vpn_server" {
-  for_each = {
-    for dvo in aws_acm_certificate.vpn_server.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
+resource "aws_acmpca_certificate_authority" "vpn_client_ca" {
+  type = "SUBORDINATE"
+
+  certificate_authority_configuration {
+    key_algorithm     = "RSA_4096"
+    signing_algorithm = "SHA512WITHRSA"
+
+    subject {
+      common_name = "vpn-client.nationalarchives.gov.uk"
+      organizational_unit = "Project Omega"
+      organization = "The National Archives"
+      locality = "Kew"
+      state = "Surrey"
+      country = "GB"
     }
   }
 
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can reduce this to 1 or 2 minutes
-  type            = each.value.type
-  zone_id         = resource.aws_route53_zone.omega_dns.zone_id
+  tags = {
+    Name = "certificate_authority"
+  }
 }
 
-resource "aws_acm_certificate" "vpn_client_root" {
-  #private_key = file("certs/client-vpn-ca.key")
-  #certificate_body = file("certs/client-vpn-ca.crt")
-  #certificate_chain = file("certs/ca-chain.crt")
+resource "tls_private_key" "root_vpn_client_certificate_private_key" {
+  algorithm   = "RSA"
+  rsa_bits = "2048"
+}
 
-  domain_name = "cat.nationalarchives.gov.uk"
-  validation_method = "DNS"
+resource "tls_cert_request" "root_vpn_client_certificate_signing_request" {
+  key_algorithm   = "RSA"
+  private_key_pem = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
+
+  subject {
+    common_name = "root.vpn-client.cat.nationalarchives.gov.uk"
+    organizational_unit = "Project Omega"
+    organization = "The National Archives"
+    street_address = ["Bessant Drive"]
+    locality = "Kew"
+    province = "Surrey"
+    country = "GB"
+    postal_code = "TW9 4DU"
+  }
+}
+
+resource "aws_acmpca_certificate" "root_vpn_client_certificate" {
+  certificate_authority_arn   = aws_acmpca_certificate_authority.vpn_client_ca.arn
+  certificate_signing_request = tls_cert_request.root_vpn_client_certificate_signing_request.cert_request_pem
+  signing_algorithm           = "SHA512WITHRSA"
+  validity {
+    type  = "YEARS"
+    value = 1
+  }
+}
+
+resource "aws_acm_certificate" "root_vpn_client_certificate" {
+  private_key = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
+  certificate_body = aws_acmpca_certificate.root_vpn_client_certificate.certificate
+  certificate_chain = aws_acmpca_certificate.root_vpn_client_certificate.certificate_chain
 
   lifecycle {
     create_before_destroy = true
@@ -115,36 +235,21 @@ resource "aws_acm_certificate" "vpn_client_root" {
 
   tags = {
     Name = "certificate"
-    Scope = "vpn_client_root"
+    Scope = "vpn_client"
     Environment = "vpn"
   }
 }
 
-resource "aws_acm_certificate_validation" "vpn_client_root" {
-  certificate_arn = aws_acm_certificate.vpn_client_root.arn
-  
-  validation_record_fqdns = [for record in aws_route53_record.omega_dns_record_vpn_client : record.fqdn]
+output "root_vpn_client_certificate_private_key" {
+  description = "VPN Client Root Certificate Private Key"
+  value = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
 
-  timeouts {
-    create = "60m"
-  }
+  sensitive = true
 }
 
-resource "aws_route53_record" "omega_dns_record_vpn_client" {
-  for_each = {
-    for dvo in aws_acm_certificate.vpn_client_root.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
-
-  allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
-  ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can reduce this to 1 or 2 minutes
-  type            = each.value.type
-  zone_id         = resource.aws_route53_zone.omega_dns.zone_id
+output "root_vpn_client_certificate" {
+  description = "VPN Client Root Certificate"
+  value = aws_acmpca_certificate.root_vpn_client_certificate.certificate
 }
 
 module "vpn_access_security_group" {
@@ -226,12 +331,13 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   
   client_cidr_block = "10.255.252.0/22"
   split_tunnel = true
-  
-  server_certificate_arn = aws_acm_certificate_validation.vpn_server.certificate_arn
+
+  server_certificate_arn = aws_acm_certificate.vpn_server.arn
 
   authentication_options {
     type = "certificate-authentication"
-    root_certificate_chain_arn = aws_acm_certificate_validation.vpn_client_root.certificate_arn
+    root_certificate_chain_arn = aws_acm_certificate.root_vpn_client_certificate.arn
+    # root_certificate_chain_arn = aws_acmpca_certificate.root_vpn_client_certificate.certificate_chain  # TODO(AR) is this better than the above line?
   }
 
   connection_log_options {
