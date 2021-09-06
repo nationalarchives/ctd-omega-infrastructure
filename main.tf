@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.55.0"
+      version = "~> 3.57.0"
     }
   }
 
@@ -387,7 +387,7 @@ resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_rule" {
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
-  version = "3.6.0"
+  version = "3.7.0"
 
   name = "tna_ct_omega_vpc"
 
