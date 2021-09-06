@@ -438,6 +438,67 @@ module "vpc" {
   }
 }
 
+# TODO (AR) do we want to log all VPC traffic in production - or just for debugging?
+resource "aws_flow_log" "vpc_flow_log" {
+  log_destination = aws_cloudwatch_log_group.vpc_log_group.arn
+  iam_role_arn    = aws_iam_role.vpc_log_group_iam_role.arn
+  traffic_type    = "ALL"
+  vpc_id          = module.vpc.vpc_id
+}
+
+resource "aws_cloudwatch_log_group" "vpc_log_group" {
+  name = "vpc_log_group"
+  retention_in_days = 7
+  tags = {
+    Name = "log_group"
+    Environment = "all"
+  }
+}
+
+resource "aws_iam_role" "vpc_log_group_iam_role" {
+  name = "vpc_log_group_iam_role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "vpc-flow-logs.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "vpc_log_group_iam_role_policy" {
+  name = "vpc_log_group_iam_role_policy"
+  role = aws_iam_role.vpc_log_group_iam_role.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
 output "omega_vpc" {
   description = "Omega VPC"
   value = module.vpc.vpc_id
