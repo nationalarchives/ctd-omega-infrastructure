@@ -433,7 +433,7 @@ module "vpc" {
   #reuse_nat_ips       = true             # <= Skip creation of EIPs for the NAT Gateways
   #external_nat_ip_ids = aws_eip.nat.*.id # <= IPs specified here as input to the module
 
-  tags = {
+  vpc_tags = {
     Name = "vpc"
   }
 }
