@@ -445,7 +445,7 @@ data "aws_ami" "amazon_linux_2" {
   }
 }
 
-module "dev_workstation_secuirty_group" {
+module "dev_workstation_security_group" {
   source = "terraform-aws-modules/security-group/aws"
   version = "4.3.0"
 
@@ -527,7 +527,7 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
-      module.dev_workstation_secuirty_group.security_group_id
+      module.dev_workstation_security_group.security_group_id
   ]
 
   tags = {
