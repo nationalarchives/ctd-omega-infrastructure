@@ -16,6 +16,8 @@ terraform {
 locals {
   aws_region = "eu-west-2"
   aws_azs = ["${local.aws_region}a"]
+
+  private_dns_domain = "in.cat.nationalarchives.gov.uk"
 }
 
 provider "aws" {
@@ -418,9 +420,6 @@ module "vpc" {
   #reuse_nat_ips       = true             # <= Skip creation of EIPs for the NAT Gateways
   #external_nat_ip_ids = aws_eip.nat.*.id # <= IPs specified here as input to the module
 
-  enable_dns_hostnames = true
-  enable_dns_support = true
-
   tags = {
     Name = "vpc"
   }
@@ -429,6 +428,38 @@ module "vpc" {
 output "omega_vpc" {
   description = "Omega VPC"
   value = module.vpc.vpc_id
+}
+
+resource "aws_route53_zone" "omega_private_dns" {
+  name = local.private_dns_domain
+
+  vpc {
+    vpc_id = module.vpc.vpc_id
+  }
+
+  tags = {
+    name = "dns_zone"
+  }
+}
+
+output "omega_private_dns_servers" {
+  description = "DNS Servers for Omega Internal"
+  value = aws_route53_zone.omega_private_dns.name_servers
+}
+
+resource "aws_vpc_dhcp_options" "vpc_dhcp_options" {
+  domain_name          = local.private_dns_domain
+  #domain_name_servers  = aws_route53_zone.omega_private_dns.name_servers   # TODO(AR) how do we get IP of the name servers? do we need our own?
+  domain_name_servers  = ["AmazonProvidedDNS"]
+
+  tags = {
+    Name = "vpc_dhcp_options"
+  }
+}
+
+resource "aws_vpc_dhcp_options_association" "dns_resolver" {
+  vpc_id          = module.vpc.vpc_id
+  dhcp_options_id = aws_vpc_dhcp_options.vpc_dhcp_options.id
 }
 
 data "aws_ami" "amazon_linux_2" {
@@ -537,6 +568,10 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
   }
 }
 
+data "aws_network_interface" "dev_workstation_1_private_interface" {
+  id = aws_network_interface.dev_workstation_1_private_interface.id
+}
+
 resource "aws_network_interface" "dev_workstation_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev Workstation 1"
   subnet_id          = module.vpc.intra_subnets[0]
@@ -600,6 +635,14 @@ resource "aws_instance" "dev_workstation_1" {
   }
 }
 
+resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_dns.zone_id
+  name    = "dev1.in.cat.nationalarchives.gov.uk"
+  type    = "A"
+  ttl     = "300"
+  records = data.aws_network_interface.dev_workstation_1_private_interface.private_ips
+}
+
 resource "aws_network_interface" "dev_mssql_server_1_internal_interface" {
   description        = "Internal Subnet Interface for Dev MS SQL Server 1"
   subnet_id          = module.vpc.intra_subnets[0]
@@ -611,6 +654,10 @@ resource "aws_network_interface" "dev_mssql_server_1_internal_interface" {
     Network     = "internal"
     Environment = "dev"
   }
+}
+
+data "aws_network_interface" "dev_mssql_server_1_internal_interface" {
+  id = aws_network_interface.dev_mssql_server_1_internal_interface.id
 }
 
 resource "aws_instance" "mssql_server_1" {
@@ -691,6 +738,14 @@ resource "aws_instance" "mssql_server_1" {
     Name        = "dev_mssql_server"
     Environment = "dev"
   }
+}
+
+resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_dns.zone_id
+  name    = "mssql1.in.cat.nationalarchives.gov.uk"
+  type    = "A"
+  ttl     = "300"
+  records = data.aws_network_interface.dev_mssql_server_1_internal_interface.private_ips
 }
 
 
