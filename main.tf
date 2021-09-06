@@ -425,6 +425,8 @@ module "vpc" {
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
 
+  manage_default_network_acl = true
+  
   # TODO (AR) are these needed still
   #enable_nat_gateway  = true
   #single_nat_gateway  = false
