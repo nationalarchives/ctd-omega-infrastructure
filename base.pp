@@ -148,7 +148,11 @@ exec { 'enable-epel':
 	path => '/usr/bin'
 }
 -> exec { 'clean-yum-metadata':
-	command => 'yum clean metadata',
+	command => 'yum -y clean metadata',
+	path => '/usr/bin'
+}
+-> exec { 'yum-update':
+	command => 'yum -y update',
 	path => '/usr/bin'
 } 
 -> package { 'epel-release':
