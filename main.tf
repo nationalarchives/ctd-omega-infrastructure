@@ -798,21 +798,60 @@ resource "aws_key_pair" "omega_admin_key_pair" {
 }
 
 data "cloudinit_config" "dev_workstation" {
-  gzip = false
+  gzip = true
   base64_encode = true
 
   part {
-    content_type = "text/x-shellscript"
-    filename = "install-puppet-agent.sh"
+    content_type = "text/cloud-config"
+    filename = "yum-upgrade.yaml"
     content = <<EOF
-sudo rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
-sudo yum -y install puppet
-sudo /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib
-sudo /opt/puppetlabs/bin/puppet module install saz-ssh
-sudo /opt/puppetlabs/bin/puppet module install domkrm-ufw
-sudo /opt/puppetlabs/bin/puppet module install puppet-yum
-sudo /opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
-sudo /opt/puppetlabs/bin/puppet module install puppetlabs-vcsrepo
+#cloud-config
+package_update: true
+package_upgrade: true
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-01-install-puppet.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
+yum -y install puppet
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-02-install-puppet-modules.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
+/opt/puppetlabs/bin/puppet module install saz-ssh
+/opt/puppetlabs/bin/puppet module install domkrm-ufw
+/opt/puppetlabs/bin/puppet module install puppet-yum
+/opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
+/opt/puppetlabs/bin/puppet module install puppetlabs-vcsrepo
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-03-install-puppet-scripts.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+mkdir /root/omega-puppet-scripts
+echo '${filebase64("base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
+echo '${filebase64("developer-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/developer-vm.pp
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-04-run-puppet-scripts.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+/opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
 EOF
   }
 }
@@ -824,44 +863,6 @@ resource "aws_instance" "dev_workstation_1" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.dev_workstation.rendered
-
-  provisioner "file" {
-    source      = "base.pp"
-    destination = "/home/ec2-user/base.pp"
-
-    connection {
-      type     = "ssh"
-      agent = true
-      user     = "ec2-user"
-      host     = data.aws_network_interface.dev_workstation_1_private_interface.private_ips[0]
-    }
-  }
-
-  provisioner "file" {
-    source      = "developer-vm.pp"
-    destination = "/home/ec2-user/developer-vm.pp"
-
-    connection {
-      type     = "ssh"
-      agent = true
-      user     = "ec2-user"
-      host     = data.aws_network_interface.dev_workstation_1_private_interface.private_ips[0]
-    }
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo /opt/puppetlabs/bin/puppet apply /home/ec2-user/base.pp",
-      "sudo /opt/puppetlabs/bin/puppet apply /home/ec2-user/developer-vm.pp"
-    ]
-
-    connection {
-      type     = "ssh"
-      agent = true
-      user     = "ec2-user"
-      host     = data.aws_network_interface.dev_workstation_1_private_interface.private_ips[0]
-    }
-  }
 
   monitoring = false
 

@@ -4,7 +4,7 @@
 sudo rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
 sudo yum -y install puppet
 
-sudo /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib
+sudo /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
 sudo /opt/puppetlabs/bin/puppet module install saz-ssh
 sudo /opt/puppetlabs/bin/puppet module install domkrm-ufw
 sudo /opt/puppetlabs/bin/puppet module install puppet-yum
