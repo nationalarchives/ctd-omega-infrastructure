@@ -267,7 +267,7 @@ module "vpn_access_security_group" {
 
   computed_ingress_with_cidr_blocks = [
     {
-      description = "Incoming VPN connection"
+      description = "VPN TLS"
       from_port   = 443
       to_port     = 443
       protocol    = "udp"
@@ -279,7 +279,7 @@ module "vpn_access_security_group" {
 
   computed_ingress_with_ipv6_cidr_blocks = [
     {
-      description      = "Incoming VPN connection (IPv6)"
+      description      = "VPN TLS (IPv6)"
       from_port        = 443
       to_port          = 443
       protocol         = "udp"
@@ -301,7 +301,7 @@ module "vpn_access_security_group" {
 
   egress_with_ipv6_cidr_blocks = [
     {
-      description = "All"
+      description = "All (IPv6)"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
@@ -737,7 +737,7 @@ module "dev_workstation_security_group" {
 
   egress_with_ipv6_cidr_blocks = [
     {
-      description = "All"
+      description = "All (IPv6)"
       from_port   = 0
       to_port     = 0
       protocol    = "-1"
