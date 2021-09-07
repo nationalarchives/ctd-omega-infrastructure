@@ -310,7 +310,8 @@ module "vpn_access_security_group" {
   ]
 
   tags = {
-    Name        = "security_group"
+    Name        = "sg_dev_vpn"
+    Type = "security_group"
     Environment = "vpn"
   }
 }
@@ -746,7 +747,8 @@ module "dev_workstation_security_group" {
   ]
 
   tags = {
-    Name        = "security_group"
+    Name        = "sg_dev_workstation"
+    Type = "security_group"
     Environment = "dev"
   }
 }
