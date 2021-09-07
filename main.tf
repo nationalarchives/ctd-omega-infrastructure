@@ -277,8 +277,7 @@ module "vpn_access_security_group" {
       from_port   = 443
       to_port     = 443
       protocol    = "udp"
-      #cidr_blocks = "${module.vpc.private_subnets_cidr_blocks}"    # TODO(AR) why can't we use private subnet here?
-      cidr_blocks = module.vpc.vpc_cidr_block
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # This is vpc_private_subnet_dev_general
     }
   ]
   number_of_computed_ingress_with_cidr_blocks = 1
@@ -289,8 +288,7 @@ module "vpn_access_security_group" {
       from_port        = 443
       to_port          = 443
       protocol         = "udp"
-      #ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks
-      ipv6_cidr_blocks = module.vpc.vpc_ipv6_cidr_block
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # This is vpc_private_subnet_dev_general (IPv6)
     }
   ]
   number_of_computed_ingress_with_ipv6_cidr_blocks = 1
@@ -367,15 +365,22 @@ output "omega_client_vpn_endpoint" {
   value = aws_ec2_client_vpn_endpoint.vpn.dns_name
 }
 
-data "aws_subnet_ids" "vpc_subnet_ids" {
+data "aws_subnet" "vpc_private_subnet_dev_general_id" {
   vpc_id = module.vpc.vpc_id
+  cidr_block = module.vpc.private_subnets_cidr_blocks[0] # This is vpc_private_subnet_dev_general
 }
 
-resource "aws_ec2_client_vpn_network_association" "vpn_subnets" {
+data "aws_subnet" "vpc_private_subnet_dev_general_ipv6_id" {
+  vpc_id = module.vpc.vpc_id
+  ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # This is vpc_private_subnet_dev_general (IPv6)
+}
+
+resource "aws_ec2_client_vpn_network_association" "vpn_for_vpc_private_subnet_dev_general" {
   count = 1
 
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
-  subnet_id = tolist(data.aws_subnet_ids.vpc_subnet_ids.ids)[count.index]  # This is the dev_private_subnet
+  subnet_id = data.aws_subnet.vpc_private_subnet_dev_general_id.id  # NOTE: restricted to vpc_private_subnet_dev_general
+
   security_groups = [
     module.vpn_access_security_group.security_group_id
   ]
@@ -388,10 +393,9 @@ resource "aws_ec2_client_vpn_network_association" "vpn_subnets" {
   }
 }
 
-resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_rule" {
+resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_for_vpc_private_subnet_dev_general" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
-  # target_network_cidr = module.vpc.private_subnets_cidr_blocks  # TODO(AR) why can't we use private subnet here?
-  target_network_cidr = module.vpc.vpc_cidr_block
+  target_network_cidr = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
   authorize_all_groups = true
 }
 
