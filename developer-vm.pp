@@ -5,32 +5,8 @@
 include ::ufw
 include 'yum'
 
-package { 'deltarpm':
-	ensure => installed
-}
-
 # TODO(AR) is this okay for overriding the 'ufw' package in the 'ufw' module
 Package <| title == 'ufw' |> { require => Package["epel-release"] }
-
-package { 'screen':
-	ensure => installed
-}
-
-package { 'git':
-	ensure => installed
-}
-
-exec { 'enable-epel':
-        command => 'amazon-linux-extras enable epel',
-	path => '/usr/bin'
-}
--> exec { 'clean-yum-metadata':
-	command => 'yum clean metadata',
-	path => '/usr/bin'
-} 
--> package { 'epel-release':
-	ensure => installed
-}
 
 package { 'java-11-amazon-corretto':
         ensure => installed
@@ -468,14 +444,6 @@ file { '/opt/fuseki':
         owner => 'root',
         group => 'root',
         require => Exec['install-fuseki']
-}
-
-file { '/home/ec2-user/code':
-	ensure => directory,
-	replace => false,
-	owner => 'ec2-user',
-	group => 'ec2-user',
-	require => User['ec2-user']
 }
 
 file { '/home/ec2-user/code/pentaho-kettle':

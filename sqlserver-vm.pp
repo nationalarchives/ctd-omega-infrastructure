@@ -5,18 +5,6 @@
 include ::ufw
 include 'yum'
 
-exec { 'enable-epel':
-        command => 'amazon-linux-extras enable epel',
-	path => '/usr/bin'
-}
--> exec { 'clean-yum-metadata':
-	command => 'yum clean metadata',
-	path => '/usr/bin'
-} 
--> package { 'epel-release':
-	ensure => installed
-}
-
 # TODO(AR) is this okay for overriding the 'ufw' package in the 'ufw' module
 Package <| title == 'ufw' |> { require => Package["epel-release"] }
 
