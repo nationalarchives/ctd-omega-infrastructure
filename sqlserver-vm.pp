@@ -20,13 +20,32 @@ package { 'mssql-server':
 	notify => Exec['configure-mssql-server']
 }
 
+group { 'mssql':
+	ensure => present,
+	auth_membership => true,
+	system => true
+}
+
+user { 'mssql':
+	ensure => present,
+	gid => 'mssql',
+	comment => 'Microsoft SQL Server',
+	managehome => false,
+	home => '/var/opt/mssql',
+	shell => '/bin/bash',
+	require => Group['mssql']
+}
+
 file { '/mssql':
 	ensure => directory,
 	replace => false,
     owner => 'mssql',
     group => 'mssql',
 	mode => '0750',
-    require => Package['mssql-server']
+    require => [
+		User['mssql'],
+		Package['mssql-server']
+	]
 }
 
 file { '/mssql/data':
