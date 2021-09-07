@@ -937,6 +937,65 @@ data "aws_network_interface" "dev_mssql_server_1_database_interface" {
   id = aws_network_interface.dev_mssql_server_1_database_interface.id
 }
 
+data "cloudinit_config" "mssql_server" {
+  gzip = true
+  base64_encode = true
+
+  part {
+    content_type = "text/cloud-config"
+    filename = "yum-upgrade.yaml"
+    content = <<EOF
+#cloud-config
+package_update: true
+package_upgrade: true
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-01-install-puppet.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
+yum -y install puppet
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-02-install-puppet-modules.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
+/opt/puppetlabs/bin/puppet module install saz-ssh
+/opt/puppetlabs/bin/puppet module install domkrm-ufw
+/opt/puppetlabs/bin/puppet module install puppet-yum
+/opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
+/opt/puppetlabs/bin/puppet module install puppetlabs-vcsrepo
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-03-install-puppet-scripts.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+mkdir /root/omega-puppet-scripts
+echo '${filebase64("base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
+echo '${filebase64("sqlserver-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/sqlserver-vm.pp
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-04-run-puppet-scripts.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+/opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
+EOF
+  }
+}
+
 resource "aws_instance" "mssql_server_1" {
   ami           = data.aws_ami.amazon_linux_2.id
   instance_type = "r5.xlarge"
@@ -944,6 +1003,8 @@ resource "aws_instance" "mssql_server_1" {
   # r5.xlarge == $0.296 / hour == 4 vCPU == 32GiB RAM
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
+
+  user_data = data.cloudinit_config.mssql_server.rendered
 
   monitoring = true
 
