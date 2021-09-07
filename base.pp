@@ -16,13 +16,27 @@ package { 'zsh':
 	ensure => installed
 }
 
+group { 'sudo':
+	ensure => present,
+	auth_membership => true
+}
+
 user { 'ec2-user':
 	ensure => present,
-	groups => ['sudo'],
+	gid => 'ec2-user',
+	groups => [
+		'adm',
+		'wheel',
+		'sudo',
+		'systemd-journal'
+	],
 	comment => 'Default EC2 AWS User',
 	managehome => true,
 	shell => '/usr/bin/zsh',
-	require => Package['zsh']
+	require => [
+		Group['sudo'],
+		Package['zsh']
+	]
 }
 
 file { '/home/ec2-user':
