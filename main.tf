@@ -30,8 +30,8 @@ locals {
   vpc_private_subnet_dev_general_ipv6_prefixes = 0
 
   /* Private Subnet for databases used in Development */
-  vpc_intra_subnet_dev_databases = "10.128.238.96/27"
-  vpc_intra_subnet_dev_databases_ipv6_prefixes = 16
+  vpc_private_subnet_dev_databases = "10.128.238.96/27"
+  vpc_private_subnet_dev_databases_ipv6_prefixes = 16
 
   /* Public Subnet for Development */
   vpc_public_subnet_dev = "10.128.238.224/27"
@@ -46,7 +46,7 @@ provider "aws" {
 data "aws_partition" "current" {}
 
 resource "aws_eip" "vpc_subnet_nats" {
-  count = 1  # NOTE: must match the number of private subnets in the VPC!
+  count = 2  # NOTE: must match the number of private subnets in the VPC!
   vpc   = true
 }
 
@@ -419,23 +419,15 @@ module "vpc" {
   # Planning tool: https://tidalmigrations.com/subnet-builder/
 
   private_subnets = [
-    local.vpc_private_subnet_dev_general
+    local.vpc_private_subnet_dev_general,
+    local.vpc_private_subnet_dev_databases
   ]
   private_subnet_ipv6_prefixes = [
-    local.vpc_private_subnet_dev_general_ipv6_prefixes
+    local.vpc_private_subnet_dev_general_ipv6_prefixes,
+    local.vpc_private_subnet_dev_databases_ipv6_prefixes
   ]
   private_subnet_tags = {
     Type = "private_subnet"
-  }
-
-  intra_subnets   = [
-    local.vpc_intra_subnet_dev_databases
-  ]
-  intra_subnet_ipv6_prefixes = [
-    local.vpc_intra_subnet_dev_databases_ipv6_prefixes
-  ]
-  intra_subnet_tags = {
-      Type = "intra_subnet"
   }
 
   public_subnets = [
@@ -792,16 +784,16 @@ data "aws_network_interface" "dev_workstation_1_private_interface" {
   id = aws_network_interface.dev_workstation_1_private_interface.id
 }
 
-resource "aws_network_interface" "dev_workstation_1_internal_interface" {
-  description        = "Internal Subnet Interface for Dev Workstation 1"
-  subnet_id          = module.vpc.intra_subnets[0]
+resource "aws_network_interface" "dev_workstation_1_database_interface" {
+  description        = "Dev Database Subnet Interface for Dev Workstation 1"
+  subnet_id          = module.vpc.private_subnets[1]
   private_ips        = ["10.128.238.100"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
     Name        = "eth1_dev1"
     Type        = "secondary_network_interface"
-    Network     = "dev_internal"
+    Network     = "dev_database"
     Environment = "dev"
   }
 }
@@ -893,7 +885,7 @@ resource "aws_instance" "dev_workstation_1" {
   }
 
   network_interface {
-    network_interface_id = aws_network_interface.dev_workstation_1_internal_interface.id
+    network_interface_id = aws_network_interface.dev_workstation_1_database_interface.id
     device_index         = 1
   }
 
@@ -927,22 +919,22 @@ resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
   records = data.aws_network_interface.dev_workstation_1_private_interface.private_ips
 }
 
-resource "aws_network_interface" "dev_mssql_server_1_internal_interface" {
-  description        = "Internal Subnet Interface for Dev MS SQL Server 1"
-  subnet_id          = module.vpc.intra_subnets[0]
+resource "aws_network_interface" "dev_mssql_server_1_database_interface" {
+  description        = "Dev Database Subnet Interface for Dev MS SQL Server 1"
+  subnet_id          = module.vpc.private_subnets[1]
   private_ips        = ["10.128.238.126"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
     Name        = "eth0_mssql1"
     Type        = "primary_network_interface"
-    Network     = "dev_internal"
+    Network     = "dev_database"
     Environment = "dev"
   }
 }
 
-data "aws_network_interface" "dev_mssql_server_1_internal_interface" {
-  id = aws_network_interface.dev_mssql_server_1_internal_interface.id
+data "aws_network_interface" "dev_mssql_server_1_database_interface" {
+  id = aws_network_interface.dev_mssql_server_1_database_interface.id
 }
 
 resource "aws_instance" "mssql_server_1" {
@@ -956,7 +948,7 @@ resource "aws_instance" "mssql_server_1" {
   monitoring = true
 
   network_interface {
-    network_interface_id = aws_network_interface.dev_mssql_server_1_internal_interface.id
+    network_interface_id = aws_network_interface.dev_mssql_server_1_database_interface.id
     device_index         = 0
   }
 
@@ -1035,7 +1027,7 @@ resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
   name    = "mssql1.${local.private_dns_domain}"
   type    = "A"
   ttl     = "300"
-  records = data.aws_network_interface.dev_mssql_server_1_internal_interface.private_ips
+  records = data.aws_network_interface.dev_mssql_server_1_database_interface.private_ips
 }
 
 
