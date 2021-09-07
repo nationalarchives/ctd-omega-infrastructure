@@ -942,6 +942,24 @@ data "aws_network_interface" "dev_mssql_server_1_database_interface" {
   id = aws_network_interface.dev_mssql_server_1_database_interface.id
 }
 
+resource "random_password" "mssql_server_1_sa_password" {
+  length = 16
+  lower = true
+  upper = true
+  number = true
+  special = true
+  override_special = "@#$%"
+}
+
+resource "aws_secretsmanager_secret" "mssql_server_1_sa_password_secret" {
+  name = "/development/databases/mssql1/password/sa"
+}
+
+resource "aws_secretsmanager_secret_version" "mssql_server_1_sa_password_secret_version" {
+  secret_id     = aws_secretsmanager_secret.mssql_server_1_sa_password_secret.id
+  secret_string = random_password.mssql_server_1_sa_password.result
+}
+
 data "cloudinit_config" "mssql_server" {
   gzip = true
   base64_encode = true
@@ -1009,6 +1027,9 @@ resource "aws_instance" "mssql_server_1" {
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
+  depends_on = [
+    aws_secretsmanager_secret_version.mssql_server_1_sa_password_secret_version
+  ]
   user_data = data.cloudinit_config.mssql_server.rendered
 
   metadata_options {
