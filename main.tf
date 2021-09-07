@@ -260,8 +260,8 @@ module "vpn_access_security_group" {
   source = "terraform-aws-modules/security-group/aws"
   version = "4.3.0"
 
-  name        = "dev_workstation_security_group"
-  description = "Security group for Development Workstation ports open within VPC"
+  name        = "vpn_access_security_group"
+  description = "Security group for VPN Access"
 
   vpc_id = module.vpc.vpc_id
 
