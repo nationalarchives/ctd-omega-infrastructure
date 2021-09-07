@@ -956,13 +956,66 @@ resource "aws_secretsmanager_secret_version" "mssql_server_1_sa_password_secret_
   secret_string = random_password.mssql_server_1_sa_password.result
 }
 
+resource "aws_iam_role" "access_dev_passwords_iam_role" {
+  name = "access_dev_passwords_iam_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid = ""
+        Principal = {
+          
+          #Service = "ec2.amazonaws.com"
+          
+          AWS = "arn:aws:iam::320289993971:user/a-aretter"  # TODO(AR) temporarily set to myself
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "access_dev_passwords_iam_role_policy" {
+  name = "access_dev_passwords_iam_role_policy"
+  role = aws_iam_role.access_dev_passwords_iam_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Effect = "Allow"
+        Resource = [
+          aws_secretsmanager_secret.mssql_server_1_sa_password_secret.arn
+        ]
+      }
+    ]
+  })
+}
+
 data "cloudinit_config" "mssql_server" {
   gzip = true
   base64_encode = true
 
   part {
     content_type = "text/cloud-config"
-    filename = "yum-upgrade.yaml"
+    filename = "omega-mount-volumes.yaml"
+    content = <<EOF
+#cloud-config
+mounts:
+ - [ xvdb, /mssql/data, "xfs", "defaults,nofail", "0", "0" ]
+ - [ xvdc, /mssql/log, "xfs", "defaults,nofail", "0", "0" ]
+ - [ xvdd, /mssql/backup, "xfs", "defaults,nofail", "0", "0" ]
+EOF
+  }
+
+  part {
+    content_type = "text/cloud-config"
+    filename = "omega-yum-upgrade.yaml"
     content = <<EOF
 #cloud-config
 package_update: true
@@ -972,7 +1025,22 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-01-install-puppet.sh"
+    filename = "omega-01-format-and-mount-volumes.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+mkfs -t xfs /dev/xvdb
+mkfs -t xfs /dev/xvdc
+mkfs -t xfs /dev/xvdd
+
+mount /dev/xvdb
+mount /dev/xvdc
+mount /dev/xvdd
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-02-install-puppet.sh"
     content = <<EOF
 #!/usr/bin/env bash
 rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
@@ -982,7 +1050,7 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-02-install-puppet-modules.sh"
+    filename = "omega-03-install-puppet-modules.sh"
     content = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
@@ -996,7 +1064,7 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-03-install-puppet-scripts.sh"
+    filename = "omega-04-install-puppet-scripts.sh"
     content = <<EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
@@ -1007,7 +1075,7 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-04-run-puppet-scripts.sh"
+    filename = "omega-05-run-puppet-scripts.sh"
     content = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
