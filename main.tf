@@ -887,13 +887,15 @@ resource "aws_instance" "dev_workstation_1" {
     volume_size           = 500 # GiB
 
     tags = {
-      Name        = "primary_volume"
+      Name        = "root_dev1"
+      Type = "primary_volume"
       Environment = "dev"
     }
   }
 
   tags = {
-    Name        = "dev_workstation"
+    Name        = "dev1"
+    Type        = "dev_workstation"
     Environment = "dev"
   }
 }
@@ -947,7 +949,8 @@ resource "aws_instance" "mssql_server_1" {
     volume_size           = 60  # GiB
 
     tags = {
-      Name        = "primary_volume"
+      Name        = "root_mssql1"
+      Type        = "primary_volume"
       Environment = "dev"
     }
   }
@@ -962,7 +965,8 @@ resource "aws_instance" "mssql_server_1" {
     volume_size           = 150 # GiB
 
     tags = {
-      Name        = "mssql_data_volume"
+      Name        = "data_mssql1"
+      Type        = "mssql_data_volume"
       Environment = "dev"
     }
   }
@@ -977,7 +981,8 @@ resource "aws_instance" "mssql_server_1" {
     volume_size           = 75  # GiB
 
     tags = {
-      Name        = "mssql_log_volume"
+      Name        = "log_mssql1"
+      Type        = "mssql_log_volume"
       Environment = "dev"
     }
   }
@@ -992,13 +997,15 @@ resource "aws_instance" "mssql_server_1" {
     volume_size           = 150 # GiB
 
     tags = {
-      Name        = "mssql_backup_volume"
+      Name        = "backup_mssql1"
+      Type        = "mssql_backup_volume"
       Environment = "dev"
     }
   }
 
   tags = {
-    Name        = "dev_mssql_server"
+    Name = "mssql1"
+    Type        = "dev_mssql_server"
     Environment = "dev"
   }
 }
