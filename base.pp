@@ -42,10 +42,10 @@ user { 'ec2-user':
 file { '/home/ec2-user':
 	ensure => directory,
 	replace => false,
-    owner => 'ec2-user',
-    group => 'ec2-user',
-	mode => '0750',
-    require => User['ec2-user']
+	owner => 'ec2-user',
+	group => 'ec2-user',
+	mode => '0700',
+	require => User['ec2-user']
 }
 
 ssh_authorized_key { 'aretter@hollowcore.local':
