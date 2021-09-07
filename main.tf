@@ -710,19 +710,17 @@ module "dev_workstation_security_group" {
   computed_ingress_with_cidr_blocks = [
     {
       description = "SSH"
-      from_port   = 0
+      from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      #cidr_blocks = "${module.vpc.private_subnets_cidr_blocks}"    # TODO(AR) why can't we use private subnet here?
-      cidr_blocks = module.vpc.vpc_cidr_block
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       description = "RDP"
-      from_port   = 0
+      from_port   = 3389
       to_port     = 3389
       protocol    = "tcp"
-      #cidr_blocks = "${module.vpc.private_subnets_cidr_blocks}"   # TODO(AR) why can't we use private subnet here?
-      cidr_blocks = module.vpc.vpc_cidr_block
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     }
   ]
   number_of_computed_ingress_with_cidr_blocks = 2
@@ -730,19 +728,17 @@ module "dev_workstation_security_group" {
   computed_ingress_with_ipv6_cidr_blocks = [
     {
       description      = "SSH (IPv6)"
-      from_port        = 0
+      from_port        = 22
       to_port          = 22
       protocol         = "tcp"
-      #ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks
-      ipv6_cidr_blocks = module.vpc.vpc_ipv6_cidr_block
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
       description = "RDP (IPv6)"
-      from_port   = 0
+      from_port   = 3389
       to_port     = 3389
       protocol    = "tcp"
-      #ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks # TODO(AR) why can't we use private subnet here?
-      ipv6_cidr_blocks = module.vpc.vpc_ipv6_cidr_block # TODO(AR) why can't we use private subnet here?
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     }
   ]
   number_of_computed_ingress_with_ipv6_cidr_blocks = 2
