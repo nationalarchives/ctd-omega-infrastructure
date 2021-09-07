@@ -877,6 +877,11 @@ resource "aws_instance" "dev_workstation_1" {
 
   user_data = data.cloudinit_config.dev_workstation.rendered
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens = "required"
+  }
+
   monitoring = false
 
   network_interface {
@@ -1005,6 +1010,11 @@ resource "aws_instance" "mssql_server_1" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.mssql_server.rendered
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens = "required"
+  }
 
   monitoring = true
 
