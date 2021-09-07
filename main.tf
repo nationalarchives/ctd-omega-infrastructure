@@ -292,9 +292,9 @@ module "vpn_access_security_group" {
   egress_with_cidr_blocks = [
     {
       description = "All"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
       cidr_blocks = "0.0.0.0/0"
     }
   ]
@@ -302,9 +302,9 @@ module "vpn_access_security_group" {
   egress_with_ipv6_cidr_blocks = [
     {
       description = "All (IPv6)"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
       cidr_blocks = "2001:db8::/64"
     }
   ]
@@ -729,9 +729,9 @@ module "dev_workstation_security_group" {
   egress_with_cidr_blocks = [
     {
       description = "All"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
       cidr_blocks = "0.0.0.0/0"
     }
   ]
@@ -739,9 +739,9 @@ module "dev_workstation_security_group" {
   egress_with_ipv6_cidr_blocks = [
     {
       description = "All (IPv6)"
-      from_port   = 0
-      to_port     = 0
-      protocol    = "-1"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
       cidr_blocks = "2001:db8::/64"
     }
   ]
