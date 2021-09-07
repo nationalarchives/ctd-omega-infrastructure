@@ -30,7 +30,7 @@ user { 'ec2-user':
 		'sudo',
 		'systemd-journal'
 	],
-	comment => 'Default EC2 AWS User',
+	comment => 'EC2 Default User',
 	managehome => true,
 	shell => '/usr/bin/zsh',
 	require => [
