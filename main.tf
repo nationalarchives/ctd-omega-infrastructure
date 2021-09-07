@@ -704,7 +704,7 @@ module "dev_workstation_security_group" {
       cidr_blocks = module.vpc.vpc_cidr_block
     }
   ]
-  number_of_computed_ingress_with_cidr_blocks = 1
+  number_of_computed_ingress_with_cidr_blocks = 2
 
   computed_ingress_with_ipv6_cidr_blocks = [
     {
@@ -724,7 +724,7 @@ module "dev_workstation_security_group" {
       ipv6_cidr_blocks = module.vpc.vpc_ipv6_cidr_block # TODO(AR) why can't we use private subnet here?
     }
   ]
-  number_of_computed_ingress_with_ipv6_cidr_blocks = 1
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 2
 
   egress_with_cidr_blocks = [
     {
