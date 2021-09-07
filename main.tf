@@ -32,17 +32,9 @@ provider "aws" {
 data "aws_partition" "current" {}
 
 resource "aws_eip" "vpc_subnet_nats" {
-  count = 1  # TODO(AR) must match the number of private subnets in the VPC
+  count = 1  # NOTE: must match the number of private subnets in the VPC!
   vpc   = true
 }
-
-
-# TODO - Security Group for VPN -- should be SSH and RDP
-# TODO - NACL (Network ACLs) Rules for VPN -- in from SSH/RDP -- out from ALL
-# TODO - Certificate Manager - for VPN
-#  --- Need a Root Chain cert
-#  --- Need a Cert per User
-#  --- AWS will provide OVPN files for users
 
 resource "aws_route53_zone" "omega_public_dns" {
   name = local.public_dns_domain
@@ -55,7 +47,7 @@ resource "aws_route53_zone" "omega_public_dns" {
 resource "aws_route53_record" "omega_public_dns_nameservers" {
   allow_overwrite = true
   name = local.public_dns_domain
-  ttl             = 3600      # 1 Hour - TODO(AR) when all is working we can increase this to 24 or 48 hours
+  ttl             = 86400      # 24 Hours
   type            = "NS"
   zone_id         = aws_route53_zone.omega_public_dns.zone_id
   records = aws_route53_zone.omega_public_dns.name_servers
@@ -342,7 +334,6 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
   authentication_options {
     type = "certificate-authentication"
     root_certificate_chain_arn = aws_acm_certificate.root_vpn_client_certificate.arn
-    # root_certificate_chain_arn = aws_acmpca_certificate.root_vpn_client_certificate.certificate_chain  # TODO(AR) is this better than the above line?
   }
 
   connection_log_options {
@@ -650,7 +641,7 @@ output "omega_private_dns_servers" {
 
 resource "aws_vpc_dhcp_options" "vpc_dhcp_options" {
   domain_name          = local.private_dns_domain
-  #domain_name_servers  = aws_route53_zone.omega_private_dns.name_servers   # TODO(AR) how do we get IP of the name servers? do we need our own?
+  #domain_name_servers  = aws_route53_zone.omega_private_dns.name_servers   # TODO(AR) how do we reesolve against our private_dns_domain?
   domain_name_servers  = ["AmazonProvidedDNS"]
 
   tags = {
@@ -1023,6 +1014,4 @@ resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
 
 
 # TODO(AR) - how about scheduled startup times each day? -- AWS Instance Scheduler -- https://registry.terraform.io/modules/diodonfrost/lambda-scheduler-stop-start/aws/latest
-
-# TODO(AR) - how to initiate Puppet?
 
