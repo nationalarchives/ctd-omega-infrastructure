@@ -764,8 +764,9 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
   ]
 
   tags = {
-    Name        = "primary_network_interface"
-    Network     = "private"
+    Name        = "eth0_dev1"
+    Type        = "primary_network_interface"
+    Network     = "dev_private"
     Environment = "dev"
   }
 }
@@ -781,8 +782,9 @@ resource "aws_network_interface" "dev_workstation_1_internal_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
-    Name        = "secondary_network_interface"
-    Network     = "internal"
+    Name        = "eth1_dev1"
+    Type        = "secondary_network_interface"
+    Network     = "dev_internal"
     Environment = "dev"
   }
 }
@@ -915,8 +917,9 @@ resource "aws_network_interface" "dev_mssql_server_1_internal_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
-    Name        = "primary_network_interface"
-    Network     = "internal"
+    Name        = "eth0_mssql1"
+    Type        = "primary_network_interface"
+    Network     = "dev_internal"
     Environment = "dev"
   }
 }
