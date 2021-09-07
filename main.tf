@@ -22,6 +22,20 @@ locals {
   private_dns_domain = "in.cat.nationalarchives.gov.uk"
 
   vpn_client_cidr_block = "10.255.252.0/22"
+
+  vpc_cidr_block = "10.128.238.0/24"
+
+  /* Private Subnet for General Development */
+  vpc_private_subnet_dev_general = "10.128.238.0/27"
+  vpc_private_subnet_dev_general_ipv6_prefixes = 0
+
+  /* Private Subnet for databases used in Development */
+  vpc_intra_subnet_dev_databases = "10.128.238.96/27"
+  vpc_intra_subnet_dev_databases_ipv6_prefixes = 16
+
+  /* Public Subnet for Development */
+  vpc_public_subnet_dev = "10.128.238.224/27"
+  vpc_public_subnet_dev_ipv6_prefixes = 128
 }
 
 provider "aws" {
@@ -387,7 +401,7 @@ module "vpc" {
 
   name = "tna_ct_omega_vpc"
 
-  cidr = "10.128.238.0/24"
+  cidr = local.vpc_cidr_block
 
   azs = local.aws_azs
 
@@ -400,22 +414,34 @@ module "vpc" {
   # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv6
   # Planning tool: https://tidalmigrations.com/subnet-builder/
 
-  private_subnets = ["10.128.238.0/27"]     # dev_private_subnet
-  private_subnet_ipv6_prefixes    = [0]
+  private_subnets = [
+    local.vpc_private_subnet_dev_general
+  ]
+  private_subnet_ipv6_prefixes = [
+    local.vpc_private_subnet_dev_general_ipv6_prefixes
+  ]
   private_subnet_tags = {
-    Name = "dev_private_subnet"
+    Type = "private_subnet"
   }
 
-  intra_subnets   = ["10.128.238.96/27"]   # dev_intra_subnet
-  intra_subnet_ipv6_prefixes      = [16]
+  intra_subnets   = [
+    local.vpc_intra_subnet_dev_databases
+  ]
+  intra_subnet_ipv6_prefixes = [
+    local.vpc_intra_subnet_dev_databases_ipv6_prefixes
+  ]
   intra_subnet_tags = {
-      Name = "dev_intra_subnet"
+      Type = "intra_subnet"
   }
 
-  public_subnets = ["10.128.238.224/27"]   # public_subnet
-  public_subnet_ipv6_prefixes      = [128]
+  public_subnets = [
+    local.vpc_public_subnet_dev
+  ]
+  public_subnet_ipv6_prefixes = [
+    local.vpc_public_subnet_dev_ipv6_prefixes
+  ]
   public_subnet_tags = {
-      Name = "public_subnet"
+      Type = "public_subnet"
   }
 
   enable_ipv6                     = true
