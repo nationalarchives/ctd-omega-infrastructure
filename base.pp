@@ -21,6 +21,10 @@ group { 'sudo':
 	auth_membership => true
 }
 
+group { 'ec2-user':
+	ensure => present
+}
+
 user { 'ec2-user':
 	ensure => present,
 	gid => 'ec2-user',
