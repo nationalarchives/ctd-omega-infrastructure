@@ -415,15 +415,15 @@ GenericName=Slack
 }
 
 exec { 'install-jena':
-        command => 'curl https://downloads.apache.org/jena/binaries/apache-jena-4.1.0.tar.gz | tar zxv -C /opt',
+        command => 'curl https://downloads.apache.org/jena/binaries/apache-jena-4.2.0.tar.gz | tar zxv -C /opt',
         path => '/usr/bin',
-        creates => '/opt/apache-jena-4.1.0',
+        creates => '/opt/apache-jena-4.2.0',
         require => Package['curl']
 }
 
 file { '/opt/jena':
         ensure => link,
-        target => '/opt/apache-jena-4.1.0',
+        target => '/opt/apache-jena-4.2.0',
         replace => false,
         owner => 'root',
         group => 'root',
@@ -431,15 +431,15 @@ file { '/opt/jena':
 }
 
 exec { 'install-fuseki':
-        command => 'curl https://downloads.apache.org/jena/binaries/apache-jena-fuseki-4.1.0.tar.gz | tar zxv -C /opt',
+        command => 'curl https://downloads.apache.org/jena/binaries/apache-jena-fuseki-4.2.0.tar.gz | tar zxv -C /opt',
         path => '/usr/bin',
-        creates => '/opt/apache-jena-fuseki-4.1.0',
+        creates => '/opt/apache-jena-fuseki-4.2.0',
         require => Package['curl']
 }
 
 file { '/opt/fuseki':
         ensure => link,
-        target => '/opt/apache-jena-fuseki-4.1.0',
+        target => '/opt/apache-jena-fuseki-4.2.0',
         replace => false,
         owner => 'root',
         group => 'root',
