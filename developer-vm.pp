@@ -21,6 +21,24 @@ exec { 'enable-corretto-8':
 	ensure => installed
 }
 
+exec { 'java-11-as-default':
+        command => 'alternatives --set java /usr/lib/jvm/java-11-amazon-corretto.x86_64/bin/java',
+        user => 'root',
+        require => [
+                Package['java-1.8.0-amazon-corretto-devel'],
+                Package['java-11-amazon-corretto']
+        ]
+}
+
+exec { 'javac-11-as-default':
+        command => 'alternatives --set javac /usr/lib/jvm/java-11-amazon-corretto.x86_64/bin/javac',
+        user => 'root',
+        require => [
+                Package['java-1.8.0-amazon-corretto-devel'],
+                Package['java-11-amazon-corretto']
+        ]
+}
+
 file { '/etc/profile.d/set-java-home.sh':
         content => 'export JAVA_HOME=/usr/lib/jvm/java',
         owner => 'root',
