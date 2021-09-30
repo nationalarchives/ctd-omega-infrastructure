@@ -797,6 +797,78 @@ resource "aws_network_interface" "dev_workstation_1_database_interface" {
   }
 }
 
+resource "aws_network_interface" "dev_workstation_2_private_interface" {
+  description        = "Private Subnet Interface for Dev Workstation 2"
+  subnet_id          = module.vpc.private_subnets[0]
+  private_ips        = ["10.128.238.5"]
+  ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
+
+  security_groups = [
+      module.dev_workstation_security_group.security_group_id
+  ]
+
+  tags = {
+    Name        = "eth0_dev2"
+    Type        = "primary_network_interface"
+    Network     = "dev_private"
+    Environment = "dev"
+  }
+}
+
+data "aws_network_interface" "dev_workstation_2_private_interface" {
+  id = aws_network_interface.dev_workstation_2_private_interface.id
+}
+
+resource "aws_network_interface" "dev_workstation_2_database_interface" {
+  description        = "Dev Database Subnet Interface for Dev Workstation 2"
+  subnet_id          = module.vpc.private_subnets[1]
+  private_ips        = ["10.128.238.101"]
+  ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
+
+  tags = {
+    Name        = "eth1_dev2"
+    Type        = "secondary_network_interface"
+    Network     = "dev_database"
+    Environment = "dev"
+  }
+}
+
+resource "aws_network_interface" "dev_workstation_3_private_interface" {
+  description        = "Private Subnet Interface for Dev Workstation 3"
+  subnet_id          = module.vpc.private_subnets[0]
+  private_ips        = ["10.128.238.6"]
+  ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
+
+  security_groups = [
+      module.dev_workstation_security_group.security_group_id
+  ]
+
+  tags = {
+    Name        = "eth0_dev3"
+    Type        = "primary_network_interface"
+    Network     = "dev_private"
+    Environment = "dev"
+  }
+}
+
+data "aws_network_interface" "dev_workstation_3_private_interface" {
+  id = aws_network_interface.dev_workstation_3_private_interface.id
+}
+
+resource "aws_network_interface" "dev_workstation_3_database_interface" {
+  description        = "Dev Database Subnet Interface for Dev Workstation 3"
+  subnet_id          = module.vpc.private_subnets[1]
+  private_ips        = ["10.128.238.102"]
+  ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
+
+  tags = {
+    Name        = "eth1_dev3"
+    Type        = "secondary_network_interface"
+    Network     = "dev_database"
+    Environment = "dev"
+  }
+}
+
 resource "aws_key_pair" "omega_admin_key_pair" {
   key_name = "omega-admin-key-pair"
 
@@ -868,6 +940,7 @@ EOF
   }
 }
 
+# Dev Workstation for Adam Retter
 resource "aws_instance" "dev_workstation_1" {
   ami           = data.aws_ami.amazon_linux_2.id
   instance_type = "m5a.2xlarge"
@@ -921,6 +994,118 @@ resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.dev_workstation_1_private_interface.private_ips
+}
+
+# Dev Workstation for Rob Walpole
+resource "aws_instance" "dev_workstation_2" {
+  ami           = data.aws_ami.amazon_linux_2.id
+  instance_type = "m5a.2xlarge"
+
+  key_name = aws_key_pair.omega_admin_key_pair.key_name
+
+  user_data = data.cloudinit_config.dev_workstation.rendered
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens = "required"
+  }
+
+  monitoring = false
+
+  network_interface {
+    network_interface_id = aws_network_interface.dev_workstation_2_private_interface.id
+    device_index         = 0
+  }
+
+  network_interface {
+    network_interface_id = aws_network_interface.dev_workstation_2_database_interface.id
+    device_index         = 1
+  }
+
+  root_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125 # MiB/s
+    volume_size           = 500 # GiB
+
+    tags = {
+      Name        = "root_dev2"
+      Type = "primary_volume"
+      Environment = "dev"
+    }
+  }
+
+  tags = {
+    Name        = "dev2"
+    Type        = "dev_workstation"
+    Environment = "dev"
+  }
+}
+
+resource "aws_route53_record" "dns_a_dev2_in_cat_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_dns.zone_id
+  name    = "dev2.${local.private_dns_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = data.aws_network_interface.dev_workstation_2_private_interface.private_ips
+}
+
+# Dev Workstation for Jaishree Davey
+resource "aws_instance" "dev_workstation_3" {
+  ami           = data.aws_ami.amazon_linux_2.id
+  instance_type = "m5a.2xlarge"
+
+  key_name = aws_key_pair.omega_admin_key_pair.key_name
+
+  user_data = data.cloudinit_config.dev_workstation.rendered
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens = "required"
+  }
+
+  monitoring = false
+
+  network_interface {
+    network_interface_id = aws_network_interface.dev_workstation_3_private_interface.id
+    device_index         = 0
+  }
+
+  network_interface {
+    network_interface_id = aws_network_interface.dev_workstation_3_database_interface.id
+    device_index         = 1
+  }
+
+  root_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125 # MiB/s
+    volume_size           = 500 # GiB
+
+    tags = {
+      Name        = "root_dev3"
+      Type = "primary_volume"
+      Environment = "dev"
+    }
+  }
+
+  tags = {
+    Name        = "dev3"
+    Type        = "dev_workstation"
+    Environment = "dev"
+  }
+}
+
+resource "aws_route53_record" "dns_a_dev3_in_cat_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_dns.zone_id
+  name    = "dev3.${local.private_dns_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = data.aws_network_interface.dev_workstation_3_private_interface.private_ips
 }
 
 resource "aws_network_interface" "dev_mssql_server_1_database_interface" {
