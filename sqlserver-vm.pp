@@ -16,8 +16,7 @@ exec { 'add-mssql-server-repo':
 
 package { 'mssql-server':
 	ensure => installed,
-	require => Exec['add-mssql-server-repo'],
-	notify => Exec['configure-mssql-server']
+	require => Exec['add-mssql-server-repo']
 }
 
 group { 'mssql':
