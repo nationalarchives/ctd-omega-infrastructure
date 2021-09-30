@@ -35,6 +35,30 @@ user { 'mssql':
 	require => Group['mssql']
 }
 
+file { '/opt/mssql':
+	ensure => directory,
+	replace => false,
+	owner => 'mssql',
+	group => 'mssql',
+	mode => '0750',
+	require => [
+		User['mssql'],
+		Package['mssql-server']
+	]
+}
+
+file { '/var/opt/mssql':
+	ensure => directory,
+	replace => false,
+	owner => 'mssql',
+	group => 'mssql',
+	mode => '0750',
+	require => [
+		User['mssql'],
+		Package['mssql-server']
+	]
+}
+
 file { '/mssql':
 	ensure => directory,
 	replace => false,
