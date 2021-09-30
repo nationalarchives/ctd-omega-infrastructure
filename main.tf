@@ -959,8 +959,9 @@ resource "aws_secretsmanager_secret_version" "mssql_server_1_sa_password_secret_
   secret_string = random_password.mssql_server_1_sa_password.result
 }
 
-resource "aws_iam_role" "access_dev_passwords_iam_role" {
+resource "aws_iam_role" "access_dev_mssql_password_iam_role" {
   name = "access_dev_passwords_iam_role"
+  path = "/development/"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -968,36 +969,46 @@ resource "aws_iam_role" "access_dev_passwords_iam_role" {
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid = ""
+        Sid    = ""
         Principal = {
-          
-          #Service = "ec2.amazonaws.com"
-          
-          AWS = "arn:aws:iam::320289993971:user/a-aretter"  # TODO(AR) temporarily set to myself
+          Service = "ec2.amazonaws.com"
         }
-      }
+      },
     ]
   })
-}
 
-resource "aws_iam_role_policy" "access_dev_passwords_iam_role_policy" {
-  name = "access_dev_passwords_iam_role_policy"
-  role = aws_iam_role.access_dev_passwords_iam_role.id
+  inline_policy {
+    name = "access_dev_mssql_password_iam_policy"
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "secretsmanager:GetSecretValue"
-        ]
-        Effect = "Allow"
-        Resource = [
-          aws_secretsmanager_secret.mssql_server_1_sa_password_secret.arn
-        ]
-      }
-    ]
-  })
+    policy = jsonencode({
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "secretsmanager:GetResourcePolicy",
+            "secretsmanager:GetSecretValue",
+            "secretsmanager:DescribeSecret",
+            "secretsmanager:ListSecretVersionIds"
+          ],
+          "Resource": aws_secretsmanager_secret.mssql_server_1_sa_password_secret.arn,
+          "Condition": {
+             "DateGreaterThan": { "aws:CurrentTime": timestamp() },
+             "DateLessThan": { "aws:CurrentTime": timeadd(timestamp(), "24h") }
+          }
+        },
+        {
+            "Effect": "Allow",
+            "Action": "secretsmanager:ListSecrets",
+            "Resource": "*"
+        }
+      ]
+    })
+  }
+
+  tags = {
+    Environment = "dev"
+  }
 }
 
 data "cloudinit_config" "mssql_server" {
@@ -1081,8 +1092,30 @@ EOF
     filename = "omega-05-run-puppet-scripts.sh"
     content = <<EOF
 #!/usr/bin/env bash
-/opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
+# Retrieve SA password from AWS Secrets Manager
+command="aws --output text --region ${local.aws_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.mssql_server_1_sa_password_secret.id} --query SecretString"
+max_retry=5
+counter=0
+until sa_password=$($command)
+do
+   sleep 1
+   [[ counter -eq $max_retry ]] && echo "Failed!" && exit 1
+   echo "Attempt #$counter - Unable to retrieve AWS Secret, trying again..."
+   ((counter++))
+done
+FACTER_sa_password=$sa_password /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
 EOF
+  }
+}
+
+resource "aws_iam_instance_profile" "dev_mssql_instance_iam_instance_profile" {
+  name = "dev_mssql_instance_iam_instance_profile"
+  path = "/development/"
+
+  role = aws_iam_role.access_dev_mssql_password_iam_role.name
+
+  tags = {
+    Environment = "dev"
   }
 }
 
@@ -1091,6 +1124,8 @@ resource "aws_instance" "mssql_server_1" {
   instance_type = "r5.xlarge"
   # m5a.2xlarge == $0.4 / hour == 8 vCPU == 32GiB RAM
   # r5.xlarge == $0.296 / hour == 4 vCPU == 32GiB RAM
+
+  iam_instance_profile = aws_iam_instance_profile.dev_mssql_instance_iam_instance_profile.name
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
