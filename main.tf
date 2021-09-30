@@ -2,6 +2,12 @@
 # Terraform Script for an AWS Cloud for Omega
 ###
 
+
+// TODO(AR) - Karl recommended - tools for checking AWS setup is secure - Scout... --- perhaps Steven Hirschorn could take a look at our Terraform and AWS estate just to verify... ta
+// TODO(AR) - Talk to Matt Besick for accrediation and penetration testing
+// TODO(AR) - How about scheduled startup times each day? -- AWS Instance Scheduler -- https://registry.terraform.io/modules/diodonfrost/lambda-scheduler-stop-start/aws/latest
+
+
 terraform {
   required_providers {
     aws = {
@@ -673,9 +679,6 @@ resource "aws_vpc_dhcp_options_association" "dns_resolver" {
 }
 
 data "aws_ami" "amazon_linux_2" {
-
-  # Likely to be AMI with id: ami-0d26eb3972b7f8c96
-
   most_recent = true
 
   owners = ["137112412989"] # Amazon Web Services
@@ -1185,7 +1188,3 @@ resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
   ttl     = "300"
   records = data.aws_network_interface.dev_mssql_server_1_database_interface.private_ips
 }
-
-
-# TODO(AR) - how about scheduled startup times each day? -- AWS Instance Scheduler -- https://registry.terraform.io/modules/diodonfrost/lambda-scheduler-stop-start/aws/latest
-
