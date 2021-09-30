@@ -549,3 +549,23 @@ vcsrepo { '/home/ec2-user/code/kettle-debug-plugins':
         require => File['/home/ec2-user/code/kettle-debug-plugins']
 }
 
+file { '/home/ec2-user/code/kettle-xml-extra-plugins':
+        ensure => directory,
+        replace => false,
+        owner => 'ec2-user',
+        group => 'ec2-user',
+        require => File['/home/ec2-user/code']
+}
+
+vcsrepo { '/home/ec2-user/code/kettle-xml-extra-plugins':
+        ensure => latest,
+        provider => git,
+        source => {
+                'origin' => 'https://github.com/nationalarchives/kettle-xml-extra-plugins.git'
+        },
+        revision => 'main',
+        keep_local_changes => true,
+        owner => 'ec2-user',
+        group => 'ec2-user',
+        require => File['/home/ec2-user/code/kettle-xml-extra-plugins']
+}
