@@ -22,7 +22,7 @@ exec { 'enable-corretto-8':
 }
 
 exec { 'java-11-as-default':
-        command => 'alternatives --set java /usr/lib/jvm/java-11-amazon-corretto.x86_64/bin/java',
+        command => '/usr/sbin/alternatives --set java /usr/lib/jvm/java-11-amazon-corretto.x86_64/bin/java',
         user => 'root',
         require => [
                 Package['java-1.8.0-amazon-corretto-devel'],
@@ -31,7 +31,7 @@ exec { 'java-11-as-default':
 }
 
 exec { 'javac-11-as-default':
-        command => 'alternatives --set javac /usr/lib/jvm/java-11-amazon-corretto.x86_64/bin/javac',
+        command => '/usr/sbin/alternatives --set javac /usr/lib/jvm/java-11-amazon-corretto.x86_64/bin/javac',
         user => 'root',
         require => [
                 Package['java-1.8.0-amazon-corretto-devel'],
