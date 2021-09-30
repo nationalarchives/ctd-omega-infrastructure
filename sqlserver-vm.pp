@@ -102,19 +102,22 @@ exec { 'configure-mssql-server':
 	environment => [
 		'MSSQL_PID=Developer',
 		'ACCEPT_EULA=Y',
-		"MSSQL_SA_PASSWORD=$facts['sa_password']",
+		"MSSQL_SA_PASSWORD=$sa_password",
 		'MSSQL_DATA_DIR=/mssql/data',
 		'MSSQL_LOG_DIR=/mssql/log',
 		'MSSQL_BACKUP_DIR=/mssql/backup'
 
 	],
-	command => 'mssql-conf -n setup',
-	path => '/opt/mssql/bin',
-	creates => '/opt/mssql/bin/sqlservr',
+	command => '/opt/mssql/bin/mssql-conf -n setup',
+	creates => '/var/opt/mssql/.system',
 	require => [
+		Package['mssql-server'],
+		File['/opt/mssql'],
+		File['/var/opt/mssql'],
 		File['/mssql/data'],
 		File['/mssql/log'],
-		File['/mssql/backup']
+		File['/mssql/backup'],
+		User['mssql']
 	]
 }
 
