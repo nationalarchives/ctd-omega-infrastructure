@@ -131,21 +131,25 @@ service { 'mssql-server':
 	]
 }
 
-package { 'mssql-tools':
-	ensure => installed,
-	install_options => [
-		{ 'ACCEPT_EULA' => 'Y' }
-	],
-	require => Exec['add-mssql-server-repo']
+exec { 'add-mssql-tools-repo':
+	command => 'yum-config-manager --add-repo https://packages.microsoft.com/config/rhel/7/prod.repo',
+	path => '/usr/bin',
+	creates => '/etc/yum.repos.d/prod.repo'
 }
 
+exec { 'install-mssql-tools' :
+  command => '/usr/bin/yum -y install mssql-tools',
+  environment => "ACCEPT_EULA=Y",
+  unless => "/usr/bin/yum list installed mssql-tools",
+  require => Exec['add-mssql-tools-repo']
+}
 
 file { '/etc/profile.d/append-mssql-tools-path.sh':
 	content => 'export PATH="${PATH}:/opt/mssql-tools/bin"',
 	owner => 'root',
 	group => 'root',
 	mode => '0644',
-	require => Package['mssql-tools']
+	require => Exec['install-mssql-tools']
 }
 
 # TODO(AR) should we only allow this on a private interface within the VPC for the VM?
