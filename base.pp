@@ -8,6 +8,16 @@
 include ::ufw
 include 'yum'
 
+exec { 'set-keymap-gb':
+	command => "/usr/bin/localectl set-keymap gb",
+	user => "root"
+}
+
+exec { 'set-locale-en-gb-utf8':
+	command => "/usr/bin/localectl set-locale LANG=en_GB.utf8",
+	user => "root"
+}
+
 package { 'deltarpm':
 	ensure => installed
 }
