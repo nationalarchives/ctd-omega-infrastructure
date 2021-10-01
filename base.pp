@@ -18,6 +18,11 @@ exec { 'set-locale-en-gb-utf8':
 	user => "root"
 }
 
+exec { 'set-timezone-europe-london':
+	command => "/usr/bin/timedatectl set-timezone Europe/London",
+	user => "root"
+}
+
 package { 'deltarpm':
 	ensure => installed
 }
