@@ -500,6 +500,12 @@ vcsrepo { '/home/ec2-user/code/pentaho-kettle':
 	require => File['/home/ec2-user/code/pentaho-kettle']
 }
 
+# NOTE: Required for Pentaho Kettle
+package { 'system-lsb-core':
+        ensure => installed,
+        require => File['/home/ec2-user/code/pentaho-kettle']
+}
+
 file { '/home/ec2-user/code/kettle-jena-plugins':
         ensure => directory,
         replace => false,
