@@ -631,3 +631,24 @@ vcsrepo { '/home/ec2-user/code/kettle-test-framework':
         group => 'ec2-user',
         require => File['/home/ec2-user/code/kettle-test-framework']
 }
+
+file { '/home/ec2-user/code/tna-cat':
+        ensure => directory,
+        replace => false,
+        owner => 'ec2-user',
+        group => 'ec2-user',
+        require => File['/home/ec2-user/code']
+}
+
+vcsrepo { '/home/ec2-user/code/tna-cat':
+        ensure => latest,
+        provider => git,
+        source => {
+                'origin' => 'https://github.com/nationalarchives/tna-cat.git'
+        },
+        revision => 'main',
+        keep_local_changes => true,
+        owner => 'ec2-user',
+        group => 'ec2-user',
+        require => File['/home/ec2-user/code/tna-cat']
+}
