@@ -500,6 +500,27 @@ vcsrepo { '/home/ec2-user/code/pentaho-kettle':
 	require => File['/home/ec2-user/code/pentaho-kettle']
 }
 
+file { '/home/ec2-user/code/pentaho-platform':
+        ensure => directory,
+        replace => false,
+        owner => 'ec2-user',
+        group => 'ec2-user',
+        require => File['/home/ec2-user/code']
+}
+
+vcsrepo { '/home/ec2-user/code/pentaho-platform':
+        ensure => latest,
+        provider => git,
+        source => {
+                'origin' => 'https://github.com/pentaho/pentaho-platform.git'
+        },
+        revision => '9.1.0.0',
+        keep_local_changes => true,
+        owner => 'ec2-user',
+        group => 'ec2-user',
+        require => File['/home/ec2-user/code/pentaho-platform']
+}
+
 # NOTE: Required for Pentaho Kettle
 package { 'system-lsb-core':
         ensure => installed,
