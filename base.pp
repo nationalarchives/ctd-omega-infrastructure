@@ -154,6 +154,10 @@ service { 'ntpd':
 	require => Package['ntp']
 }
 
+package { 'htop':
+	ensure => installed
+}
+
 package { 'screen':
 	ensure => installed
 }
