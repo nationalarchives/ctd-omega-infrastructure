@@ -192,6 +192,28 @@ GenericName=Microsoft Azure Data Studio
         ]
 }
 
+
+yum::install { 'diffmerge':
+        ensure => present,
+        source => 'https://download.sourcegear.com/DiffMerge/4.2.0/diffmerge-4.2.0.697.stable-1.x86_64.rpm',
+        require => Yum::Group['Xfce']
+}
+
+
+file { '/home/ec2-user/Desktop/diffmerge.desktop':
+        ensure => file,
+        owner => 'ec2-user',
+        group => 'ec2-user',
+        mode => '0766',
+        source => '/usr/share/applications/sourcegear.com-diffmerge.desktop',
+        require => [
+                User['ec2-user'],
+                Yum::Group['Xfce'],
+                File['/home/ec2-user/Desktop'],
+                Yum::Install['diffmerge']
+        ]
+}
+
 exec { 'install-intellij-ce':
         command => 'curl -L https://download.jetbrains.com/idea/ideaIC-2021.2.tar.gz | tar zxv -C /opt',
         path => '/usr/bin',
