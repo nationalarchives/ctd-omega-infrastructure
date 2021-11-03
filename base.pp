@@ -80,9 +80,11 @@ package { 'curl':
 }
 
 exec { 'install-ohmyzsh':
-	command => 'sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"',
-	path => '/usr/bin',
+	command => '/usr/bin/sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended',
 	user => 'ec2-user',
+	environment => [
+		'HOME=/home/ec2-user'
+	],
 	require => [
 		Package['curl'],
 		Package['zsh'],
@@ -90,6 +92,14 @@ exec { 'install-ohmyzsh':
 		User['ec2-user']
 	],
 	creates => '/home/ec2-user/.oh-my-zsh'
+}
+
+exec { 'chsh-ec2-user-zsh':
+	command => '/usr/bin/chsh -s /usr/bin/zsh ec2-user',
+	user => root,
+	subscribe => [
+		Exec['install-ohmyzsh']
+	]
 }
 
 package { 'openssh':
