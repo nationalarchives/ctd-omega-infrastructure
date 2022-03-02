@@ -986,6 +986,13 @@ resource "aws_instance" "dev_workstation_1" {
     Type        = "dev_workstation"
     Environment = "dev"
   }
+
+  lifecycle {
+    // The issue why we are ignoring changes is that updates
+    // to user_data cause Terraform to want to replace existing instances - we don't want that!
+    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
+    ignore_changes = [user_data]
+  }
 }
 
 resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
@@ -1042,6 +1049,13 @@ resource "aws_instance" "dev_workstation_2" {
     Type        = "dev_workstation"
     Environment = "dev"
   }
+
+  lifecycle {
+    // The issue why we are ignoring changes is that updates
+    // to user_data cause Terraform to want to replace existing instances - we don't want that!
+    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
+    ignore_changes = [user_data]
+  }
 }
 
 resource "aws_route53_record" "dns_a_dev2_in_cat_nationalarchives_gov_uk" {
@@ -1097,6 +1111,13 @@ resource "aws_instance" "dev_workstation_3" {
     Name        = "dev3"
     Type        = "dev_workstation"
     Environment = "dev"
+  }
+
+  lifecycle {
+    // The issue why we are ignoring changes is that updates
+    // to user_data cause Terraform to want to replace existing instances - we don't want that!
+    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
+    ignore_changes = [user_data]
   }
 }
 
@@ -1398,6 +1419,13 @@ resource "aws_instance" "mssql_server_1" {
     Name = "mssql1"
     Type        = "dev_mssql_server"
     Environment = "dev"
+  }
+
+  lifecycle {
+    // The issue why we are ignoring changes is that updates
+    // to user_data cause Terraform to want to replace existing instances - we don't want that!
+    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
+    ignore_changes = [user_data]
   }
 }
 
