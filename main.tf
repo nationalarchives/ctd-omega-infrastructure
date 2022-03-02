@@ -679,13 +679,13 @@ resource "aws_vpc_dhcp_options_association" "dns_resolver" {
 }
 
 data "aws_ami" "amazon_linux_2" {
-  most_recent = true
+  most_recent = false
 
   owners = ["137112412989"] # Amazon Web Services
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+    values = ["amzn2-ami-hvm-2.0.20210813.1-x86_64-gp2"]
   }
 }
 
