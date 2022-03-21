@@ -118,16 +118,16 @@ service { 'xrdp':
 }
 
 exec { 'install-maven':
-	command => 'curl -L https://downloads.apache.org/maven/maven-3/3.8.1/binaries/apache-maven-3.8.1-bin.tar.gz | tar zxv -C /opt',
+	command => 'curl -L https://archive.apache.org/dist/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz | tar zxv -C /opt',
 	path => '/usr/bin',
 	user => 'root',
-	creates => '/opt/apache-maven-3.8.1',
+	creates => '/opt/apache-maven-3.8.5',
 	require => Package['curl']
 }
 
 file { '/opt/maven':
         ensure => link,
-	target => '/opt/apache-maven-3.8.1',
+	target => '/opt/apache-maven-3.8.5',
         replace => false,
         owner => 'root',
         group => 'root',
@@ -479,7 +479,7 @@ GenericName=Slack
 }
 
 exec { 'install-jena':
-        command => 'curl https://downloads.apache.org/jena/binaries/apache-jena-4.2.0.tar.gz | tar zxv -C /opt',
+        command => 'curl https://archive.apache.org/dist/jena/binaries/apache-jena-4.2.0.tar.gz | tar zxv -C /opt',
         path => '/usr/bin',
         creates => '/opt/apache-jena-4.2.0',
         require => Package['curl']
@@ -495,7 +495,7 @@ file { '/opt/jena':
 }
 
 exec { 'install-fuseki':
-        command => 'curl https://downloads.apache.org/jena/binaries/apache-jena-fuseki-4.2.0.tar.gz | tar zxv -C /opt',
+        command => 'curl https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-4.2.0.tar.gz | tar zxv -C /opt',
         path => '/usr/bin',
         creates => '/opt/apache-jena-fuseki-4.2.0',
         require => Package['curl']
