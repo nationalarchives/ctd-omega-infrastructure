@@ -23,6 +23,12 @@ exec { 'set-timezone-europe-london':
 	user => "root"
 }
 
+exec { 'install-kernel-5.15':
+	command => 'amazon-linux-extras install kernel-5.15 -y',
+	path => '/usr/bin',
+	unless => "amazon-linux-extras list | grep -q 'kernel-5.4=.*enabled'"
+}
+
 package { 'deltarpm':
 	ensure => installed
 }
@@ -184,7 +190,8 @@ yum::install { 'github-cli':
 
 exec { 'enable-epel':
         command => 'amazon-linux-extras enable epel',
-	path => '/usr/bin'
+	path => '/usr/bin',
+	unless => "amazon-linux-extras list | grep -q 'epel=.*enabled'"
 }
 -> exec { 'clean-yum-metadata':
 	command => 'yum -y clean metadata',

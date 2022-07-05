@@ -8,6 +8,16 @@ include 'yum'
 # TODO(AR) is this okay for overriding the 'ufw' package in the 'ufw' module
 Package <| title == 'ufw' |> { require => Package["epel-release"] }
 
+# Make desktop environment more responsive
+yum::install { 'cfs-zen-tweaks':
+        ensure => present,
+        source => 'https://github.com/igo95862/cfs-zen-tweaks/releases/download/1.2.0/cfs-zen-tweaks-1.2.0-Linux.rpm'
+}
+~> service {'set-cfs-tweaks':
+  ensure => 'running',
+  enable => true
+}
+
 package { 'java-11-amazon-corretto':
         ensure => installed
 }
