@@ -8,6 +8,14 @@ include 'yum'
 # TODO(AR) is this okay for overriding the 'ufw' package in the 'ufw' module
 Package <| title == 'ufw' |> { require => Package["epel-release"] }
 
+$maven_version = "3.8.5"
+$sbt_version = "1.5.5"
+$idea_version = "212.4746.92"
+$eclipse_version = "2021-06"
+$oxygen_version = "23.1"
+$firefox_version = "91.0"
+$jena_version = "4.2.0"
+
 # Make desktop environment more responsive
 yum::install { 'cfs-zen-tweaks':
         ensure => present,
@@ -118,16 +126,16 @@ service { 'xrdp':
 }
 
 exec { 'install-maven':
-	command => 'curl -L https://archive.apache.org/dist/maven/maven-3/3.8.5/binaries/apache-maven-3.8.5-bin.tar.gz | tar zxv -C /opt',
+	command => "curl -L https://archive.apache.org/dist/maven/maven-3/${maven_version}/binaries/apache-maven-${maven_version}-bin.tar.gz | tar zxv -C /opt",
 	path => '/usr/bin',
 	user => 'root',
-	creates => '/opt/apache-maven-3.8.5',
+	creates => "/opt/apache-maven-${maven_version}",
 	require => Package['curl']
 }
 
 file { '/opt/maven':
         ensure => link,
-	target => '/opt/apache-maven-3.8.5',
+	target => "/opt/apache-maven-${maven_version}",
         replace => false,
         owner => 'root',
         group => 'root',
@@ -143,16 +151,16 @@ file { '/etc/profile.d/append-maven-path.sh':
 }
 
 exec { 'install-sbt':
-	command => 'curl -L https://github.com/sbt/sbt/releases/download/v1.5.5/sbt-1.5.5.tgz | tar zxv -C /opt && mv /opt/sbt /opt/sbt-1.5.5',
+	command => "curl -L https://github.com/sbt/sbt/releases/download/v${sbt_version}/sbt-${sbt_version}.tgz | tar zxv -C /opt && mv /opt/sbt /opt/sbt-${sbt_version}",
 	path => '/usr/bin',
 	user => 'root',
-	creates => '/opt/sbt-1.5.5',
+	creates => "/opt/sbt-${sbt_version}",
 	require => Package['curl']
 }
 
 file { '/opt/sbt':
         ensure => link,
-        target => '/opt/sbt-1.5.5',
+        target => "/opt/sbt-${sbt_version}",
         replace => false,
         owner => 'root',
         group => 'root',
@@ -228,13 +236,13 @@ exec { 'install-intellij-ce':
         command => 'curl -L https://download.jetbrains.com/idea/ideaIC-2021.2.tar.gz | tar zxv -C /opt',
         path => '/usr/bin',
         user => 'root',
-        creates => '/opt/idea-IC-212.4746.92',
+        creates => "/opt/idea-IC-${idea_version}",
 	require => Package['curl']
 }
 
 file { '/opt/idea-IC':
         ensure => link,
-        target => '/opt/idea-IC-212.4746.92',
+        target => "/opt/idea-IC-${idea_version}",
         replace => false,
         owner => 'root',
         group => 'root',
@@ -265,16 +273,16 @@ GenericName=IntelliJ IDEA CE
 }
 
 exec { 'install-eclipse':
-	command => 'curl https://mirror.ibcp.fr/pub/eclipse/technology/epp/downloads/release/2021-06/R/eclipse-java-2021-06-R-linux-gtk-x86_64.tar.gz | tar zxv -C /opt && mv /opt/eclipse /opt/eclipse-2012-06',
+	command => "curl https://mirror.ibcp.fr/pub/eclipse/technology/epp/downloads/release/2021-06/R/eclipse-java-${eclipse_version}-R-linux-gtk-x86_64.tar.gz | tar zxv -C /opt && mv /opt/eclipse /opt/eclipse-${eclipse_version}",
         path => '/usr/bin',
         user => 'root',
-        creates => '/opt/eclipse-2012-06',
+        creates => "/opt/eclipse-${eclipse_version}",
 	require => Package['curl']
 }
 
 file { '/opt/eclipse':
         ensure => link,
-        target => '/opt/eclipse-2012-06',
+        target => "/opt/eclipse-${eclipse_version}",
         replace => false,
         owner => 'root',
         group => 'root',
@@ -305,16 +313,16 @@ GenericName=Eclipse IDE
 }
 
 exec { 'install-oxygen':
-	command => 'curl https://mirror.oxygenxml.com/InstData/Editor/All/oxygen.tar.gz | tar zxv -C /opt && mv /opt/oxygen /opt/oxygen-23.1',
+	command => "curl https://mirror.oxygenxml.com/InstData/Editor/All/oxygen.tar.gz | tar zxv -C /opt && mv /opt/oxygen /opt/oxygen-${oxygen_version}",
 	path => '/usr/bin',
 	user => 'root',
-	creates => '/opt/oxygen-23.1',
+	creates => "/opt/oxygen-${oxygen_version}",
 	require => Package['curl']
 }
 
 file { '/opt/oxygen':
         ensure => link,
-        target => '/opt/oxygen-23.1',
+        target => "/opt/oxygen-${oxygen_version}",
         replace => false,
         owner => 'root',
         group => 'root',
@@ -412,15 +420,15 @@ GenericName=Chromium Web Browser
 }
 
 exec { 'install-firefox':
-	command => 'curl https://download-installer.cdn.mozilla.net/pub/firefox/releases/91.0/linux-x86_64/en-GB/firefox-91.0.tar.bz2 | tar jxv -C /opt && mv /opt/firefox /opt/firefox-91.0',
+	command => "curl https://download-installer.cdn.mozilla.net/pub/firefox/releases/${firefox_version}/linux-x86_64/en-GB/firefox-${firefox_version}.tar.bz2 | tar jxv -C /opt && mv /opt/firefox /opt/firefox-${firefox_version}",
 	path => '/usr/bin',
-	creates => '/opt/firefox-91.0',
+	creates => "/opt/firefox-${firefox_version}",
 	require => Package['curl']
 }
 
 file { '/opt/firefox':
         ensure => link,
-        target => '/opt/firefox-91.0',
+        target => "/opt/firefox-${firefox_version}",
         replace => false,
         owner => 'root',
         group => 'root',
@@ -479,15 +487,15 @@ GenericName=Slack
 }
 
 exec { 'install-jena':
-        command => 'curl https://archive.apache.org/dist/jena/binaries/apache-jena-4.2.0.tar.gz | tar zxv -C /opt',
+        command => "curl https://archive.apache.org/dist/jena/binaries/apache-jena-${jena_version}.tar.gz | tar zxv -C /opt",
         path => '/usr/bin',
-        creates => '/opt/apache-jena-4.2.0',
+        creates => "/opt/apache-jena-${jena_version}",
         require => Package['curl']
 }
 
 file { '/opt/jena':
         ensure => link,
-        target => '/opt/apache-jena-4.2.0',
+        target => "/opt/apache-jena-${jena_version}",
         replace => false,
         owner => 'root',
         group => 'root',
@@ -495,15 +503,15 @@ file { '/opt/jena':
 }
 
 exec { 'install-fuseki':
-        command => 'curl https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-4.2.0.tar.gz | tar zxv -C /opt',
+        command => "curl https://archive.apache.org/dist/jena/binaries/apache-jena-fuseki-${jena_version}.tar.gz | tar zxv -C /opt",
         path => '/usr/bin',
-        creates => '/opt/apache-jena-fuseki-4.2.0',
+        creates => "/opt/apache-jena-fuseki-${jena_version}",
         require => Package['curl']
 }
 
 file { '/opt/fuseki':
         ensure => link,
-        target => '/opt/apache-jena-fuseki-4.2.0',
+        target => "/opt/apache-jena-fuseki-${jena_version}",
         replace => false,
         owner => 'root',
         group => 'root',
