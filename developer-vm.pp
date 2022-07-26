@@ -11,7 +11,7 @@ Package <| title == 'ufw' |> { require => Package["epel-release"] }
 $maven_version = "3.8.5"
 $sbt_version = "1.5.5"
 $idea_version = "212.4746.92"
-$eclipse_version = "2021-06"
+$eclipse_version = "2022-06"
 $oxygen_version = "23.1"
 $firefox_version = "91.0"
 $jena_version = "4.2.0"
@@ -273,7 +273,7 @@ GenericName=IntelliJ IDEA CE
 }
 
 exec { 'install-eclipse':
-	command => "curl https://mirror.ibcp.fr/pub/eclipse/technology/epp/downloads/release/2021-06/R/eclipse-java-${eclipse_version}-R-linux-gtk-x86_64.tar.gz | tar zxv -C /opt && mv /opt/eclipse /opt/eclipse-${eclipse_version}",
+	command => "curl https://mirror.ibcp.fr/pub/eclipse/technology/epp/downloads/release/${eclipse_version}/R/eclipse-java-${eclipse_version}-R-linux-gtk-x86_64.tar.gz | tar zxv -C /opt && mv /opt/eclipse /opt/eclipse-${eclipse_version}",
         path => '/usr/bin',
         user => 'root',
         creates => "/opt/eclipse-${eclipse_version}",
