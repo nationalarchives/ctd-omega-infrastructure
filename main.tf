@@ -5,7 +5,6 @@
 
 // TODO(AR) - Karl recommended - tools for checking AWS setup is secure - Scout... --- perhaps Steven Hirschorn could take a look at our Terraform and AWS estate just to verify... ta
 // TODO(AR) - Talk to Matt Besick for accrediation and penetration testing
-// TODO(AR) - How about scheduled startup times each day? -- AWS Instance Scheduler -- https://registry.terraform.io/modules/diodonfrost/lambda-scheduler-stop-start/aws/latest
 
 
 terraform {
@@ -1018,9 +1017,10 @@ resource "aws_instance" "dev_workstation_1" {
   }
 
   tags = {
-    Name        = "dev1"
-    Type        = "dev_workstation"
-    Environment = "dev"
+    Name                      = "dev1"
+    Type                      = "dev_workstation"
+    Environment               = "dev"
+    scheduler_mon_fri_dev_ec2 = "true"
   }
 
   lifecycle {
@@ -1084,6 +1084,7 @@ resource "aws_instance" "dev_workstation_2" {
     Name        = "dev2"
     Type        = "dev_workstation"
     Environment = "dev"
+    scheduler_mon_fri_dev_ec2 = "true"
   }
 
   lifecycle {
@@ -1147,6 +1148,7 @@ resource "aws_instance" "dev_workstation_3" {
     Name        = "dev3"
     Type        = "dev_workstation"
     Environment = "dev"
+    scheduler_mon_fri_dev_ec2 = "true"
   }
 
   lifecycle {
@@ -1210,6 +1212,7 @@ resource "aws_instance" "dev_workstation_4" {
     Name        = "dev4"
     Type        = "dev_workstation"
     Environment = "dev"
+    scheduler_mon_fri_dev_ec2 = "true"
   }
 
   lifecycle {
@@ -1518,6 +1521,7 @@ resource "aws_instance" "mssql_server_1" {
     Name = "mssql1"
     Type        = "dev_mssql_server"
     Environment = "dev"
+    scheduler_mon_fri_dev_ec2 = "true"
   }
 
   lifecycle {
@@ -1534,4 +1538,36 @@ resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.dev_mssql_server_1_database_interface.private_ips
+}
+
+module "scheduler_mon_fri_dev_stop_ec2" {
+  source                         = "diodonfrost/lambda-scheduler-stop-start/aws"
+  name                           = "ec2_stop"
+  cloudwatch_schedule_expression = "cron(0 1 ? * MON-FRI *)"
+  schedule_action                = "stop"
+  autoscaling_schedule           = "false"
+  ec2_schedule                   = "true"
+  rds_schedule                   = "false"
+  cloudwatch_alarm_schedule      = "false"
+
+  scheduler_tag                  = {
+    key   = "scheduler_mon_fri_dev_ec2"
+    value = "true"
+  }
+}
+
+module "scheduler_mon_fri_dev_start_ec2" {
+  source                         = "diodonfrost/lambda-scheduler-stop-start/aws"
+  name                           = "ec2_start"
+  cloudwatch_schedule_expression = "cron(0 8 ? * MON-FRI *)"
+  schedule_action                = "start"
+  autoscaling_schedule           = "false"
+  ec2_schedule                   = "true"
+  rds_schedule                   = "false"
+  cloudwatch_alarm_schedule      = "false"
+
+  scheduler_tag                  = {
+    key   = "scheduler_mon_fri_dev_ec2"
+    value = "true"
+  }
 }
