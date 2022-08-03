@@ -978,7 +978,7 @@ EOF
 # Dev Workstation for Adam Retter
 resource "aws_instance" "dev_workstation_1" {
   ami           = data.aws_ami.amazon_linux_2.id
-  instance_type = "m5a.2xlarge"
+  instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
@@ -1042,7 +1042,7 @@ resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
 # Dev Workstation for Rob Walpole
 resource "aws_instance" "dev_workstation_2" {
   ami           = data.aws_ami.amazon_linux_2.id
-  instance_type = "m5a.2xlarge"
+  instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
@@ -1106,7 +1106,7 @@ resource "aws_route53_record" "dns_a_dev2_in_cat_nationalarchives_gov_uk" {
 # Dev Workstation for Jaishree Davey
 resource "aws_instance" "dev_workstation_3" {
   ami           = data.aws_ami.amazon_linux_2.id
-  instance_type = "m5a.2xlarge"
+  instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
@@ -1170,7 +1170,7 @@ resource "aws_route53_record" "dns_a_dev3_in_cat_nationalarchives_gov_uk" {
 # Dev Workstation for Enrique Manuel Del Pino
 resource "aws_instance" "dev_workstation_4" {
   ami           = data.aws_ami.amazon_linux_2.id
-  instance_type = "m5a.2xlarge"
+  instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
