@@ -93,7 +93,7 @@ resource "aws_acmpca_certificate" "omega_ca_certificate" {
 
   validity {
     type  = "YEARS"
-    value = 3
+    value = 5
   }
 }
 
@@ -146,7 +146,7 @@ resource "aws_acmpca_certificate" "vpn_server_certificate" {
   signing_algorithm           = "SHA512WITHRSA"
   validity {
     type  = "YEARS"
-    value = 1
+    value = 3
   }
 }
 
@@ -182,7 +182,7 @@ resource "aws_acmpca_certificate" "vpn_client_ca_certificate" {
 
   validity {
     type  = "YEARS"
-    value = 2
+    value = 3
   }
 }
 
