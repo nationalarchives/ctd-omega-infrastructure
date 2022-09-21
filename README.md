@@ -1,5 +1,7 @@
 # Project Omega - Infrastructure and Configuration as Code
 
+![CI](https://github.com/nationalarchives/ctd-omega-infrastructure/actions/workflows/ci.yml/badge.svg)
+
 This repository contains:
 
 1. Infrastructure as Code in the form of a set of [Terraform](https://www.terraform.io/) scripts in the https://github.com/nationalarchives/tna-cat/tree/ctd-omega-infrastructure/terraform folder.
