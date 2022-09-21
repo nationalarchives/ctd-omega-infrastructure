@@ -960,8 +960,8 @@ EOF
     content = <<EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
-echo '${filebase64("base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
-echo '${filebase64("developer-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/developer-vm.pp
+echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
+echo '${filebase64("../puppet/developer-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/developer-vm.pp
 EOF
   }
 
@@ -1390,8 +1390,8 @@ EOF
     content = <<EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
-echo '${filebase64("base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
-echo '${filebase64("sqlserver-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/sqlserver-vm.pp
+echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
+echo '${filebase64("../puppet/sqlserver-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/sqlserver-vm.pp
 EOF
   }
 

@@ -1,32 +1,18 @@
-# Install Puppet on Amazon Linux 2
+# Project Omega - Infrastructure and Configuration as Code
 
-```
-sudo rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
-sudo yum -y install puppet
+This repository contains:
 
-sudo /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
-sudo /opt/puppetlabs/bin/puppet module install saz-ssh
-sudo /opt/puppetlabs/bin/puppet module install domkrm-ufw
-sudo /opt/puppetlabs/bin/puppet module install puppet-yum
-sudo /opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
-sudo /opt/puppetlabs/bin/puppet module install puppetlabs-vcsrepo
-```
+1. Infrastructure as Code in the form of a set of [Terraform](https://www.terraform.io/) scripts in the https://github.com/nationalarchives/tna-cat/tree/ctd-omega-infrastructure/terraform folder.
 
-## Installing a Developer VM
+2. Configuration as Code in the form of a set of [Puppet](https://www.puppet.com/) agent scripts in the https://github.com/nationalarchives/ctd-omega-infrastructure/tree/main/puppet folder.
 
-Copy the `base.pp` and `developer-vm.pp` files into `/root/omega-puppet-scripts` of the VM and then run:
+## Approach
+The Terraform scripts are applied to the AWS VPC for Project Omega using the `terraform apply` CLI from a remote host with general internet access. Terraform uses the AWS SDK API to communicate with AWS and provision the AWS infrastructure within the VPC account for Project Omega.
 
-```
-sudo /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
-```
+Terraform configures each EC2 instance with a number of [cloud-init](https://cloud-init.io/) scripts. These cloud-init scripts take the following steps:
+1. Execute a Bash script to update to the latest Yum packages
+2. Execute a Bash script to install Puppet agent via Yum
+3. Deploy a set of Puppet agent .pp script files to a known location on the machine
+4. Execute a Bash script which calls the Puppet agent to execute the .pp script files
 
-# Install the SQL Server VM
-
-Copy the `base.pp` and `sqlserver-vm.pp` files into `/root/omega-puppet-scripts` of the VM and then run:
-
-```
-sudo FACTER_sa_password=\!myStrongSqlPassword2019 /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
-```
-
-NOTE: In the above you should replace the `\!myStrongSqlPassword2019` with a suitable password.
-
+Terraform is responsible for the setting up the infrastruture, and uses cloud-init as a hook to install and execute Puppet. Puppet is responsible for all software configuration.
