@@ -34,8 +34,8 @@ locals {
   /* Private Subnet for databases used in Development */
   vpc_private_subnet_dev_databases = "10.128.238.96/27"
 
-  /* Private Subnet for TNA network access for Development */
-  vpc_private_tna_net_subnet_dev = "10.128.238.224/27"
+  /* Public Subnet for General Use (NAT Gateway etc.) */
+  vpc_public_subnet_general = "10.128.238.224/27"
 
   /* Private Subnet for MVP Beta Web Application */
   vpc_private_subnet_mvpbeta_web = "10.128.238.32/28"
@@ -78,8 +78,10 @@ locals {
   vpc_intra_ipv6_subnets = [for i in local.vpc_intra_subnets : length(local.vpc_private_subnets) + length(local.vpc_database_subnets) + index(local.vpc_intra_subnets, i)]
 
   vpc_public_subnets = [
+    /* General Use subnet (NAT Gateway etc.) */
+    local.vpc_public_subnet_general,
+
     /* Development public subnets */
-    local.vpc_private_tna_net_subnet_dev,
 
     /* MVP Beta private subnets */
   ]
@@ -107,7 +109,7 @@ provider "aws" {
 data "aws_partition" "current" {}
 
 resource "aws_eip" "vpc_subnet_nats" {
-  count = 5  # NOTE: must match the number of private subnets in the VPC!
+  count = 1  # NOTE: must match the number of NAT Gateways in the VPC!
   vpc   = true
 }
 
@@ -665,7 +667,7 @@ module "vpc" {
   ]
 
   enable_nat_gateway  = true
-  single_nat_gateway  = false
+  single_nat_gateway  = true
   one_nat_gateway_per_az = false
   reuse_nat_ips       = true             # <= Skip creation of EIPs for the NAT Gateways
   external_nat_ip_ids = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
