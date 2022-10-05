@@ -1,12 +1,16 @@
 ###
 # Puppet Script for a Base System on Amazon Linux 2
+#
+# Author: Adam Retter @ Evolved Binary
 ###
 
-# TODO(AR) - Update Yum packages
-# TODO(AR) - Automatic Updates
-
 include ufw
-include 'yum'
+include yum
+
+class { 'yum_cron':
+  apply_updates => true,
+  update_cmd => security,
+}
 
 exec { 'set-keymap-gb':
   command => '/usr/bin/localectl set-keymap gb',
