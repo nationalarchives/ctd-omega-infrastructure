@@ -546,6 +546,38 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
+      rule_number = 300
+      rule_action = "allow"
+      from_port   = 80
+      to_port   = 80
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      rule_number = 360
+      rule_action = "allow"
+      from_port   = 80
+      to_port   = 80
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      rule_number = 400
+      rule_action = "allow"
+      from_port   = 443
+      to_port   = 443
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      rule_number = 460
+      rule_action = "allow"
+      from_port   = 443
+      to_port   = 443
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
       # allow results from outgoing IPv4 internet traffic
       rule_number = 900
       rule_action = "allow"
@@ -1754,6 +1786,13 @@ module "mvpbeta_web_proxy_security_group" {
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
+      description = "HTTP"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
       description = "HTTPS"
       from_port   = 443
       to_port     = 443
@@ -1761,7 +1800,7 @@ module "mvpbeta_web_proxy_security_group" {
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     }
   ]
-  number_of_computed_ingress_with_cidr_blocks = 2
+  number_of_computed_ingress_with_cidr_blocks = 3
 
   computed_ingress_with_ipv6_cidr_blocks = [
     {
@@ -1772,6 +1811,13 @@ module "mvpbeta_web_proxy_security_group" {
       ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
+      description = "HTTP (IPv6)"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+    },
+    {
       description = "HTTPS (IPv6)"
       from_port   = 443
       to_port     = 443
@@ -1779,7 +1825,7 @@ module "mvpbeta_web_proxy_security_group" {
       ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     }
   ]
-  number_of_computed_ingress_with_ipv6_cidr_blocks = 2
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 3
 
   egress_with_cidr_blocks = [
     {
@@ -1865,6 +1911,10 @@ EOF
 /opt/puppetlabs/bin/puppet module install puppet-yum
 /opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
 /opt/puppetlabs/bin/puppet module install treydock-yum_cron
+/opt/puppetlabs/bin/puppet module install petems-swap_file
+/opt/puppetlabs/bin/puppet module install puppet-openssl
+/opt/puppetlabs/bin/puppet module install puppet-nginx
+/opt/puppetlabs/bin/puppet module install puppet-letsencrypt
 EOF
   }
 
@@ -1875,7 +1925,7 @@ EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
 echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
-#echo '${filebase64("../puppet/developer-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/developer-vm.pp  #TODO(AR) puppet script for web-proxy
+echo '${filebase64("../puppet/web-proxy-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/web-proxy-vm.pp
 EOF
   }
 

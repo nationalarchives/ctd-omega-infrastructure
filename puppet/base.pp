@@ -112,9 +112,16 @@ exec { 'install-ohmyzsh':
   creates     => '/home/ec2-user/.oh-my-zsh',
 }
 
+package { 'util-linux-user':
+  ensure => installed,
+}
+
 exec { 'chsh-ec2-user-zsh':
   command   => '/usr/bin/chsh -s /usr/bin/zsh ec2-user',
   user      => root,
+  require     => [
+    Package['util-linux-user']
+  ],
   subscribe => [
     Exec['install-ohmyzsh']
   ],
