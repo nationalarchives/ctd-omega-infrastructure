@@ -194,12 +194,6 @@ package { 'git':
   ensure => installed,
 }
 
-yum::install { 'github-cli':
-  ensure  => present,
-  source  => 'https://github.com/cli/cli/releases/download/v2.0.0/gh_2.0.0_linux_amd64.rpm',
-  require => Package['git'],
-}
-
 exec { 'enable-epel':
   command => 'amazon-linux-extras enable epel',
   path    => '/usr/bin',
@@ -215,12 +209,4 @@ exec { 'enable-epel':
 }
 -> package { 'epel-release':
   ensure => installed,
-}
-
-file { '/home/ec2-user/code':
-  ensure  => directory,
-  replace => false,
-  owner   => 'ec2-user',
-  group   => 'ec2-user',
-  require => User['ec2-user'],
 }

@@ -1,9 +1,11 @@
 ###
 # Puppet Script for a Developer VM on Amazon Linux 2
+#
+# Author: Adam Retter @ Evolved Binary
 ###
 
 include ufw
-include 'yum'
+include yum
 
 # TODO(AR) is this okay for overriding the 'ufw' package in the 'ufw' module
 Package <| title == 'ufw' |> { require => Package['epel-release'] }
@@ -15,6 +17,22 @@ $eclipse_version = '2022-06'
 $oxygen_version = '23.1'
 $firefox_version = '91.0'
 $jena_version = '4.2.0'
+
+
+
+file { '/home/ec2-user/code':
+  ensure  => directory,
+  replace => false,
+  owner   => 'ec2-user',
+  group   => 'ec2-user',
+  require => User['ec2-user'],
+}
+
+yum::install { 'github-cli':
+  ensure  => present,
+  source  => 'https://github.com/cli/cli/releases/download/v2.0.0/gh_2.0.0_linux_amd64.rpm',
+  require => Package['git'],
+}
 
 # Make desktop environment more responsive
 yum::install { 'cfs-zen-tweaks':
@@ -535,7 +553,10 @@ vcsrepo { '/home/ec2-user/code/pentaho-kettle':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/pentaho-kettle'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/pentaho-kettle']
+  ],
 }
 
 file { '/home/ec2-user/code/pentaho-platform':
@@ -556,7 +577,10 @@ vcsrepo { '/home/ec2-user/code/pentaho-platform':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/pentaho-platform'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/pentaho-platform']
+  ],
 }
 
 # NOTE: Required for Pentaho Kettle
@@ -583,7 +607,10 @@ vcsrepo { '/home/ec2-user/code/kettle-jena-plugins':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/kettle-jena-plugins'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/kettle-jena-plugins']
+  ],
 }
 
 file { '/home/ec2-user/code/kettle-atomic-plugins':
@@ -604,7 +631,10 @@ vcsrepo { '/home/ec2-user/code/kettle-atomic-plugins':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/kettle-atomic-plugins'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/kettle-atomic-plugins']
+  ],
 }
 
 file { '/home/ec2-user/code/kettle-debug-plugins':
@@ -625,7 +655,10 @@ vcsrepo { '/home/ec2-user/code/kettle-debug-plugins':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/kettle-debug-plugins'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/kettle-debug-plugins']
+  ],
 }
 
 file { '/home/ec2-user/code/kettle-xml-extra-plugins':
@@ -646,7 +679,10 @@ vcsrepo { '/home/ec2-user/code/kettle-xml-extra-plugins':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/kettle-xml-extra-plugins'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/kettle-xml-extra-plugins']
+  ],
 }
 
 file { '/home/ec2-user/code/kettle-test-framework':
@@ -667,7 +703,10 @@ vcsrepo { '/home/ec2-user/code/kettle-test-framework':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/kettle-test-framework'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/kettle-test-framework']
+  ],
 }
 
 file { '/home/ec2-user/code/tna-cat':
@@ -688,7 +727,10 @@ vcsrepo { '/home/ec2-user/code/tna-cat':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/tna-cat'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/tna-cat']
+  ],
 }
 
 file { '/home/ec2-user/code/ctd-omega-etl-workflows':
@@ -709,5 +751,8 @@ vcsrepo { '/home/ec2-user/code/ctd-omega-etl-workflows':
   keep_local_changes => true,
   owner              => 'ec2-user',
   group              => 'ec2-user',
-  require            => File['/home/ec2-user/code/ctd-omega-etl-workflows'],
+  require            => [
+    Package['git'],
+    File['/home/ec2-user/code/ctd-omega-etl-workflows']
+  ],
 }

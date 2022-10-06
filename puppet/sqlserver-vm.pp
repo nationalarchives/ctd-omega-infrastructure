@@ -1,5 +1,7 @@
 ###
 # Puppet Script for installing SQL Server (Developer Edition) VM on Amazon Linux 2
+#
+# Author: Adam Retter @ Evolved Binary
 ###
 
 include ufw

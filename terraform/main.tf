@@ -1512,7 +1512,6 @@ EOF
 /opt/puppetlabs/bin/puppet module install domkrm-ufw
 /opt/puppetlabs/bin/puppet module install puppet-yum
 /opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
-/opt/puppetlabs/bin/puppet module install puppetlabs-vcsrepo
 /opt/puppetlabs/bin/puppet module install treydock-yum_cron
 EOF
   }
@@ -1865,7 +1864,6 @@ EOF
 /opt/puppetlabs/bin/puppet module install domkrm-ufw
 /opt/puppetlabs/bin/puppet module install puppet-yum
 /opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
-/opt/puppetlabs/bin/puppet module install puppetlabs-vcsrepo
 /opt/puppetlabs/bin/puppet module install treydock-yum_cron
 EOF
   }
