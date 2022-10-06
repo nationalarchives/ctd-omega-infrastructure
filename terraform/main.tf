@@ -1093,6 +1093,18 @@ EOF
 /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
 EOF
   }
+
+  part {
+    content_type = "text/cloud-config"
+    filename = "reboot.yaml"
+    content = <<EOF
+#cloud-config
+power_state:
+    delay: now
+    mode: reboot
+    message: Rebooting machine after Omega cloud-init Initialisation Completed
+EOF
+  }
 }
 
 # Dev Workstation for Adam Retter
@@ -1535,6 +1547,18 @@ done
 FACTER_sa_password=$sa_password /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
 EOF
   }
+
+  part {
+    content_type = "text/cloud-config"
+    filename = "reboot.yaml"
+    content = <<EOF
+#cloud-config
+power_state:
+    delay: now
+    mode: reboot
+    message: Rebooting machine after Omega cloud-init Initialisation Completed
+EOF
+  }
 }
 
 resource "aws_iam_instance_profile" "dev_mssql_instance_iam_instance_profile" {
@@ -1863,6 +1887,18 @@ EOF
     content = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
+EOF
+  }
+
+  part {
+    content_type = "text/cloud-config"
+    filename = "reboot.yaml"
+    content = <<EOF
+#cloud-config
+power_state:
+    delay: now
+    mode: reboot
+    message: Rebooting machine after Omega cloud-init Initialisation Completed
 EOF
   }
 }
