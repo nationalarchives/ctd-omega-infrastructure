@@ -8,6 +8,16 @@ include yum
 
 $sysops_email = 'adam@evolvedbinary.com'
 
+ufw::allow { 'http':
+  port      => '80',
+  interface => 'eth0',
+}
+
+ufw::allow { 'https':
+  port      => '443',
+  interface => 'eth0',
+}
+
 swap_file::files { 'default':
   ensure => present,
 }
@@ -255,16 +265,6 @@ nginx::resource::server { 'www.mvpbeta.catalogue.nationalarchives.gov.uk':
     File['/etc/letsencrypt/options-ssl-nginx.conf'],
     Class['nginx']
   ],
-}
-
-ufw::allow { 'http':
-  port      => '80',
-  interface => 'eth0',
-}
-
-ufw::allow { 'https':
-  port      => '443',
-  interface => 'eth0',
 }
 
 class { 'letsencrypt':

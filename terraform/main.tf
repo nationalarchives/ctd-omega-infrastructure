@@ -578,6 +578,22 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
+      rule_number = 600
+      rule_action = "allow"
+      from_port   = 9443
+      to_port   = 9443
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      rule_number = 660
+      rule_action = "allow"
+      from_port   = 9443
+      to_port   = 9443
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
       # allow results from outgoing IPv4 internet traffic
       rule_number = 900
       rule_action = "allow"
@@ -631,6 +647,22 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4]  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
+      rule_number = 102
+      rule_action = "allow"
+      from_port   = 22
+      to_port   = 22
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+    },
+    {
+      rule_number = 162
+      rule_action = "allow"
+      from_port   = 22
+      to_port   = 22
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+    },
+    {
       rule_number = 200
       rule_action = "allow"
       from_port   = 3389
@@ -679,7 +711,7 @@ module "vpc" {
       ipv6_cidr_block = "::/0"
     },
     {
-      # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta to vpc_private_subnet_dev_general
+      # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta and vpc_private_subnet_mvpbeta_web, to vpc_private_subnet_dev_general
       rule_number = 1200
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
@@ -688,14 +720,14 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      # allow IPv6 return traffic from vpc_private_tna_net_subnet_mvpbeta to vpc_private_subnet_dev_general
+      # allow IPv6 return traffic from vpc_private_tna_net_subnet_mvpbeta and vpc_private_subnet_mvpbeta_web, to vpc_private_subnet_dev_general
       rule_number = 1260
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
-    }
+    },
   ]
 
   enable_nat_gateway  = true
@@ -843,11 +875,18 @@ module "dev_workstation_security_group" {
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      description = "SSH-return-from-vpc_private_tna_net_subnet_mvpbeta"
+      description = "return-from-vpc_private_tna_net_subnet_mvpbeta"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+    },
+    {
+      description = "return-from-vpc_private_subnet_mvpbeta_web"
+      from_port   = local.linux_ephemeral_port_start
+      to_port     = local.linux_ephemeral_port_end
+      protocol    = "tcp"
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       description = "RDP"
@@ -868,11 +907,18 @@ module "dev_workstation_security_group" {
       ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
-      description      = "SSH-return-from-vpc_private_tna_net_subnet_mvpbeta (IPv6)"
+      description      = "return-from-vpc_private_tna_net_subnet_mvpbeta (IPv6)"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol         = "tcp"
       ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[4]  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta (IPv6)
+    },
+    {
+      description      = "return-from-vpc_private_subnet_mvpbeta_web (IPv6)"
+      from_port   = local.linux_ephemeral_port_start
+      to_port     = local.linux_ephemeral_port_end
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web (IPv6)
     },
     {
       description = "RDP (IPv6)"
@@ -2006,4 +2052,229 @@ resource "aws_route53_record" "dns_a_web-proxy-1_mvpbeta_catalogue_nationalarchi
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.mvpbeta_web_proxy_1_interface.private_ips
+}
+
+
+## Config for web-app-1 below
+
+module "mvpbeta_web_app_security_group" {
+  source = "terraform-aws-modules/security-group/aws"
+  version = "4.13.0"
+
+  name        = "web_app_security_group"
+  description = "Security group for Web Application ports open within VPC"
+
+  vpc_id = module.vpc.vpc_id
+
+  computed_ingress_with_cidr_blocks = [
+    {
+      description = "SSH"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      description = "Play HTTPS"
+      from_port   = 9443
+      to_port     = 9443
+      protocol    = "tcp"
+      cidr_blocks = "${module.vpc.private_subnets_cidr_blocks[0]},${module.vpc.private_subnets_cidr_blocks[4]}"  # NOTE: restricted to vpc_private_subnet_dev_general and vpc_private_tna_net_subnet_mvpbeta
+    }
+  ]
+  number_of_computed_ingress_with_cidr_blocks = 2
+
+  computed_ingress_with_ipv6_cidr_blocks = [
+    {
+      description      = "SSH (IPv6)"
+      from_port        = 22
+      to_port          = 22
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+    },
+    {
+      description = "Play HTTPS (IPv6)"
+      from_port   = 9443
+      to_port     = 9443
+      protocol    = "tcp"
+      ipv6_cidr_blocks = "${module.vpc.private_subnets_ipv6_cidr_blocks[0]},${module.vpc.private_subnets_ipv6_cidr_blocks[4]}"  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6) and vpc_private_tna_net_subnet_mvpbeta (IPv6)
+    }
+  ]
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 2
+
+  egress_with_cidr_blocks = [
+    {
+      description = "All"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+
+  egress_with_ipv6_cidr_blocks = [
+    {
+      description = "All (IPv6)"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_blocks = "2001:db8::/64"
+    }
+  ]
+
+  tags = {
+    Name        = "sg_web_app"
+    Type        = "security_group"
+    Environment = "mvpbeta"
+  }
+}
+
+resource "aws_network_interface" "mvpbeta_web_app_1_interface" {
+  description        = "Private Subnet Interface for MVP Beta web-app-1"
+  subnet_id          = module.vpc.private_subnets[2]
+  private_ips        = ["10.128.238.36"]
+  ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
+
+  security_groups = [
+      module.mvpbeta_web_app_security_group.security_group_id
+  ]
+
+  tags = {
+    Name        = "eth0_web-app-1"
+    Type        = "primary_network_interface"
+    Network     = "mvpbeta_web"
+    Environment = "mvpbeta"
+  }
+}
+
+data "aws_network_interface" "mvpbeta_web_app_1_interface" {
+  id = aws_network_interface.mvpbeta_web_app_1_interface.id
+}
+
+data "cloudinit_config" "web_app" {
+  gzip = true
+  base64_encode = true
+
+  part {
+    content_type = "text/cloud-config"
+    filename = "yum-upgrade.yaml"
+    content = <<EOF
+#cloud-config
+package_update: true
+package_upgrade: true
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-01-install-puppet.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
+yum -y install puppet
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-02-install-puppet-modules.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+/opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
+/opt/puppetlabs/bin/puppet module install saz-ssh
+/opt/puppetlabs/bin/puppet module install domkrm-ufw
+/opt/puppetlabs/bin/puppet module install puppet-yum
+/opt/puppetlabs/bin/puppet module install puppetlabs-sshkeys_core
+/opt/puppetlabs/bin/puppet module install treydock-yum_cron
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-03-install-puppet-scripts.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+mkdir /root/omega-puppet-scripts
+echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
+echo '${filebase64("../puppet/web-app-vm.pp")}' | base64 -d > /root/omega-puppet-scripts/web-app-vm.pp
+EOF
+  }
+
+  part {
+    content_type = "text/x-shellscript"
+    filename = "omega-04-run-puppet-scripts.sh"
+    content = <<EOF
+#!/usr/bin/env bash
+/opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
+EOF
+  }
+
+  part {
+    content_type = "text/cloud-config"
+    filename = "reboot.yaml"
+    content = <<EOF
+#cloud-config
+power_state:
+    delay: now
+    mode: reboot
+    message: Rebooting machine after Omega cloud-init Initialisation Completed
+EOF
+  }
+}
+
+resource "aws_instance" "mvpbeta_web_app_1" {
+  availability_zone    = local.aws_azs[0]
+  ami                  = data.aws_ami.amazon_linux_2_arm64.id
+  instance_type        = "t4g.large"            # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
+
+  key_name = aws_key_pair.omega_admin_key_pair.key_name
+
+  user_data = data.cloudinit_config.web_app.rendered
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens = "required"
+  }
+
+  monitoring = false
+
+  network_interface {
+    network_interface_id = aws_network_interface.mvpbeta_web_app_1_interface.id
+    device_index         = 0
+  }
+
+  root_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    volume_size           = 8 # GiB
+
+    tags = {
+      Name        = "root_web-app-1"
+      Type        = "primary_volume"
+      Environment = "mvpbeta"
+    }
+  }
+
+  tags = {
+    Name                      = "web-app-1"
+    Type                      = "web_app"
+    Environment               = "mvpbeta"
+    scheduler_mon_fri_dev_ec2 = "true"
+  }
+
+  lifecycle {
+    // The issue why we are ignoring changes is that updates
+    // to user_data cause Terraform to want to replace existing instances - we don't want that!
+    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
+    ignore_changes = [user_data]
+  }
+}
+
+resource "aws_route53_record" "dns_a_web-app-1_mvpbeta_catalogue_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_mvpbeta_dns.zone_id
+  name    = "web-app-1.${local.private_mvpbeta_dns_domain}"
+  type    = "A"
+  ttl     = "300"
+  records = data.aws_network_interface.mvpbeta_web_app_1_interface.private_ips
 }
