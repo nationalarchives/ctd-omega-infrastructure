@@ -18,8 +18,6 @@ $oxygen_version = '23.1'
 $firefox_version = '91.0'
 $jena_version = '4.2.0'
 
-
-
 file { '/home/ec2-user/code':
   ensure  => directory,
   replace => false,

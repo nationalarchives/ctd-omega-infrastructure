@@ -9,7 +9,7 @@ include yum
 
 class { 'yum_cron':
   apply_updates => true,
-  update_cmd => security,
+  update_cmd    => security,
 }
 
 exec { 'set-keymap-gb':
@@ -119,7 +119,7 @@ package { 'util-linux-user':
 exec { 'chsh-ec2-user-zsh':
   command   => '/usr/bin/chsh -s /usr/bin/zsh ec2-user',
   user      => root,
-  require     => [
+  require   => [
     Package['util-linux-user']
   ],
   subscribe => [
