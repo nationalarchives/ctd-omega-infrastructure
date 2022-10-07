@@ -1,6 +1,6 @@
 # Project Omega - Infrastructure and Configuration as Code
 
-![CI](https://github.com/nationalarchives/ctd-omega-infrastructure/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/nationalarchives/ctd-omega-infrastructure/actions/workflows/ci.yml/badge.svg)](https://github.com/nationalarchives/ctd-omega-infrastructure/actions/workflows/ci.yml)
 
 This repository contains:
 
