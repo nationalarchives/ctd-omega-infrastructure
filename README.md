@@ -16,6 +16,7 @@ Terraform configures each EC2 instance with a number of [cloud-init](https://clo
 2. Execute a Bash script to install Puppet agent via Yum
 3. Deploy a set of Puppet agent .pp script files to a known location on the machine
 4. Execute a Bash script which calls the Puppet agent to execute the .pp script files
+5. Reboots the system after cloud-init completes
 
 Terraform is responsible for the setting up the infrastruture, and uses cloud-init as a hook to install and execute Puppet. Puppet is responsible for all software configuration.
 
