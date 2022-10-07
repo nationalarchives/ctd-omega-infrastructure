@@ -6,6 +6,8 @@
 
 include yum
 
+# TODO(AR) make DNS names injectable from Terraform via Facter
+
 $sysops_email = 'adam@evolvedbinary.com'
 
 ufw::allow { 'http':
@@ -256,7 +258,7 @@ nginx::resource::server { 'www.mvpbeta.catalogue.nationalarchives.gov.uk':
       include => '/etc/letsencrypt/options-ssl-nginx.conf',
       ssl_dhparam => '/etc/letsencrypt/ssl-dhparams.pem',
   },
-  proxy        => 'https://10.128.238.36:9443',
+  proxy        => 'https://10.128.238.36:9443',         # TODO(AR) make this injectable from Terraform via Facter
   require => [
     Swap_file::Files['default'],
     Class['openssl'],

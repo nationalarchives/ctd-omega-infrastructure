@@ -711,7 +711,23 @@ module "vpc" {
       ipv6_cidr_block = "::/0"
     },
     {
-      # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta and vpc_private_subnet_mvpbeta_web, to vpc_private_subnet_dev_general
+      rule_number = 500
+      rule_action = "allow"
+      from_port   = 9443
+      to_port   = 9443
+      protocol    = "tcp"
+      cidr_block = module.vpc.private_subnets_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+    },
+    {
+      rule_number = 560
+      rule_action = "allow"
+      from_port   = 9443
+      to_port   = 9443
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+    },
+    {
+      # allow IPv4 return traffic from vpc_private_subnet_dev_general
       rule_number = 1200
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
@@ -720,13 +736,31 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      # allow IPv6 return traffic from vpc_private_tna_net_subnet_mvpbeta and vpc_private_subnet_mvpbeta_web, to vpc_private_subnet_dev_general
+      # allow IPv6 return traffic from vpc_private_subnet_dev_general
       rule_number = 1260
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta
+      rule_number = 1400
+      rule_action = "allow"
+      from_port   = local.linux_ephemeral_port_start
+      to_port     = local.linux_ephemeral_port_end
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[4]  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+    },
+    {
+      # allow IPv6 return traffic from vpc_private_subnet_mvpbeta_web
+      rule_number = 1460
+      rule_action = "allow"
+      from_port   = local.linux_ephemeral_port_start
+      to_port     = local.linux_ephemeral_port_end
+      protocol    = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
   ]
 
