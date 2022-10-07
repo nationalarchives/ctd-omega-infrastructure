@@ -930,7 +930,7 @@ module "dev_workstation_security_group" {
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
     }
   ]
-  number_of_computed_ingress_with_cidr_blocks = 3
+  number_of_computed_ingress_with_cidr_blocks = 4
 
   computed_ingress_with_ipv6_cidr_blocks = [
     {
@@ -962,7 +962,7 @@ module "dev_workstation_security_group" {
       ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     }
   ]
-  number_of_computed_ingress_with_ipv6_cidr_blocks = 3
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 4
 
   egress_with_cidr_blocks = [
     {
