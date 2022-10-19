@@ -8,7 +8,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.58.0"
+      version = "~> 4.35.0"
     }
   }
 
@@ -325,7 +325,7 @@ output "root_vpn_client_certificate" {
 
 module "vpn_access_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "4.13.1"
 
   name        = "vpn_access_security_group"
   description = "Security group for VPN Access"
@@ -399,6 +399,8 @@ resource "aws_cloudwatch_log_stream" "client_vpn_log_stream" {
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description = "Omega Client VPN"
 
+  vpc_id     = module.vpc.vpc_id
+
   client_cidr_block = local.vpn_client_cidr_block
   split_tunnel      = true
 
@@ -414,6 +416,12 @@ resource "aws_ec2_client_vpn_endpoint" "vpn" {
     cloudwatch_log_group  = aws_cloudwatch_log_group.client_vpn_log_group.name
     cloudwatch_log_stream = aws_cloudwatch_log_stream.client_vpn_log_stream.name
   }
+
+  self_service_portal = "disabled"
+
+  security_group_ids = [
+    module.vpn_access_security_group.security_group_id
+  ]
 
   tags = {
     Name        = "client_vpn_endpoint"
@@ -442,10 +450,6 @@ resource "aws_ec2_client_vpn_network_association" "vpn_for_vpc_private_subnet_de
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
   subnet_id              = data.aws_subnet.vpc_private_subnet_dev_general_id.id # NOTE: restricted to vpc_private_subnet_dev_general
 
-  security_groups = [
-    module.vpn_access_security_group.security_group_id
-  ]
-
   lifecycle {
     // The issue why we are ignoring changes is that on every change
     // terraform screws up most of the vpn assosciations
@@ -462,7 +466,7 @@ resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_for_vpc_private_subne
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.7.0"
+  version = "3.16.1"
 
   name = "tna_ct_omega_vpc"
 
@@ -891,7 +895,7 @@ data "aws_ami" "amazon_linux_2_arm64" {
 
 module "dev_workstation_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "4.13.1"
 
   name        = "dev_workstation_security_group"
   description = "Security group for Development Workstation ports open within VPC"
@@ -1225,6 +1229,7 @@ resource "aws_instance" "dev_workstation_1" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data_replace_on_change = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -1264,13 +1269,6 @@ resource "aws_instance" "dev_workstation_1" {
     Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
-
-  lifecycle {
-    // The issue why we are ignoring changes is that updates
-    // to user_data cause Terraform to want to replace existing instances - we don't want that!
-    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
-    ignore_changes = [user_data]
-  }
 }
 
 resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
@@ -1289,6 +1287,7 @@ resource "aws_instance" "dev_workstation_2" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data_replace_on_change = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -1328,13 +1327,6 @@ resource "aws_instance" "dev_workstation_2" {
     Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
-
-  lifecycle {
-    // The issue why we are ignoring changes is that updates
-    // to user_data cause Terraform to want to replace existing instances - we don't want that!
-    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
-    ignore_changes = [user_data]
-  }
 }
 
 resource "aws_route53_record" "dns_a_dev2_in_cat_nationalarchives_gov_uk" {
@@ -1353,6 +1345,7 @@ resource "aws_instance" "dev_workstation_3" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data_replace_on_change = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -1392,13 +1385,6 @@ resource "aws_instance" "dev_workstation_3" {
     Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
-
-  lifecycle {
-    // The issue why we are ignoring changes is that updates
-    // to user_data cause Terraform to want to replace existing instances - we don't want that!
-    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
-    ignore_changes = [user_data]
-  }
 }
 
 resource "aws_route53_record" "dns_a_dev3_in_cat_nationalarchives_gov_uk" {
@@ -1417,6 +1403,7 @@ resource "aws_instance" "dev_workstation_4" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data_replace_on_change = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -1455,13 +1442,6 @@ resource "aws_instance" "dev_workstation_4" {
     Type                      = "dev_workstation"
     Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
-  }
-
-  lifecycle {
-    // The issue why we are ignoring changes is that updates
-    // to user_data cause Terraform to want to replace existing instances - we don't want that!
-    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
-    ignore_changes = [user_data]
   }
 }
 
@@ -1695,6 +1675,7 @@ resource "aws_instance" "mssql_server_1" {
     aws_secretsmanager_secret_version.mssql_server_1_sa_password_secret_version
   ]
   user_data = data.cloudinit_config.mssql_server.rendered
+  user_data_replace_on_change = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -1777,13 +1758,6 @@ resource "aws_instance" "mssql_server_1" {
     Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
-
-  lifecycle {
-    // The issue why we are ignoring changes is that updates
-    // to user_data cause Terraform to want to replace existing instances - we don't want that!
-    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
-    ignore_changes = [user_data]
-  }
 }
 
 resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
@@ -1848,7 +1822,7 @@ output "omega_private_mvpbeta_dns_servers" {
 
 module "mvpbeta_web_proxy_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "4.13.1"
 
   name        = "web_proxy_security_group"
   description = "Security group for Web Proxy ports open within VPC"
@@ -2037,6 +2011,7 @@ resource "aws_instance" "mvpbeta_web_proxy_1" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.web_proxy.rendered
+  user_data_replace_on_change = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -2069,13 +2044,6 @@ resource "aws_instance" "mvpbeta_web_proxy_1" {
     Environment               = "mvpbeta"
     scheduler_mon_fri_dev_ec2 = "true"
   }
-
-  lifecycle {
-    // The issue why we are ignoring changes is that updates
-    // to user_data cause Terraform to want to replace existing instances - we don't want that!
-    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
-    ignore_changes = [user_data]
-  }
 }
 
 resource "aws_route53_record" "dns_a_web-proxy-1_mvpbeta_catalogue_nationalarchives_gov_uk" {
@@ -2091,7 +2059,7 @@ resource "aws_route53_record" "dns_a_web-proxy-1_mvpbeta_catalogue_nationalarchi
 
 module "mvpbeta_web_app_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.0"
+  version = "4.13.1"
 
   name        = "web_app_security_group"
   description = "Security group for Web Application ports open within VPC"
@@ -2262,6 +2230,7 @@ resource "aws_instance" "mvpbeta_web_app_1" {
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
   user_data = data.cloudinit_config.web_app.rendered
+  user_data_replace_on_change = false
 
   metadata_options {
     http_endpoint = "enabled"
@@ -2293,13 +2262,6 @@ resource "aws_instance" "mvpbeta_web_app_1" {
     Type                      = "web_app"
     Environment               = "mvpbeta"
     scheduler_mon_fri_dev_ec2 = "true"
-  }
-
-  lifecycle {
-    // The issue why we are ignoring changes is that updates
-    // to user_data cause Terraform to want to replace existing instances - we don't want that!
-    // see: https://stackoverflow.com/questions/65806726/terraform-minor-aws-user-data-change-forces-replacement-what-is-the-best-res
-    ignore_changes = [user_data]
   }
 }
 
