@@ -8,7 +8,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 3.57.0"
+      version = "~> 3.58.0"
     }
   }
 
@@ -183,7 +183,6 @@ resource "tls_private_key" "vpn_server_certificate_private_key" {
 }
 
 resource "tls_cert_request" "vpn_server_certificate_signing_request" {
-  key_algorithm   = "RSA"
   private_key_pem = tls_private_key.vpn_server_certificate_private_key.private_key_pem
 
   subject {
@@ -272,7 +271,6 @@ resource "tls_private_key" "root_vpn_client_certificate_private_key" {
 }
 
 resource "tls_cert_request" "root_vpn_client_certificate_signing_request" {
-  key_algorithm   = "RSA"
   private_key_pem = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
 
   subject {

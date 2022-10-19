@@ -5,7 +5,6 @@ resource "tls_private_key" "edelpino_vpn_client_certificate_private_key" {
 }
 
 resource "tls_cert_request" "edelpino_vpn_client_certificate_signing_request" {
-  key_algorithm   = "RSA"
   private_key_pem = tls_private_key.edelpino_vpn_client_certificate_private_key.private_key_pem
 
   subject {
