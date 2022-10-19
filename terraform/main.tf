@@ -510,6 +510,13 @@ module "vpc" {
   enable_ipv6                     = true
   assign_ipv6_address_on_creation = true
 
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
+  one_nat_gateway_per_az = false
+  reuse_nat_ips          = true                         # <= Skip creation of EIPs for the NAT Gateways
+  external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
+
+
   manage_default_network_acl = true
 
   private_dedicated_network_acl = true
@@ -765,12 +772,6 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
   ]
-
-  enable_nat_gateway     = true
-  single_nat_gateway     = true
-  one_nat_gateway_per_az = false
-  reuse_nat_ips          = true                         # <= Skip creation of EIPs for the NAT Gateways
-  external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
   vpc_tags = {
     Name = "vpc"
