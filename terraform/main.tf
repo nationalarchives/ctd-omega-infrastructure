@@ -17,11 +17,11 @@ terraform {
 
 locals {
   aws_region = "eu-west-2"
-  aws_azs = ["${local.aws_region}a"]
+  aws_azs    = ["${local.aws_region}a"]
 
 
-  public_dns_domain = "cat.nationalarchives.gov.uk"
-  private_dev_dns_domain = "dev.${local.public_dns_domain}"
+  public_dns_domain          = "cat.nationalarchives.gov.uk"
+  private_dev_dns_domain     = "dev.${local.public_dns_domain}"
   private_mvpbeta_dns_domain = "mvpbeta.${local.public_dns_domain}"
 
   vpn_client_cidr_block = "10.255.252.0/22"
@@ -52,7 +52,7 @@ locals {
   vpc_private_subnets = [
     /* Development private subnets */
     local.vpc_private_subnet_dev_general,
-    local.vpc_private_subnet_dev_databases,     # TODO(AR) move to vpc_database_subnets
+    local.vpc_private_subnet_dev_databases, # TODO(AR) move to vpc_database_subnets
 
     /* MVP Beta private subnets */
     local.vpc_private_subnet_mvpbeta_web,
@@ -90,15 +90,15 @@ locals {
 
   # See https://datatracker.ietf.org/doc/html/rfc6056.html#section-2
   unpriviledged_port_start = 1024
-  unpriviledged_port_end = 65535
+  unpriviledged_port_end   = 65535
 
   # See https://datatracker.ietf.org/doc/html/rfc6056.html#section-2.1
   iana_ephemeral_port_start = 49152
-  iana_ephemeral_port_end = 65535
+  iana_ephemeral_port_end   = 65535
 
   # See `cat /proc/net/sys/ipv4/ip_local_port_range`
   linux_ephemeral_port_start = 32768
-  linux_ephemeral_port_end = 60999
+  linux_ephemeral_port_end   = 60999
 }
 
 provider "aws" {
@@ -109,7 +109,7 @@ provider "aws" {
 data "aws_partition" "current" {}
 
 resource "aws_eip" "vpc_subnet_nats" {
-  count = 1  # NOTE: must match the number of NAT Gateways in the VPC!
+  count = 1 # NOTE: must match the number of NAT Gateways in the VPC!
   vpc   = true
 }
 
@@ -123,16 +123,16 @@ resource "aws_route53_zone" "omega_public_dns" {
 
 resource "aws_route53_record" "omega_public_dns_nameservers" {
   allow_overwrite = true
-  name = local.public_dns_domain
-  ttl             = 86400      # 24 Hours
+  name            = local.public_dns_domain
+  ttl             = 86400 # 24 Hours
   type            = "NS"
   zone_id         = aws_route53_zone.omega_public_dns.zone_id
-  records = aws_route53_zone.omega_public_dns.name_servers
+  records         = aws_route53_zone.omega_public_dns.name_servers
 }
 
 output "omega_public_dns_servers" {
   description = "Public DNS Servers for Omega"
-  value = aws_route53_zone.omega_public_dns.name_servers
+  value       = aws_route53_zone.omega_public_dns.name_servers
 }
 
 resource "aws_acmpca_certificate_authority_certificate" "omega_ca_certificate_association" {
@@ -163,37 +163,37 @@ resource "aws_acmpca_certificate_authority" "omega_ca" {
     signing_algorithm = "SHA512WITHRSA"
 
     subject {
-      common_name = local.public_dns_domain
+      common_name         = local.public_dns_domain
       organizational_unit = "Project Omega"
-      organization = "The National Archives"
-      locality = "Kew"
-      state = "Surrey"
-      country = "GB"
+      organization        = "The National Archives"
+      locality            = "Kew"
+      state               = "Surrey"
+      country             = "GB"
     }
   }
 
   tags = {
-      Name = "certificate_authority"
+    Name = "certificate_authority"
   }
 }
 
 resource "tls_private_key" "vpn_server_certificate_private_key" {
-  algorithm   = "RSA"
-  rsa_bits = "2048"
+  algorithm = "RSA"
+  rsa_bits  = "2048"
 }
 
 resource "tls_cert_request" "vpn_server_certificate_signing_request" {
   private_key_pem = tls_private_key.vpn_server_certificate_private_key.private_key_pem
 
   subject {
-    common_name = "vpn-server.${local.public_dns_domain}"
+    common_name         = "vpn-server.${local.public_dns_domain}"
     organizational_unit = "Project Omega"
-    organization = "The National Archives"
-    street_address = ["Bessant Drive"]
-    locality = "Kew"
-    province = "Surrey"
-    country = "GB"
-    postal_code = "TW9 4DU"
+    organization        = "The National Archives"
+    street_address      = ["Bessant Drive"]
+    locality            = "Kew"
+    province            = "Surrey"
+    country             = "GB"
+    postal_code         = "TW9 4DU"
   }
 }
 
@@ -208,8 +208,8 @@ resource "aws_acmpca_certificate" "vpn_server_certificate" {
 }
 
 resource "aws_acm_certificate" "vpn_server" {
-  private_key = tls_private_key.vpn_server_certificate_private_key.private_key_pem
-  certificate_body = aws_acmpca_certificate.vpn_server_certificate.certificate
+  private_key       = tls_private_key.vpn_server_certificate_private_key.private_key_pem
+  certificate_body  = aws_acmpca_certificate.vpn_server_certificate.certificate
   certificate_chain = aws_acmpca_certificate.vpn_server_certificate.certificate_chain
 
   lifecycle {
@@ -217,8 +217,8 @@ resource "aws_acm_certificate" "vpn_server" {
   }
 
   tags = {
-    Name = "certificate"
-    Scope = "vpn_server"
+    Name        = "certificate"
+    Scope       = "vpn_server"
     Environment = "vpn"
   }
 }
@@ -251,12 +251,12 @@ resource "aws_acmpca_certificate_authority" "vpn_client_ca" {
     signing_algorithm = "SHA512WITHRSA"
 
     subject {
-      common_name = "vpn-client.nationalarchives.gov.uk"
+      common_name         = "vpn-client.nationalarchives.gov.uk"
       organizational_unit = "Project Omega"
-      organization = "The National Archives"
-      locality = "Kew"
-      state = "Surrey"
-      country = "GB"
+      organization        = "The National Archives"
+      locality            = "Kew"
+      state               = "Surrey"
+      country             = "GB"
     }
   }
 
@@ -266,22 +266,22 @@ resource "aws_acmpca_certificate_authority" "vpn_client_ca" {
 }
 
 resource "tls_private_key" "root_vpn_client_certificate_private_key" {
-  algorithm   = "RSA"
-  rsa_bits = "2048"
+  algorithm = "RSA"
+  rsa_bits  = "2048"
 }
 
 resource "tls_cert_request" "root_vpn_client_certificate_signing_request" {
   private_key_pem = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
 
   subject {
-    common_name = "root.vpn-client.${local.public_dns_domain}"
+    common_name         = "root.vpn-client.${local.public_dns_domain}"
     organizational_unit = "Project Omega"
-    organization = "The National Archives"
-    street_address = ["Bessant Drive"]
-    locality = "Kew"
-    province = "Surrey"
-    country = "GB"
-    postal_code = "TW9 4DU"
+    organization        = "The National Archives"
+    street_address      = ["Bessant Drive"]
+    locality            = "Kew"
+    province            = "Surrey"
+    country             = "GB"
+    postal_code         = "TW9 4DU"
   }
 }
 
@@ -296,8 +296,8 @@ resource "aws_acmpca_certificate" "root_vpn_client_certificate" {
 }
 
 resource "aws_acm_certificate" "root_vpn_client_certificate" {
-  private_key = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
-  certificate_body = aws_acmpca_certificate.root_vpn_client_certificate.certificate
+  private_key       = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
+  certificate_body  = aws_acmpca_certificate.root_vpn_client_certificate.certificate
   certificate_chain = aws_acmpca_certificate.root_vpn_client_certificate.certificate_chain
 
   lifecycle {
@@ -305,26 +305,26 @@ resource "aws_acm_certificate" "root_vpn_client_certificate" {
   }
 
   tags = {
-    Name = "certificate"
-    Scope = "vpn_client"
+    Name        = "certificate"
+    Scope       = "vpn_client"
     Environment = "vpn"
   }
 }
 
 output "root_vpn_client_certificate_private_key" {
   description = "VPN Client Root Certificate Private Key"
-  value = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
+  value       = tls_private_key.root_vpn_client_certificate_private_key.private_key_pem
 
   sensitive = true
 }
 
 output "root_vpn_client_certificate" {
   description = "VPN Client Root Certificate"
-  value = aws_acmpca_certificate.root_vpn_client_certificate.certificate
+  value       = aws_acmpca_certificate.root_vpn_client_certificate.certificate
 }
 
 module "vpn_access_security_group" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 
   name        = "vpn_access_security_group"
@@ -376,63 +376,63 @@ module "vpn_access_security_group" {
 
   tags = {
     Name        = "sg_dev_vpn"
-    Type = "security_group"
+    Type        = "security_group"
     Environment = "vpn"
   }
 }
 
 resource "aws_cloudwatch_log_group" "client_vpn_log_group" {
-  name = "client_vpn"
+  name              = "client_vpn"
   retention_in_days = 60
   tags = {
-    Name = "log_group"
+    Name        = "log_group"
     Environment = "vpn"
   }
 }
 
 resource "aws_cloudwatch_log_stream" "client_vpn_log_stream" {
-  name = "client_vpn"
+  name           = "client_vpn"
   log_group_name = aws_cloudwatch_log_group.client_vpn_log_group.name
 }
 
 
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description = "Omega Client VPN"
-  
+
   client_cidr_block = local.vpn_client_cidr_block
-  split_tunnel = true
+  split_tunnel      = true
 
   server_certificate_arn = aws_acm_certificate.vpn_server.arn
 
   authentication_options {
-    type = "certificate-authentication"
+    type                       = "certificate-authentication"
     root_certificate_chain_arn = aws_acm_certificate.root_vpn_client_certificate.arn
   }
 
   connection_log_options {
-    enabled = true
-    cloudwatch_log_group = aws_cloudwatch_log_group.client_vpn_log_group.name
+    enabled               = true
+    cloudwatch_log_group  = aws_cloudwatch_log_group.client_vpn_log_group.name
     cloudwatch_log_stream = aws_cloudwatch_log_stream.client_vpn_log_stream.name
   }
 
   tags = {
-    Name = "client_vpn_endpoint"
+    Name        = "client_vpn_endpoint"
     Environment = "vpn"
   }
 }
 
 output "omega_client_vpn_endpoint" {
   description = "Client VPN Endpoint for Omega"
-  value = aws_ec2_client_vpn_endpoint.vpn.dns_name
+  value       = aws_ec2_client_vpn_endpoint.vpn.dns_name
 }
 
 data "aws_subnet" "vpc_private_subnet_dev_general_id" {
-  vpc_id = module.vpc.vpc_id
+  vpc_id     = module.vpc.vpc_id
   cidr_block = module.vpc.private_subnets_cidr_blocks[0] # This is vpc_private_subnet_dev_general
 }
 
 data "aws_subnet" "vpc_private_subnet_dev_general_ipv6_id" {
-  vpc_id = module.vpc.vpc_id
+  vpc_id          = module.vpc.vpc_id
   ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # This is vpc_private_subnet_dev_general (IPv6)
 }
 
@@ -440,7 +440,7 @@ resource "aws_ec2_client_vpn_network_association" "vpn_for_vpc_private_subnet_de
   count = 1
 
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
-  subnet_id = data.aws_subnet.vpc_private_subnet_dev_general_id.id  # NOTE: restricted to vpc_private_subnet_dev_general
+  subnet_id              = data.aws_subnet.vpc_private_subnet_dev_general_id.id # NOTE: restricted to vpc_private_subnet_dev_general
 
   security_groups = [
     module.vpn_access_security_group.security_group_id
@@ -456,12 +456,12 @@ resource "aws_ec2_client_vpn_network_association" "vpn_for_vpc_private_subnet_de
 
 resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_for_vpc_private_subnet_dev_general" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn.id
-  target_network_cidr = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
-  authorize_all_groups = true
+  target_network_cidr    = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+  authorize_all_groups   = true
 }
 
 module "vpc" {
-  source = "terraform-aws-modules/vpc/aws"
+  source  = "terraform-aws-modules/vpc/aws"
   version = "3.7.0"
 
   name = "tna_ct_omega_vpc"
@@ -479,28 +479,28 @@ module "vpc" {
   # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv6
   # Planning tool: https://tidalmigrations.com/subnet-builder/
 
-  private_subnets = local.vpc_private_subnets
+  private_subnets              = local.vpc_private_subnets
   private_subnet_ipv6_prefixes = local.vpc_private_ipv6_subnets
   private_subnet_tags = {
     Type = "private_subnet"
   }
 
-  database_subnets = local.vpc_database_subnets
+  database_subnets              = local.vpc_database_subnets
   database_subnet_ipv6_prefixes = local.vpc_database_ipv6_subnets
   database_subnet_tags = {
     Type = "database_subnet"
   }
 
-  intra_subnets = local.vpc_intra_subnets
+  intra_subnets              = local.vpc_intra_subnets
   intra_subnet_ipv6_prefixes = local.vpc_intra_ipv6_subnets
   intra_subnet_tags = {
     Type = "intra_subnet"
   }
 
-  public_subnets = local.vpc_public_subnets
+  public_subnets              = local.vpc_public_subnets
   public_subnet_ipv6_prefixes = local.vpc_public_ipv6_subnets
   public_subnet_tags = {
-      Type = "public_subnet"
+    Type = "public_subnet"
   }
 
   enable_ipv6                     = true
@@ -508,88 +508,88 @@ module "vpc" {
 
   manage_default_network_acl = true
 
-  private_dedicated_network_acl     = true
+  private_dedicated_network_acl = true
 
-  private_inbound_acl_rules       = [
+  private_inbound_acl_rules = [
     {
       rule_number = 100
       rule_action = "allow"
       from_port   = 22
-      to_port   = 22
+      to_port     = 22
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 160
-      rule_action = "allow"
-      from_port   = 22
-      to_port   = 22
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 160
+      rule_action     = "allow"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 200
       rule_action = "allow"
       from_port   = 3389
-      to_port   = 3389
+      to_port     = 3389
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 260
-      rule_action = "allow"
-      from_port   = 3389
-      to_port   = 3389
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 260
+      rule_action     = "allow"
+      from_port       = 3389
+      to_port         = 3389
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 300
       rule_action = "allow"
       from_port   = 80
-      to_port   = 80
+      to_port     = 80
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 360
-      rule_action = "allow"
-      from_port   = 80
-      to_port   = 80
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 360
+      rule_action     = "allow"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 400
       rule_action = "allow"
       from_port   = 443
-      to_port   = 443
+      to_port     = 443
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 460
-      rule_action = "allow"
-      from_port   = 443
-      to_port   = 443
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 460
+      rule_action     = "allow"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 600
       rule_action = "allow"
       from_port   = 9443
-      to_port   = 9443
+      to_port     = 9443
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 660
-      rule_action = "allow"
-      from_port   = 9443
-      to_port   = 9443
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 660
+      rule_action     = "allow"
+      from_port       = 9443
+      to_port         = 9443
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow results from outgoing IPv4 internet traffic
@@ -602,127 +602,127 @@ module "vpc" {
     },
     {
       # allow results from outgoing IPv6 internet traffic
-      rule_number = 960
-      rule_action = "allow"
-      from_port   = local.unpriviledged_port_start
-      to_port     = local.unpriviledged_port_end
-      protocol    = "tcp"
+      rule_number     = 960
+      rule_action     = "allow"
+      from_port       = local.unpriviledged_port_start
+      to_port         = local.unpriviledged_port_end
+      protocol        = "tcp"
       ipv6_cidr_block = "::/0"
     }
   ]
 
-  private_outbound_acl_rules       = [
+  private_outbound_acl_rules = [
     {
       rule_number = 100
       rule_action = "allow"
       from_port   = 22
-      to_port   = 22
+      to_port     = 22
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 160
-      rule_action = "allow"
-      from_port   = 22
-      to_port   = 22
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 160
+      rule_action     = "allow"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 101
       rule_action = "allow"
       from_port   = 22
-      to_port   = 22
+      to_port     = 22
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[4]  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
-      rule_number = 161
-      rule_action = "allow"
-      from_port   = 22
-      to_port   = 22
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4]  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      rule_number     = 161
+      rule_action     = "allow"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       rule_number = 102
       rule_action = "allow"
       from_port   = 22
-      to_port   = 22
+      to_port     = 22
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
-      rule_number = 162
-      rule_action = "allow"
-      from_port   = 22
-      to_port   = 22
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      rule_number     = 162
+      rule_action     = "allow"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       rule_number = 200
       rule_action = "allow"
       from_port   = 3389
-      to_port   = 3389
+      to_port     = 3389
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 260
-      rule_action = "allow"
-      from_port   = 3389
-      to_port   = 3389
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 260
+      rule_action     = "allow"
+      from_port       = 3389
+      to_port         = 3389
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 300
       rule_action = "allow"
       from_port   = 80
-      to_port   = 80
+      to_port     = 80
       protocol    = "tcp"
-      cidr_block = "0.0.0.0/0"
+      cidr_block  = "0.0.0.0/0"
     },
     {
-      rule_number = 360
-      rule_action = "allow"
-      from_port   = 80
-      to_port   = 80
-      protocol    = "tcp"
+      rule_number     = 360
+      rule_action     = "allow"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
       ipv6_cidr_block = "::/0"
     },
     {
       rule_number = 400
       rule_action = "allow"
       from_port   = 443
-      to_port   = 443
+      to_port     = 443
       protocol    = "tcp"
-      cidr_block = "0.0.0.0/0"
+      cidr_block  = "0.0.0.0/0"
     },
     {
-      rule_number = 460
-      rule_action = "allow"
-      from_port   = 443
-      to_port   = 443
-      protocol    = "tcp"
+      rule_number     = 460
+      rule_action     = "allow"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
       ipv6_cidr_block = "::/0"
     },
     {
       rule_number = 500
       rule_action = "allow"
       from_port   = 9443
-      to_port   = 9443
+      to_port     = 9443
       protocol    = "tcp"
-      cidr_block = module.vpc.private_subnets_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
-      rule_number = 560
-      rule_action = "allow"
-      from_port   = 9443
-      to_port   = 9443
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      rule_number     = 560
+      rule_action     = "allow"
+      from_port       = 9443
+      to_port         = 9443
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv4 return traffic from vpc_private_subnet_dev_general
@@ -731,16 +731,16 @@ module "vpc" {
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 return traffic from vpc_private_subnet_dev_general
-      rule_number = 1260
-      rule_action = "allow"
-      from_port   = local.linux_ephemeral_port_start
-      to_port     = local.linux_ephemeral_port_end
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      rule_number     = 1260
+      rule_action     = "allow"
+      from_port       = local.linux_ephemeral_port_start
+      to_port         = local.linux_ephemeral_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta
@@ -749,24 +749,24 @@ module "vpc" {
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4]  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow IPv6 return traffic from vpc_private_subnet_mvpbeta_web
-      rule_number = 1460
-      rule_action = "allow"
-      from_port   = local.linux_ephemeral_port_start
-      to_port     = local.linux_ephemeral_port_end
-      protocol    = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      rule_number     = 1460
+      rule_action     = "allow"
+      from_port       = local.linux_ephemeral_port_start
+      to_port         = local.linux_ephemeral_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
   ]
 
-  enable_nat_gateway  = true
-  single_nat_gateway  = true
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
   one_nat_gateway_per_az = false
-  reuse_nat_ips       = true             # <= Skip creation of EIPs for the NAT Gateways
-  external_nat_ip_ids = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
+  reuse_nat_ips          = true                         # <= Skip creation of EIPs for the NAT Gateways
+  external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
   vpc_tags = {
     Name = "vpc"
@@ -782,10 +782,10 @@ resource "aws_flow_log" "vpc_flow_log" {
 }
 
 resource "aws_cloudwatch_log_group" "vpc_log_group" {
-  name = "vpc_log_group"
+  name              = "vpc_log_group"
   retention_in_days = 7
   tags = {
-    Name = "log_group"
+    Name        = "log_group"
     Environment = "all"
   }
 }
@@ -799,7 +799,7 @@ resource "aws_iam_role" "vpc_log_group_iam_role" {
       {
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid = ""
+        Sid    = ""
         Principal = {
           Service = "vpc-flow-logs.amazonaws.com"
         }
@@ -823,7 +823,7 @@ resource "aws_iam_role_policy" "vpc_log_group_iam_role_policy" {
           "logs:DescribeLogGroups",
           "logs:DescribeLogStreams"
         ]
-        Effect = "Allow"
+        Effect   = "Allow"
         Resource = "*"
       }
     ]
@@ -832,7 +832,7 @@ resource "aws_iam_role_policy" "vpc_log_group_iam_role_policy" {
 
 output "omega_vpc" {
   description = "Omega VPC"
-  value = module.vpc.vpc_id
+  value       = module.vpc.vpc_id
 }
 
 resource "aws_route53_zone" "omega_private_dev_dns" {
@@ -849,13 +849,13 @@ resource "aws_route53_zone" "omega_private_dev_dns" {
 
 output "omega_private_dev_dns_servers" {
   description = "DNS Servers for Omega dev environment"
-  value = aws_route53_zone.omega_private_dev_dns.name_servers
+  value       = aws_route53_zone.omega_private_dev_dns.name_servers
 }
 
 resource "aws_vpc_dhcp_options" "vpc_dhcp_options" {
-  domain_name          = local.private_dev_dns_domain
+  domain_name = local.private_dev_dns_domain
   #domain_name_servers  = aws_route53_zone.omega_private_dev_dns.name_servers   # TODO(AR) how do we reesolve against our private_dev_dns_domain?
-  domain_name_servers  = ["AmazonProvidedDNS"]
+  domain_name_servers = ["AmazonProvidedDNS"]
 
   tags = {
     Name = "vpc_dhcp_options"
@@ -890,7 +890,7 @@ data "aws_ami" "amazon_linux_2_arm64" {
 }
 
 module "dev_workstation_security_group" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 
   name        = "dev_workstation_security_group"
@@ -925,7 +925,7 @@ module "dev_workstation_security_group" {
       from_port   = 3389
       to_port     = 3389
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     }
   ]
   number_of_computed_ingress_with_cidr_blocks = 4
@@ -936,28 +936,28 @@ module "dev_workstation_security_group" {
       from_port        = 22
       to_port          = 22
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
       description      = "return-from-vpc_private_tna_net_subnet_mvpbeta (IPv6)"
-      from_port   = local.linux_ephemeral_port_start
-      to_port     = local.linux_ephemeral_port_end
+      from_port        = local.linux_ephemeral_port_start
+      to_port          = local.linux_ephemeral_port_end
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[4]  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta (IPv6)
     },
     {
       description      = "return-from-vpc_private_subnet_mvpbeta_web (IPv6)"
-      from_port   = local.linux_ephemeral_port_start
-      to_port     = local.linux_ephemeral_port_end
+      from_port        = local.linux_ephemeral_port_start
+      to_port          = local.linux_ephemeral_port_end
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[2]  # NOTE: restricted to vpc_private_subnet_mvpbeta_web (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web (IPv6)
     },
     {
-      description = "RDP (IPv6)"
-      from_port   = 3389
-      to_port     = 3389
-      protocol    = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+      description      = "RDP (IPv6)"
+      from_port        = 3389
+      to_port          = 3389
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     }
   ]
   number_of_computed_ingress_with_ipv6_cidr_blocks = 4
@@ -984,7 +984,7 @@ module "dev_workstation_security_group" {
 
   tags = {
     Name        = "sg_dev_workstation"
-    Type = "security_group"
+    Type        = "security_group"
     Environment = "dev"
   }
 }
@@ -996,7 +996,7 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
-      module.dev_workstation_security_group.security_group_id
+    module.dev_workstation_security_group.security_group_id
   ]
 
   tags = {
@@ -1032,7 +1032,7 @@ resource "aws_network_interface" "dev_workstation_2_private_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
-      module.dev_workstation_security_group.security_group_id
+    module.dev_workstation_security_group.security_group_id
   ]
 
   tags = {
@@ -1068,7 +1068,7 @@ resource "aws_network_interface" "dev_workstation_3_private_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
-      module.dev_workstation_security_group.security_group_id
+    module.dev_workstation_security_group.security_group_id
   ]
 
   tags = {
@@ -1104,7 +1104,7 @@ resource "aws_network_interface" "dev_workstation_4_private_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
-      module.dev_workstation_security_group.security_group_id
+    module.dev_workstation_security_group.security_group_id
   ]
 
   tags = {
@@ -1139,20 +1139,20 @@ resource "aws_key_pair" "omega_admin_key_pair" {
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDgy946NcJxQGKhoMSpdKKxKwH1hqM4VOolTiYB+AssPV+8yJ8NTbAdxJhm0as6IIbJgVcrYpoZ98S+DKN1WZwJLBM+ahKbXhftvu+EIq7TQlUjreBimArbRK7VCSGnyLHfaMDgE7X+pXrfnrLwvYyp2vODPfl7p0wGsbPIAFNzmI2NyX2o/ozRJWtHwK29PGj0nqRs1TpfD9PUGEm4dqAMVllLwl/glu3/vS18QfNAda5q4wW3Gz+YBR1aefp9xj/RXaTFjUUAVcbiIkB32zstOTn95BLEYk4soLm2Wrr49aYcMoQWS4jqqegCNIM07RHxNrx9dti8CVhF82LeMxl3vUjS3BddmhxGTSuMio1QwTJWTTRuWGhwMZof2RG6YnZhmwl2iy9Ptk9jlwofU8TziP2A0zvllhMvtrr3sVk8QFQ3wmKxeM7PKCbmdVmOETXTCiJ5b33e5B7FoVYsuUxolJyN39tkLG8aBEgYGmowqxSsnJ0BcFIaX2jfoCRGLbs= admin@cat.nationalarchives.gov.uk"
 
   tags = {
-    Name = "key_pair"
-    Network = "all"
+    Name        = "key_pair"
+    Network     = "all"
     Environment = "all"
   }
 }
 
 data "cloudinit_config" "dev_workstation" {
-  gzip = true
+  gzip          = true
   base64_encode = true
 
   part {
     content_type = "text/cloud-config"
-    filename = "yum-upgrade.yaml"
-    content = <<EOF
+    filename     = "yum-upgrade.yaml"
+    content      = <<EOF
 #cloud-config
 package_update: true
 package_upgrade: true
@@ -1161,8 +1161,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-01-install-puppet.sh"
-    content = <<EOF
+    filename     = "omega-01-install-puppet.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
 yum -y install puppet
@@ -1171,8 +1171,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-02-install-puppet-modules.sh"
-    content = <<EOF
+    filename     = "omega-02-install-puppet-modules.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
 /opt/puppetlabs/bin/puppet module install saz-ssh
@@ -1186,8 +1186,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-03-install-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-03-install-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
 echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
@@ -1197,8 +1197,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-04-run-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-04-run-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
 EOF
@@ -1206,8 +1206,8 @@ EOF
 
   part {
     content_type = "text/cloud-config"
-    filename = "reboot.yaml"
-    content = <<EOF
+    filename     = "reboot.yaml"
+    content      = <<EOF
 #cloud-config
 power_state:
     delay: now
@@ -1228,7 +1228,7 @@ resource "aws_instance" "dev_workstation_1" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   monitoring = false
@@ -1253,7 +1253,7 @@ resource "aws_instance" "dev_workstation_1" {
 
     tags = {
       Name        = "root_dev1"
-      Type = "primary_volume"
+      Type        = "primary_volume"
       Environment = "dev"
     }
   }
@@ -1292,7 +1292,7 @@ resource "aws_instance" "dev_workstation_2" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   monitoring = false
@@ -1317,15 +1317,15 @@ resource "aws_instance" "dev_workstation_2" {
 
     tags = {
       Name        = "root_dev2"
-      Type = "primary_volume"
+      Type        = "primary_volume"
       Environment = "dev"
     }
   }
 
   tags = {
-    Name        = "dev2"
-    Type        = "dev_workstation"
-    Environment = "dev"
+    Name                      = "dev2"
+    Type                      = "dev_workstation"
+    Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
 
@@ -1356,7 +1356,7 @@ resource "aws_instance" "dev_workstation_3" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   monitoring = false
@@ -1381,15 +1381,15 @@ resource "aws_instance" "dev_workstation_3" {
 
     tags = {
       Name        = "root_dev3"
-      Type = "primary_volume"
+      Type        = "primary_volume"
       Environment = "dev"
     }
   }
 
   tags = {
-    Name        = "dev3"
-    Type        = "dev_workstation"
-    Environment = "dev"
+    Name                      = "dev3"
+    Type                      = "dev_workstation"
+    Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
 
@@ -1420,7 +1420,7 @@ resource "aws_instance" "dev_workstation_4" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   monitoring = false
@@ -1445,15 +1445,15 @@ resource "aws_instance" "dev_workstation_4" {
 
     tags = {
       Name        = "root_dev4"
-      Type = "primary_volume"
+      Type        = "primary_volume"
       Environment = "dev"
     }
   }
 
   tags = {
-    Name        = "dev4"
-    Type        = "dev_workstation"
-    Environment = "dev"
+    Name                      = "dev4"
+    Type                      = "dev_workstation"
+    Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
 
@@ -1492,11 +1492,11 @@ data "aws_network_interface" "dev_mssql_server_1_database_interface" {
 }
 
 resource "random_password" "mssql_server_1_sa_password" {
-  length = 16
-  lower = true
-  upper = true
-  numeric = true
-  special = true
+  length           = 16
+  lower            = true
+  upper            = true
+  numeric          = true
+  special          = true
   override_special = "@#$%"
 }
 
@@ -1531,26 +1531,26 @@ resource "aws_iam_role" "access_dev_mssql_password_iam_role" {
     name = "access_dev_mssql_password_iam_policy"
 
     policy = jsonencode({
-      "Version": "2012-10-17",
-      "Statement": [
+      "Version" : "2012-10-17",
+      "Statement" : [
         {
-          "Effect": "Allow",
-          "Action": [
+          "Effect" : "Allow",
+          "Action" : [
             "secretsmanager:GetResourcePolicy",
             "secretsmanager:GetSecretValue",
             "secretsmanager:DescribeSecret",
             "secretsmanager:ListSecretVersionIds"
           ],
-          "Resource": aws_secretsmanager_secret.mssql_server_1_sa_password_secret.arn,
-          "Condition": {
-             "DateGreaterThan": { "aws:CurrentTime": timestamp() },
-             "DateLessThan": { "aws:CurrentTime": timeadd(timestamp(), "24h") }
+          "Resource" : aws_secretsmanager_secret.mssql_server_1_sa_password_secret.arn,
+          "Condition" : {
+            "DateGreaterThan" : { "aws:CurrentTime" : timestamp() },
+            "DateLessThan" : { "aws:CurrentTime" : timeadd(timestamp(), "24h") }
           }
         },
         {
-            "Effect": "Allow",
-            "Action": "secretsmanager:ListSecrets",
-            "Resource": "*"
+          "Effect" : "Allow",
+          "Action" : "secretsmanager:ListSecrets",
+          "Resource" : "*"
         }
       ]
     })
@@ -1562,13 +1562,13 @@ resource "aws_iam_role" "access_dev_mssql_password_iam_role" {
 }
 
 data "cloudinit_config" "mssql_server" {
-  gzip = true
+  gzip          = true
   base64_encode = true
 
   part {
     content_type = "text/cloud-config"
-    filename = "omega-mount-volumes.yaml"
-    content = <<EOF
+    filename     = "omega-mount-volumes.yaml"
+    content      = <<EOF
 #cloud-config
 mounts:
  - [ xvdb, /mssql/data, "xfs", "defaults,nofail", "0", "0" ]
@@ -1579,8 +1579,8 @@ EOF
 
   part {
     content_type = "text/cloud-config"
-    filename = "omega-yum-upgrade.yaml"
-    content = <<EOF
+    filename     = "omega-yum-upgrade.yaml"
+    content      = <<EOF
 #cloud-config
 package_update: true
 package_upgrade: true
@@ -1589,8 +1589,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-01-format-and-mount-volumes.sh"
-    content = <<EOF
+    filename     = "omega-01-format-and-mount-volumes.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 mkfs -t xfs /dev/xvdb
 mkfs -t xfs /dev/xvdc
@@ -1604,8 +1604,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-02-install-puppet.sh"
-    content = <<EOF
+    filename     = "omega-02-install-puppet.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
 yum -y install puppet
@@ -1614,8 +1614,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-03-install-puppet-modules.sh"
-    content = <<EOF
+    filename     = "omega-03-install-puppet-modules.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
 /opt/puppetlabs/bin/puppet module install saz-ssh
@@ -1628,8 +1628,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-04-install-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-04-install-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
 echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
@@ -1639,8 +1639,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-05-run-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-05-run-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 # Retrieve SA password from AWS Secrets Manager
 command="aws --output text --region ${local.aws_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.mssql_server_1_sa_password_secret.id} --query SecretString"
@@ -1659,8 +1659,8 @@ EOF
 
   part {
     content_type = "text/cloud-config"
-    filename = "reboot.yaml"
-    content = <<EOF
+    filename     = "reboot.yaml"
+    content      = <<EOF
 #cloud-config
 power_state:
     delay: now
@@ -1698,7 +1698,7 @@ resource "aws_instance" "mssql_server_1" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   monitoring = true
@@ -1772,9 +1772,9 @@ resource "aws_instance" "mssql_server_1" {
   }
 
   tags = {
-    Name = "mssql1"
-    Type        = "dev_mssql_server"
-    Environment = "dev"
+    Name                      = "mssql1"
+    Type                      = "dev_mssql_server"
+    Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
 
@@ -1804,7 +1804,7 @@ module "scheduler_mon_fri_dev_stop_ec2" {
   rds_schedule                   = "false"
   cloudwatch_alarm_schedule      = "false"
 
-  scheduler_tag                  = {
+  scheduler_tag = {
     key   = "scheduler_mon_fri_dev_ec2"
     value = "true"
   }
@@ -1820,7 +1820,7 @@ module "scheduler_mon_fri_dev_start_ec2" {
   rds_schedule                   = "false"
   cloudwatch_alarm_schedule      = "false"
 
-  scheduler_tag                  = {
+  scheduler_tag = {
     key   = "scheduler_mon_fri_dev_ec2"
     value = "true"
   }
@@ -1843,11 +1843,11 @@ resource "aws_route53_zone" "omega_private_mvpbeta_dns" {
 
 output "omega_private_mvpbeta_dns_servers" {
   description = "DNS Servers for Omega mvpbeta environment"
-  value = aws_route53_zone.omega_private_mvpbeta_dns.name_servers
+  value       = aws_route53_zone.omega_private_mvpbeta_dns.name_servers
 }
 
 module "mvpbeta_web_proxy_security_group" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 
   name        = "web_proxy_security_group"
@@ -1861,21 +1861,21 @@ module "mvpbeta_web_proxy_security_group" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       description = "HTTP"
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       description = "HTTPS"
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     }
   ]
   number_of_computed_ingress_with_cidr_blocks = 3
@@ -1886,21 +1886,21 @@ module "mvpbeta_web_proxy_security_group" {
       from_port        = 22
       to_port          = 22
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
-      description = "HTTP (IPv6)"
-      from_port   = 80
-      to_port     = 80
-      protocol    = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+      description      = "HTTP (IPv6)"
+      from_port        = 80
+      to_port          = 80
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
-      description = "HTTPS (IPv6)"
-      from_port   = 443
-      to_port     = 443
-      protocol    = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+      description      = "HTTPS (IPv6)"
+      from_port        = 443
+      to_port          = 443
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     }
   ]
   number_of_computed_ingress_with_ipv6_cidr_blocks = 3
@@ -1939,7 +1939,7 @@ resource "aws_network_interface" "mvpbeta_web_proxy_1_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
-      module.mvpbeta_web_proxy_security_group.security_group_id
+    module.mvpbeta_web_proxy_security_group.security_group_id
   ]
 
   tags = {
@@ -1955,13 +1955,13 @@ data "aws_network_interface" "mvpbeta_web_proxy_1_interface" {
 }
 
 data "cloudinit_config" "web_proxy" {
-  gzip = true
+  gzip          = true
   base64_encode = true
 
   part {
     content_type = "text/cloud-config"
-    filename = "yum-upgrade.yaml"
-    content = <<EOF
+    filename     = "yum-upgrade.yaml"
+    content      = <<EOF
 #cloud-config
 package_update: true
 package_upgrade: true
@@ -1970,8 +1970,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-01-install-puppet.sh"
-    content = <<EOF
+    filename     = "omega-01-install-puppet.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
 yum -y install puppet
@@ -1980,8 +1980,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-02-install-puppet-modules.sh"
-    content = <<EOF
+    filename     = "omega-02-install-puppet-modules.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
 /opt/puppetlabs/bin/puppet module install saz-ssh
@@ -1998,8 +1998,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-03-install-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-03-install-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
 echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
@@ -2009,8 +2009,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-04-run-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-04-run-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
 EOF
@@ -2018,8 +2018,8 @@ EOF
 
   part {
     content_type = "text/cloud-config"
-    filename = "reboot.yaml"
-    content = <<EOF
+    filename     = "reboot.yaml"
+    content      = <<EOF
 #cloud-config
 power_state:
     delay: now
@@ -2030,9 +2030,9 @@ EOF
 }
 
 resource "aws_instance" "mvpbeta_web_proxy_1" {
-  availability_zone    = local.aws_azs[0]
-  ami                  = data.aws_ami.amazon_linux_2_arm64.id
-  instance_type        = "t4g.nano"
+  availability_zone = local.aws_azs[0]
+  ami               = data.aws_ami.amazon_linux_2_arm64.id
+  instance_type     = "t4g.nano"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
@@ -2040,7 +2040,7 @@ resource "aws_instance" "mvpbeta_web_proxy_1" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   monitoring = false
@@ -2090,7 +2090,7 @@ resource "aws_route53_record" "dns_a_web-proxy-1_mvpbeta_catalogue_nationalarchi
 ## Config for web-app-1 below
 
 module "mvpbeta_web_app_security_group" {
-  source = "terraform-aws-modules/security-group/aws"
+  source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 
   name        = "web_app_security_group"
@@ -2104,14 +2104,14 @@ module "mvpbeta_web_app_security_group" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       description = "Play HTTPS"
       from_port   = 9443
       to_port     = 9443
       protocol    = "tcp"
-      cidr_blocks = "${module.vpc.private_subnets_cidr_blocks[0]},${module.vpc.private_subnets_cidr_blocks[4]}"  # NOTE: restricted to vpc_private_subnet_dev_general and vpc_private_tna_net_subnet_mvpbeta
+      cidr_blocks = "${module.vpc.private_subnets_cidr_blocks[0]},${module.vpc.private_subnets_cidr_blocks[4]}" # NOTE: restricted to vpc_private_subnet_dev_general and vpc_private_tna_net_subnet_mvpbeta
     }
   ]
   number_of_computed_ingress_with_cidr_blocks = 2
@@ -2122,14 +2122,14 @@ module "mvpbeta_web_app_security_group" {
       from_port        = 22
       to_port          = 22
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
-      description = "Play HTTPS (IPv6)"
-      from_port   = 9443
-      to_port     = 9443
-      protocol    = "tcp"
-      ipv6_cidr_blocks = "${module.vpc.private_subnets_ipv6_cidr_blocks[0]},${module.vpc.private_subnets_ipv6_cidr_blocks[4]}"  # NOTE: restricted to vpc_private_subnet_dev_general (IPv6) and vpc_private_tna_net_subnet_mvpbeta (IPv6)
+      description      = "Play HTTPS (IPv6)"
+      from_port        = 9443
+      to_port          = 9443
+      protocol         = "tcp"
+      ipv6_cidr_blocks = "${module.vpc.private_subnets_ipv6_cidr_blocks[0]},${module.vpc.private_subnets_ipv6_cidr_blocks[4]}" # NOTE: restricted to vpc_private_subnet_dev_general (IPv6) and vpc_private_tna_net_subnet_mvpbeta (IPv6)
     }
   ]
   number_of_computed_ingress_with_ipv6_cidr_blocks = 2
@@ -2168,7 +2168,7 @@ resource "aws_network_interface" "mvpbeta_web_app_1_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   security_groups = [
-      module.mvpbeta_web_app_security_group.security_group_id
+    module.mvpbeta_web_app_security_group.security_group_id
   ]
 
   tags = {
@@ -2184,13 +2184,13 @@ data "aws_network_interface" "mvpbeta_web_app_1_interface" {
 }
 
 data "cloudinit_config" "web_app" {
-  gzip = true
+  gzip          = true
   base64_encode = true
 
   part {
     content_type = "text/cloud-config"
-    filename = "yum-upgrade.yaml"
-    content = <<EOF
+    filename     = "yum-upgrade.yaml"
+    content      = <<EOF
 #cloud-config
 package_update: true
 package_upgrade: true
@@ -2199,8 +2199,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-01-install-puppet.sh"
-    content = <<EOF
+    filename     = "omega-01-install-puppet.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 rpm -Uvh https://yum.puppet.com/puppet7-release-el-7.noarch.rpm
 yum -y install puppet
@@ -2209,8 +2209,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-02-install-puppet-modules.sh"
-    content = <<EOF
+    filename     = "omega-02-install-puppet-modules.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet module install puppetlabs-stdlib --version 7.1.0
 /opt/puppetlabs/bin/puppet module install saz-ssh
@@ -2223,8 +2223,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-03-install-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-03-install-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 mkdir /root/omega-puppet-scripts
 echo '${filebase64("../puppet/base.pp")}' | base64 -d > /root/omega-puppet-scripts/base.pp
@@ -2234,8 +2234,8 @@ EOF
 
   part {
     content_type = "text/x-shellscript"
-    filename = "omega-04-run-puppet-scripts.sh"
-    content = <<EOF
+    filename     = "omega-04-run-puppet-scripts.sh"
+    content      = <<EOF
 #!/usr/bin/env bash
 /opt/puppetlabs/bin/puppet apply /root/omega-puppet-scripts
 EOF
@@ -2243,8 +2243,8 @@ EOF
 
   part {
     content_type = "text/cloud-config"
-    filename = "reboot.yaml"
-    content = <<EOF
+    filename     = "reboot.yaml"
+    content      = <<EOF
 #cloud-config
 power_state:
     delay: now
@@ -2255,9 +2255,9 @@ EOF
 }
 
 resource "aws_instance" "mvpbeta_web_app_1" {
-  availability_zone    = local.aws_azs[0]
-  ami                  = data.aws_ami.amazon_linux_2_arm64.id
-  instance_type        = "t4g.large"            # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
+  availability_zone = local.aws_azs[0]
+  ami               = data.aws_ami.amazon_linux_2_arm64.id
+  instance_type     = "t4g.large" # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
@@ -2265,7 +2265,7 @@ resource "aws_instance" "mvpbeta_web_app_1" {
 
   metadata_options {
     http_endpoint = "enabled"
-    http_tokens = "required"
+    http_tokens   = "required"
   }
 
   monitoring = false
