@@ -1495,7 +1495,7 @@ resource "random_password" "mssql_server_1_sa_password" {
   length = 16
   lower = true
   upper = true
-  number = true
+  numeric = true
   special = true
   override_special = "@#$%"
 }
