@@ -17,7 +17,8 @@ terraform {
 
 locals {
   aws_region = "eu-west-2"
-  aws_azs    = ["${local.aws_region}a"]
+  aws_az_1   = "${local.aws_region}a"
+  aws_azs    = [local.aws_az_1]
 
 
   public_dns_domain          = "cat.nationalarchives.gov.uk"
