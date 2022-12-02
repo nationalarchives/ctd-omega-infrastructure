@@ -11,12 +11,12 @@
 resource "aws_sqs_queue" "dead_letter_queue" {
   name                       = "deadletter"
   delay_seconds              = 0
-  max_message_size           = 262144     # 256KB
-  message_retention_seconds  = 1209600    # 14 days
+  max_message_size           = 262144  # 256KB
+  message_retention_seconds  = 1209600 # 14 days
   receive_wait_time_seconds  = 0
   visibility_timeout_seconds = 30
   sqs_managed_sse_enabled    = true
-  
+
   redrive_allow_policy = jsonencode({
     redrivePermission = "allowAll"
   })
@@ -32,8 +32,8 @@ resource "aws_sqs_queue" "dead_letter_queue" {
 resource "aws_sqs_queue" "request_general_queue" {
   name                       = "request_general"
   delay_seconds              = 0
-  max_message_size           = 1024     # 1KB
-  message_retention_seconds  = 1209600	# 14 days
+  max_message_size           = 1024    # 1KB
+  message_retention_seconds  = 1209600 # 14 days
   receive_wait_time_seconds  = 0
   visibility_timeout_seconds = 30
   sqs_managed_sse_enabled    = true
