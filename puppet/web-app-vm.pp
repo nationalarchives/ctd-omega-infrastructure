@@ -16,6 +16,16 @@ ufw::allow { 'Play https from web-proxy-1':
   interface => 'eth0',
 }
 
+user { 'ctd-omega-editorial-frontend':
+  ensure     => present,
+  comment    => 'Service User Account for the ctd-omega-editorial-frontend application',
+  system     => true,
+  membership => inclusive,
+  managehome => false,
+  home       => '/nonexistent',
+  shell      => '/sbin/nologin',
+}
+
 package { 'java-11-amazon-corretto':
   ensure => installed,
 }
