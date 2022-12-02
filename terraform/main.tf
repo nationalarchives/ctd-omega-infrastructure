@@ -399,7 +399,7 @@ resource "aws_cloudwatch_log_stream" "client_vpn_log_stream" {
 resource "aws_ec2_client_vpn_endpoint" "vpn" {
   description = "Omega Client VPN"
 
-  vpc_id     = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
 
   client_cidr_block = local.vpn_client_cidr_block
   split_tunnel      = true
@@ -1229,7 +1229,7 @@ resource "aws_instance" "dev_workstation_1" {
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
-  user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data                   = data.cloudinit_config.dev_workstation.rendered
   user_data_replace_on_change = false
 
   metadata_options {
@@ -1287,7 +1287,7 @@ resource "aws_instance" "dev_workstation_2" {
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
-  user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data                   = data.cloudinit_config.dev_workstation.rendered
   user_data_replace_on_change = false
 
   metadata_options {
@@ -1323,9 +1323,9 @@ resource "aws_instance" "dev_workstation_2" {
   }
 
   tags = {
-    Name                      = "dev2"
-    Type                      = "dev_workstation"
-    Environment               = "dev"
+    Name        = "dev2"
+    Type        = "dev_workstation"
+    Environment = "dev"
     #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
@@ -1345,7 +1345,7 @@ resource "aws_instance" "dev_workstation_3" {
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
-  user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data                   = data.cloudinit_config.dev_workstation.rendered
   user_data_replace_on_change = false
 
   metadata_options {
@@ -1403,7 +1403,7 @@ resource "aws_instance" "dev_workstation_4" {
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
-  user_data = data.cloudinit_config.dev_workstation.rendered
+  user_data                   = data.cloudinit_config.dev_workstation.rendered
   user_data_replace_on_change = false
 
   metadata_options {
@@ -1675,7 +1675,7 @@ resource "aws_instance" "mssql_server_1" {
   depends_on = [
     aws_secretsmanager_secret_version.mssql_server_1_sa_password_secret_version
   ]
-  user_data = data.cloudinit_config.mssql_server.rendered
+  user_data                   = data.cloudinit_config.mssql_server.rendered
   user_data_replace_on_change = false
 
   metadata_options {
@@ -1754,9 +1754,9 @@ resource "aws_instance" "mssql_server_1" {
   }
 
   tags = {
-    Name                      = "mssql1"
-    Type                      = "dev_mssql_server"
-    Environment               = "dev"
+    Name        = "mssql1"
+    Type        = "dev_mssql_server"
+    Environment = "dev"
     #scheduler_mon_fri_dev_ec2 = "true"
   }
 }

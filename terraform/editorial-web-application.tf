@@ -214,7 +214,7 @@ resource "aws_instance" "mvpbeta_web_proxy_1" {
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
-  user_data = data.cloudinit_config.web_proxy.rendered
+  user_data                   = data.cloudinit_config.web_proxy.rendered
   user_data_replace_on_change = false
 
   metadata_options {
@@ -433,7 +433,7 @@ resource "aws_instance" "mvpbeta_web_app_1" {
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
 
-  user_data = data.cloudinit_config.web_app.rendered
+  user_data                   = data.cloudinit_config.web_app.rendered
   user_data_replace_on_change = false
 
   metadata_options {
