@@ -553,6 +553,45 @@ exec { 'corepack-prepare-yarn':
   require => Exec['corepack-enable'],
 }
 
+package { 'docker':
+  ensure => installed,
+}
+
+group { 'docker':
+  ensure          => present,
+  auth_membership => false,
+  members         => ['ec2-user'],
+  require         => [
+    User['ec2-user'],
+    Package['docker']
+  ],
+}
+
+service { 'docker':
+  ensure  => running,
+  name    => 'docker',
+  enable  => true,
+  require => [
+    Package['docker'],
+    Group['docker']
+  ],
+}
+
+package { 'python3':
+  ensure => installed,
+}
+
+package { 'python3-pip':
+  ensure  => installed,
+  require => Package['python3'],
+}
+
+package {'docker-compose':
+  provider => 'pip3',
+  ensure   => installed,
+  require  => Package['python3-pip'],
+}
+
 file { '/home/ec2-user/code/pentaho-kettle':
   ensure  => directory,
   replace => false,
