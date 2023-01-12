@@ -5,7 +5,7 @@ module "iam_github_oidc_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
   name = "IAMGitHubOIDCRole"
   subjects = [
-    "repo:nationalarchives/ctd-omega-editorial-frontend:*"
+    "repo:nationalarchives/ctd-omega-editorial-frontend:ref:refs/heads/main"
   ]
   policies = {
     additional = aws_iam_policy.CodeDeployAccess.arn
