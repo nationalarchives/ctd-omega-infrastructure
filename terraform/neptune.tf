@@ -15,7 +15,7 @@ resource "aws_neptune_cluster" "ctd-omega-neptune-dev-cluster-a" {
   preferred_backup_window = "00:00-04:00"
   backup_retention_period = 14 # days
 
-  preferred_maintenance_window = "04:00-08:00"
+  preferred_maintenance_window = "sun:04:00-sun:08:00"
 
   skip_final_snapshot       = false
   final_snapshot_identifier = "ctd-omega-neptune-dev-cluster-a-final-snapshot"
@@ -45,7 +45,7 @@ resource "aws_neptune_cluster_instance" "ctd-omega-neptune-dev-cluster-a-instanc
   apply_immediately = true # TODO(AR) should be set to false for production
 
   tags = {
-    Name        = id
+    Name        = "ctd-omega-neptune-dev-cluster-a-instance"
     Type        = "database"
     DBType      = "neptune"
     Environment = "dev"
