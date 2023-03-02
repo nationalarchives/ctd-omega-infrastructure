@@ -10,12 +10,12 @@ data "aws_iam_policy" "neptune_service_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "neptune_service_role_policy_attach" {
-   role       = "${aws_iam_role.neptune_service_role.name}"
-   policy_arn = "${data.aws_iam_policy.neptune_service_policy.arn}"
+  role       = aws_iam_role.neptune_service_role.name
+  policy_arn = data.aws_iam_policy.neptune_service_policy.arn
 }
 
 resource "aws_iam_role" "neptune_service_role" {
-  name = "NeptuneServiceLinked"
+  name               = "NeptuneServiceLinked"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -70,5 +70,4 @@ resource "aws_iam_user_policy" "neptuneuser_rw" {
   ]
 }
 EOF
-}
 }
