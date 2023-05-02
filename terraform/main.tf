@@ -1274,7 +1274,7 @@ resource "aws_instance" "dev_workstation_1" {
     Name                      = "dev1"
     Type                      = "dev_workstation"
     Environment               = "dev"
-    scheduler_mon_fri_dev_ec2 = "true"
+    #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 
@@ -1390,7 +1390,7 @@ resource "aws_instance" "dev_workstation_3" {
     Name                      = "dev3"
     Type                      = "dev_workstation"
     Environment               = "dev"
-    scheduler_mon_fri_dev_ec2 = "true"
+    #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 
@@ -1448,7 +1448,7 @@ resource "aws_instance" "dev_workstation_4" {
     Name                      = "dev4"
     Type                      = "dev_workstation"
     Environment               = "dev"
-    scheduler_mon_fri_dev_ec2 = "true"
+    #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 

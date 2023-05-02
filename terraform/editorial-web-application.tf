@@ -246,7 +246,7 @@ resource "aws_instance" "mvpbeta_web_proxy_1" {
     Name                      = "web-proxy-1"
     Type                      = "web_proxy"
     Environment               = "mvpbeta"
-    scheduler_mon_fri_dev_ec2 = "true"
+    #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 
@@ -465,7 +465,7 @@ resource "aws_instance" "mvpbeta_web_app_1" {
     Name                      = "web-app-1"
     Type                      = "web_app"
     Environment               = "mvpbeta"
-    scheduler_mon_fri_dev_ec2 = "true"
+    #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 
