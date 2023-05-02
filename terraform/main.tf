@@ -8,7 +8,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.56.0"
+      version = "~> 4.65.0"
     }
   }
 
@@ -325,7 +325,7 @@ output "root_vpn_client_certificate" {
 
 module "vpn_access_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.1"
+  version = "4.17.2"
 
   name        = "vpn_access_security_group"
   description = "Security group for VPN Access"
@@ -466,7 +466,7 @@ resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_for_vpc_private_subne
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "3.16.1"
+  version = "4.0.1"
 
   name = "tna_ct_omega_vpc"
 
@@ -484,31 +484,35 @@ module "vpc" {
   # Planning tool: https://tidalmigrations.com/subnet-builder/
 
   private_subnets              = local.vpc_private_subnets
+  private_subnet_assign_ipv6_address_on_creation = true
   private_subnet_ipv6_prefixes = local.vpc_private_ipv6_subnets
   private_subnet_tags = {
     Type = "private_subnet"
   }
 
   database_subnets              = local.vpc_database_subnets
+  database_subnet_assign_ipv6_address_on_creation = true
   database_subnet_ipv6_prefixes = local.vpc_database_ipv6_subnets
   database_subnet_tags = {
     Type = "database_subnet"
   }
 
   intra_subnets              = local.vpc_intra_subnets
+  intra_subnet_assign_ipv6_address_on_creation = true
   intra_subnet_ipv6_prefixes = local.vpc_intra_ipv6_subnets
   intra_subnet_tags = {
     Type = "intra_subnet"
   }
 
   public_subnets              = local.vpc_public_subnets
+  public_subnet_assign_ipv6_address_on_creation = true
   public_subnet_ipv6_prefixes = local.vpc_public_ipv6_subnets
   public_subnet_tags = {
     Type = "public_subnet"
   }
 
   enable_ipv6                     = true
-  assign_ipv6_address_on_creation = true
+  map_public_ip_on_launch = false
 
   enable_nat_gateway     = true
   single_nat_gateway     = true
@@ -516,6 +520,8 @@ module "vpc" {
   reuse_nat_ips          = true                         # <= Skip creation of EIPs for the NAT Gateways
   external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
+  enable_dns_support = true
+  enable_dns_hostnames = true
 
   manage_default_network_acl = true
 
@@ -896,7 +902,7 @@ data "aws_ami" "amazon_linux_2_20210813_arm64" {
 
 module "dev_workstation_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.1"
+  version = "4.17.2"
 
   name        = "dev_workstation_security_group"
   description = "Security group for Development Workstation ports open within VPC"

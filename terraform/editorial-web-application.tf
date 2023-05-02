@@ -26,7 +26,7 @@ output "omega_private_mvpbeta_dns_servers" {
 
 module "mvpbeta_web_proxy_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.1"
+  version = "4.17.2"
 
   name        = "web_proxy_security_group"
   description = "Security group for Web Proxy ports open within VPC"
@@ -263,7 +263,7 @@ resource "aws_route53_record" "dns_a_web-proxy-1_mvpbeta_catalogue_nationalarchi
 
 module "mvpbeta_web_app_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.13.1"
+  version = "4.17.2"
 
   name        = "web_app_security_group"
   description = "Security group for Web Application ports open within VPC"
