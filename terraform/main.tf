@@ -512,7 +512,7 @@ module "vpc" {
   }
 
   enable_ipv6                     = true
-  map_public_ip_on_launch = false
+  map_public_ip_on_launch = true
 
   enable_nat_gateway     = true
   single_nat_gateway     = true
@@ -521,9 +521,11 @@ module "vpc" {
   external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
   enable_dns_support = true
-  enable_dns_hostnames = true
+  enable_dns_hostnames = false
 
+  manage_default_security_group = false
   manage_default_network_acl = true
+  manage_default_route_table = false
 
   private_dedicated_network_acl = true
 
