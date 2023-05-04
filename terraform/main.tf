@@ -523,9 +523,28 @@ module "vpc" {
   enable_dns_support = true
   enable_dns_hostnames = false
 
-  manage_default_security_group = false
+  manage_default_security_group = true
   manage_default_network_acl = true
   manage_default_route_table = false
+
+  default_security_group_ingress = [
+    {
+      description = "Allow all"
+      protocol = -1
+      self = true
+    }
+  ]
+
+  default_security_group_egress = [
+    {
+      description = "Allow all"
+      protocol = -1
+      from_port = 0
+      to_port = 0
+      cidr_blocks = "0.0.0.0/0"
+      ipv6_cidr_blocks = "::/0"
+    }
+  ]
 
   private_dedicated_network_acl = true
 
