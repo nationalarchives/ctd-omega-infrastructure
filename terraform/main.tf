@@ -1469,7 +1469,7 @@ resource "aws_instance" "dev_workstation_4" {
     Name                      = "dev4"
     Type                      = "dev_workstation"
     Environment               = "dev"
-    #scheduler_mon_fri_dev_ec2 = "true"
+    scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 
@@ -1784,7 +1784,7 @@ resource "aws_instance" "mssql_server_1" {
     Name        = "mssql1"
     Type        = "dev_mssql_server"
     Environment = "dev"
-    #scheduler_mon_fri_dev_ec2 = "true"
+    scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 
