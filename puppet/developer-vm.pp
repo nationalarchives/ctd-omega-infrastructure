@@ -586,9 +586,9 @@ package { 'python3-pip':
   require => Package['python3'],
 }
 
-package {'docker-compose':
-  provider => 'pip3',
+package { 'docker-compose':
   ensure   => installed,
+  provider => 'pip3',
   require  => Package['python3-pip'],
 }
 
