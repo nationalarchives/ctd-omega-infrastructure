@@ -535,7 +535,7 @@ file { '/opt/fuseki':
 
 class { 'nvm':
   user         => 'ec2-user',
-  install_node => ${nodejs_version},
+  install_node => "${nodejs_version}",
   require      => User['ec2-user'],
 }
 
@@ -586,9 +586,9 @@ package { 'python3-pip':
   require => Package['python3'],
 }
 
-package {'docker-compose':
-  provider => 'pip3',
+package { 'docker-compose':
   ensure   => installed,
+  provider => 'pip3',
   require  => Package['python3-pip'],
 }
 
