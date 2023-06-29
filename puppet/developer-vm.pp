@@ -535,7 +535,7 @@ file { '/opt/fuseki':
 
 class { 'nvm':
   user         => 'ec2-user',
-  install_node => ${nodejs_version},
+  install_node => "${nodejs_version}",
   require      => User['ec2-user'],
 }
 
