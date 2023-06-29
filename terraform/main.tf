@@ -1798,6 +1798,7 @@ resource "aws_route53_record" "dns_a_mssql1_in_cat_nationalarchives_gov_uk" {
 
 module "scheduler_mon_fri_dev_stop_ec2" {
   source                         = "diodonfrost/lambda-scheduler-stop-start/aws"
+  version                        = "3.1.3"
   name                           = "ec2_stop"
   cloudwatch_schedule_expression = "cron(0 1 ? * MON-FRI *)"
   schedule_action                = "stop"
@@ -1814,6 +1815,7 @@ module "scheduler_mon_fri_dev_stop_ec2" {
 
 module "scheduler_mon_fri_dev_start_ec2" {
   source                         = "diodonfrost/lambda-scheduler-stop-start/aws"
+  version                        = "3.1.3"
   name                           = "ec2_start"
   cloudwatch_schedule_expression = "cron(0 8 ? * MON-FRI *)"
   schedule_action                = "start"
