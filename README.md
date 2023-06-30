@@ -35,3 +35,20 @@ or you can use the shorter version:
 ```bash
 $ git clone --recurse-submodules https://github.com/nationalarchives/ctd-omega-infrastructure.git
 ```
+
+## New approach for Terraform code in the development branch
+```bash
+$ git checkout development
+$ cd terraform
+$ cd environments/development/create_backend_resources
+$ terraform init
+```
+This next terraform apply command will create the resources required for an s3 remote state backend. These Terraform commands only need to be executed once, just before creating a new environment. Terraform is idempotent so nothing should break if you decide to run terraform several times in this current directory.
+```bash
+$ terraform apply
+$ cd ..
+```
+This next terraform init command will create the actual 'backend' resource using the s3 bucket and the dynamodb table defined in the 'create_backend_resources' directory.
+```bash
+$ terraform init
+```
