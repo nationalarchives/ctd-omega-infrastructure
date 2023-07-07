@@ -21,7 +21,11 @@ Terraform configures each EC2 instance with a number of [cloud-init](https://clo
 Terraform is responsible for the setting up the infrastruture, and uses cloud-init as a hook to install and execute Puppet. Puppet is responsible for all software configuration.
 
 ## Terraform
-This repository used a Git sub-module to store Terraform state in a separate private repository. To correctly clone this repository for use with Terraform (assuming you have permissions to access the Terraform state repository), you need to run something like:
+This repository uses Git sub-modules to:
+1. store Terraform state in a separate private repository.
+2. store Certificates for use in AWS.
+
+To correctly clone this repository you need to run something like:
 
 ```bash
 $ git clone https://github.com/nationalarchives/ctd-omega-infrastructure.git
