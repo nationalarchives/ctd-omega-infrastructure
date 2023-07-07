@@ -1,0 +1,3 @@
+[submodule "ctd-omega-infrastructure-certificates"]
+	path = ctd-omega-infrastructure-certificates
+	url = https://github.com/nationalarchives/ctd-omega-infrastructure-certificates.git
