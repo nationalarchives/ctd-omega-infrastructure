@@ -40,6 +40,20 @@ resource "aws_network_interface" "services_api_1_private_interface" {
   }
 }
 
+resource "aws_network_interface" "puppet_server_1_private_interface" {
+  description        = "Private Management Subnet Interface for puppet_server-1"
+  subnet_id          = module.vpc.private_subnets[2] # {3 of 10}
+  private_ips        = ["172.27.3.4"]
+  ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
+
+  tags = {
+    Name        = "eth0_omg_srevices_api_1"
+    Type        = "primary_network_interface"
+    Network     = "omg_private"
+    Environment = "omg"
+  }
+}
+
 data "aws_network_interface" "web_proxy_1_private_interface" {
   id = aws_network_interface.web_proxy_1_private_interface.id
 }
