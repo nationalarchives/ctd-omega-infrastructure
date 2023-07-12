@@ -20,14 +20,14 @@ module "dev_workstation_security_group" {
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       description = "return-from-vpc_private_subnet_mvpbeta_web"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       description = "RDP"
@@ -52,14 +52,14 @@ module "dev_workstation_security_group" {
       from_port        = local.linux_ephemeral_port_start
       to_port          = local.linux_ephemeral_port_end
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta (IPv6)
     },
     {
       description      = "return-from-vpc_private_subnet_mvpbeta_web (IPv6)"
       from_port        = local.linux_ephemeral_port_start
       to_port          = local.linux_ephemeral_port_end
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web (IPv6)
     },
     {
       description      = "RDP (IPv6)"
