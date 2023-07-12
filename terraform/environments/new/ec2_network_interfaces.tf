@@ -61,7 +61,7 @@ resource "aws_network_interface" "puppet_server_1_private_interface" {
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
-    Name        = "eth0_omg_srevices_api_1"
+    Name        = "eth0_omg_puppet_server_1"
     Type        = "primary_network_interface"
     Network     = "omg_private"
     Environment = "omg"
