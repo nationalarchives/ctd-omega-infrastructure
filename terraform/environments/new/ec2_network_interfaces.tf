@@ -79,8 +79,8 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
   tags = {
     Name        = "eth0_dev1"
     Type        = "primary_network_interface"
-    Network     = "dev_private"
-    Environment = "dev"
+    Network     = "omg_private"
+    Environment = "omg"
   }
 }
 
