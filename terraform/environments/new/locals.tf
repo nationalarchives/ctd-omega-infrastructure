@@ -3,6 +3,7 @@ locals {
   aws_azs    = ["${local.aws_region}a", "${local.aws_region}b"]
 
   public_dns_domain          = "catalogue.nationalarchives.gov.uk"
+  private_omg_dns_domain     = "omg.${local.public_dns_domain}"
 
   /* Primary CIDR for Private Omega */
   vpc_cidr_block = "172.27.0.0/16"
