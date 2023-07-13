@@ -2,8 +2,8 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "4.0.1"
 
-  name = "tna_ct_omega_vpc_new"
-  cidr = local.vpc_cidr_block
+  name                  = "tna_ct_omega_vpc_new"
+  cidr                  = local.vpc_cidr_block
   secondary_cidr_blocks = local.vpc_secondary_cidr_blocks
 
   azs = local.aws_azs
