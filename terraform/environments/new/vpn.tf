@@ -55,3 +55,85 @@ module "vpn_access_security_group" {
     Environment = "vpn"
   }
 }
+
+resource "aws_cloudwatch_log_group" "client_vpn_log_group_new" {
+  name              = "client_vpn_new"
+  retention_in_days = 60
+  tags = {
+    Name        = "log_group"
+    Environment = "vpn"
+  }
+}
+
+resource "aws_cloudwatch_log_stream" "client_vpn_log_stream_new" {
+  name           = "client_vpn_new"
+  log_group_name = aws_cloudwatch_log_group.client_vpn_log_group_new.name
+}
+
+resource "aws_ec2_client_vpn_endpoint" "vpn_new" {
+  description = "Omega Client VPN"
+
+  vpc_id = module.vpc.vpc_id
+
+  client_cidr_block = local.vpn_client_cidr_block
+  split_tunnel      = true
+
+  server_certificate_arn = aws_acm_certificate.cvpn_server_new.arn
+
+  authentication_options {
+    type                       = "certificate-authentication"
+    root_certificate_chain_arn = aws_acm_certificate.vpn_client_root_ca_certificate_new.arn
+  }
+
+  connection_log_options {
+    enabled               = true
+    cloudwatch_log_group  = aws_cloudwatch_log_group.client_vpn_log_group_new.name
+    cloudwatch_log_stream = aws_cloudwatch_log_stream.client_vpn_log_stream_new.name
+  }
+
+  self_service_portal = "disabled"
+
+  security_group_ids = [
+    module.vpn_access_security_group.security_group_id
+  ]
+
+  tags = {
+    Name        = "client_vpn_endpoint_new"
+    Environment = "vpn"
+  }
+}
+
+output "omega_client_vpn_endpoint" {
+  description = "Client VPN Endpoint for Omega"
+  value       = aws_ec2_client_vpn_endpoint.vpn_new.dns_name
+}
+
+data "aws_subnet" "vpc_private_subnet_dev_general_id" {
+  vpc_id     = module.vpc.vpc_id
+  cidr_block = module.vpc.private_subnets_cidr_blocks[0] # This is vpc_private_subnet_dev_general
+}
+
+data "aws_subnet" "vpc_private_subnet_dev_general_ipv6_id" {
+  vpc_id          = module.vpc.vpc_id
+  ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # This is vpc_private_subnet_dev_general (IPv6)
+}
+
+resource "aws_ec2_client_vpn_network_association" "vpn_for_vpc_private_subnet_dev_general" {
+  count = 1
+
+  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_new.id
+  subnet_id              = data.aws_subnet.vpc_private_subnet_dev_general_id.id # NOTE: restricted to vpc_private_subnet_dev_general
+
+  lifecycle {
+    // The issue why we are ignoring changes is that on every change
+    // terraform screws up most of the vpn assosciations
+    // see: https://github.com/hashicorp/terraform-provider-aws/issues/14717
+    ignore_changes = [subnet_id]
+  }
+}
+
+resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_for_vpc_private_subnet_dev_general" {
+  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_new.id
+  target_network_cidr    = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+  authorize_all_groups   = true
+}
