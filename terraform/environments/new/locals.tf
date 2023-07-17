@@ -5,6 +5,8 @@ locals {
   public_dns_domain      = "catalogue.nationalarchives.gov.uk"
   private_omg_dns_domain = "omg.${local.public_dns_domain}"
 
+  vpn_client_cidr_block = "192.168.168.0/22"
+
   /* Primary CIDR for Private Omega */
   vpc_cidr_block = "172.27.0.0/16"
 
