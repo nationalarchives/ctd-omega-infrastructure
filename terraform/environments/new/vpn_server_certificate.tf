@@ -43,13 +43,3 @@ resource "aws_acm_certificate_validation" "acm-validation" {
     create = "3m"
   }
 }
-
-/*
-resource "aws_acm_certificate_validation" "cvpn_server" {
-  certificate_arn = aws_acm_certificate.cvpn_server.arn
-
-  timeouts {
-    create = "3m"
-  }
-}
-*/
