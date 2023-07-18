@@ -1,10 +1,10 @@
 /*
 data "local_sensitive_file" "vpn_client_test_user_private_key" {
-  filename = ("../../../../ctd-omega-infrastructure-certificates/exported/vpn-client-test-user.private.key.pem")
+  filename = ("../../../ctd-omega-infrastructure-certificates/exported/vpn-client-test-user.private.key.pem")
 }
 
 data "tls_certificate" "vpn_client_test_user_certificate_new" {
-  content = file("../../../../ctd-omega-infrastructure-certificates/exported/vpn-client-test-user.crt.pem")
+  content = file("../../../ctd-omega-infrastructure-certificates/exported/vpn-client-test-user.crt.pem")
 }
 
 resource "aws_acm_certificate" "vpn_client_test_user_certificate" {
