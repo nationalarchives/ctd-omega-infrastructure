@@ -5,8 +5,7 @@ module "vpc" {
   name                  = "tna_ct_omega_vpc_new"
   cidr                  = local.vpc_cidr_block
   secondary_cidr_blocks = local.vpc_secondary_cidr_blocks
-
-  azs = local.aws_azs
+  azs                   = local.aws_azs
 
   # NOTE: Smallest subnet possible in a VPC is a '/28',
   #       however for a VPN connection the smallest possible subnet is '/27'
