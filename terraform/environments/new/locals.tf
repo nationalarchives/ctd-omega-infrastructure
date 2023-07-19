@@ -2,6 +2,9 @@ locals {
   aws_region = "eu-west-2"
   aws_azs    = ["${local.aws_region}a", "${local.aws_region}b"]
 
+  /* ID of the The National Archives Transit Gateway which we use for site-to-site VPN */
+  tna_transit_gateway_id = "tgw-0213325c898e4df09"
+
   public_dns_domain      = "catalogue.nationalarchives.gov.uk"
   private_omg_dns_domain = "omg.${local.public_dns_domain}"
 
