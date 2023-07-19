@@ -1,7 +1,7 @@
 resource "aws_network_interface" "web_proxy_1_private_interface" {
   description        = "Private MVP Beta TNA Network Access Subnet interface for web-proxy-1"
   subnet_id          = module.vpc.private_subnets[8]
-  private_ips        = ["172.28.0.4"]
+  private_ips        = ["10.129.199.4"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -15,7 +15,7 @@ resource "aws_network_interface" "web_proxy_1_private_interface" {
 resource "aws_network_interface" "web_app_1_private_interface" {
   description        = "Private MVP Beta Web Subnet interface for web-app-1"
   subnet_id          = module.vpc.private_subnets[4]
-  private_ips        = ["172.27.1.4"]
+  private_ips        = ["10.129.193.4"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -29,7 +29,7 @@ resource "aws_network_interface" "web_app_1_private_interface" {
 resource "aws_network_interface" "services_api_1_private_interface" {
   description        = "Private MVP Beta Services Subnet interface for services-api-1"
   subnet_id          = module.vpc.private_subnets[6]
-  private_ips        = ["172.27.2.4"]
+  private_ips        = ["10.129.194.4"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -43,7 +43,7 @@ resource "aws_network_interface" "services_api_1_private_interface" {
 resource "aws_network_interface" "puppet_server_1_private_interface" {
   description        = "Private Management Subnet interface for puppet_server-1"
   subnet_id          = module.vpc.private_subnets[2]
-  private_ips        = ["172.27.3.4"]
+  private_ips        = ["10.129.195.4"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -73,7 +73,7 @@ data "aws_network_interface" "puppet_server_1_private_interface" {
 resource "aws_network_interface" "dev_workstation_1_private_interface" {
   description        = "Private Dev General Subnet interface for Dev Workstation 1"
   subnet_id          = module.vpc.private_subnets[0]
-  private_ips        = ["172.27.64.4"]
+  private_ips        = ["10.129.202.4"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -87,7 +87,7 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
 resource "aws_network_interface" "dev_workstation_2_private_interface" {
   description        = "Private Dev General Subnet interface for Dev Workstation 2"
   subnet_id          = module.vpc.private_subnets[0]
-  private_ips        = ["172.27.64.5"]
+  private_ips        = ["10.129.202.5"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
@@ -101,7 +101,7 @@ resource "aws_network_interface" "dev_workstation_2_private_interface" {
 resource "aws_network_interface" "dev_mssql_server_1_database_interface" {
   description        = "Private Dev Database Subnet interface for Dev MS SQL Server 1"
   subnet_id          = module.vpc.database_subnets[0]
-  private_ips        = ["172.27.65.132"]
+  private_ips        = ["10.129.203.132"]
   ipv6_address_count = 0 # use assign_ipv6_address_on_creation=true from the vpc subnet configuration
 
   tags = {
