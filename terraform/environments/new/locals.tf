@@ -6,34 +6,31 @@ locals {
   private_omg_dns_domain = "omg.${local.public_dns_domain}"
 
   /* Primary CIDR for Private Omega */
-  vpc_cidr_block = "172.27.0.0/16"
-
-  /* Secondary CIDR for TNA Private Networks */
-  vpc_secondary_cidr_blocks = ["172.28.0.0/24"] # NOTE(AR) Temporary solution until a larger subnet block is allocated from TNA for the entirety of Project Omega in AWS.
+  vpc_cidr_block = "10.129.192.0/18"
 
   /* Private Subnet for General Development */
-  vpc_private_subnet_dev_general = ["172.27.64.0/24", "172.27.192.0/24"]
+  vpc_private_subnet_dev_general = ["10.129.202.0/24", "10.129.222.0/24"]
 
   /* Private Subnet for databases used in Development */
-  vpc_private_subnet_dev_databases = ["172.27.65.0/24", "172.27.193.0/24"]
+  vpc_private_subnet_dev_databases = ["10.129.203.0/24", "10.129.223.0/24"]
 
   /* Public Subnet for General Use (NAT Gateway etc.) */
-  vpc_public_subnet_general = ["172.27.0.0/24", "172.27.128.0/24"]
+  vpc_public_subnet_general = ["10.129.192.0/24", "10.129.212.0/24"]
 
   /* Private Subnet for MVP Beta Web Application */
-  vpc_private_subnet_mvpbeta_web = ["172.27.1.0/24", "172.27.129.0/24"]
+  vpc_private_subnet_mvpbeta_web = ["10.129.193.0/24", "10.129.213.0/24"]
 
   /* Private Subnet for MVP Beta Services */
-  vpc_private_subnet_mvpbeta_services = ["172.27.2.0/24", "172.27.130.0/24"]
+  vpc_private_subnet_mvpbeta_services = ["10.129.194.0/24", "10.129.214.0/24"]
 
   /* Intra Subnet for databases used in MVP Beta */
-  vpc_intra_subnet_mvpbeta_databases = ["172.27.4.0/24", "172.27.132.0/24"]
+  vpc_intra_subnet_mvpbeta_databases = ["10.129.196.0/24", "10.129.216.0/24"]
 
   /* Private Subnet for TNA network access for MVP Beta */
-  vpc_private_tna_net_subnet_mvpbeta = ["172.28.0.0/27", "172.28.0.128/27"] # NOTE(AR) Temporary solution until a larger subnet block is allocated from TNA for the entirety of Project Omega in AWS.
+  vpc_private_tna_net_subnet_mvpbeta = ["10.129.199.0/24", "10.129.219.0/24"]
 
   /* Private Subnet for Management */
-  vpc_private_subnet_management = ["172.27.3.0/24", "172.27.131.0/24"]
+  vpc_private_subnet_management = ["10.129.195.0/24", "10.129.215.0/24"]
 
   vpc_private_subnets = tolist(
     concat(
