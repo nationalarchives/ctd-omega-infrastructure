@@ -19,6 +19,10 @@ terraform {
       source  = "hashicorp/local"
       version = "2.4.0"
     }
+    cloudinit = {
+      source  = "hashicorp/cloudinit"
+      version = "2.3.2"
+    }
   }
 
   required_version = ">= 1.3.9"
@@ -34,4 +38,14 @@ resource "aws_s3_account_public_access_block" "tna-ct-omega" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+data "aws_key_pair" "omega_admin_key_pair" {
+  key_name           = "omega-admin-key-pair"
+  include_public_key = true
+
+  filter {
+    name   = "tag:Name"
+    values = ["key_pair"]
+  }
 }
