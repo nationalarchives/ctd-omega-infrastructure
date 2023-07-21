@@ -35,7 +35,7 @@ resource "aws_route53_record" "acm-records" {
   zone_id = aws_route53_zone.omega_public_dns.zone_id
 }
 
-resource "aws_acm_certificate_validation" "acm-validation" {
+resource "aws_acm_certificate_validation" "cvpn_server_new" {
   certificate_arn         = aws_acm_certificate.cvpn_server_new.arn
   validation_record_fqdns = [for record in aws_route53_record.acm-records : record.fqdn]
 
