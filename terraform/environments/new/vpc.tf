@@ -87,9 +87,47 @@ module "vpc" {
 
   private_dedicated_network_acl = true
 
-  private_inbound_acl_rules = []
+  private_inbound_acl_rules = [
+    {
+      # allow results from outgoing IPv4 internet traffic
+      rule_number = 900
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      # allow results from outgoing IPv6 internet traffic
+      rule_number     = 960
+      rule_action     = "allow"
+      from_port       = local.unpriviledged_port_start
+      to_port         = local.unpriviledged_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = "::/0"
+    }
+  ]
 
-  private_outbound_acl_rules = []
+  private_outbound_acl_rules = [
+    {
+      # allow IPv4 return traffic from vpc_private_subnet_dev_general
+      rule_number = 1200
+      rule_action = "allow"
+      from_port   = local.linux_ephemeral_port_start
+      to_port     = local.linux_ephemeral_port_end
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv6 return traffic from vpc_private_subnet_dev_general
+      rule_number     = 1260
+      rule_action     = "allow"
+      from_port       = local.linux_ephemeral_port_start
+      to_port         = local.linux_ephemeral_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    }
+  ]
 
   vpc_tags = {
     Name = "tag_tna_ct_omega_vpc_new"

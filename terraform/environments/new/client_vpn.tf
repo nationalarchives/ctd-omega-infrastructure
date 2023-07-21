@@ -1,4 +1,4 @@
-module "vpn_access_security_group" {
+module "cvpn_access_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.17.2"
 
@@ -78,7 +78,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn_new" {
   client_cidr_block = local.vpn_client_cidr_block
   split_tunnel      = true
 
-  server_certificate_arn = aws_acm_certificate.cvpn_server_new.arn
+  server_certificate_arn = aws_acm_certificate_validation.cvpn_server_new.certificate_arn
 
   authentication_options {
     type                       = "certificate-authentication"
@@ -94,7 +94,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn_new" {
   self_service_portal = "disabled"
 
   security_group_ids = [
-    module.vpn_access_security_group.security_group_id
+    module.cvpn_access_security_group.security_group_id
   ]
 
   tags = {
@@ -118,7 +118,7 @@ data "aws_subnet" "vpc_private_subnet_dev_general_ipv6_id" {
   ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # This is vpc_private_subnet_dev_general (IPv6)
 }
 
-resource "aws_ec2_client_vpn_network_association" "vpn_for_vpc_private_subnet_dev_general" {
+resource "aws_ec2_client_vpn_network_association" "cvpn_for_vpc_private_subnet_dev_general" {
   count = 1
 
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_new.id
@@ -132,7 +132,7 @@ resource "aws_ec2_client_vpn_network_association" "vpn_for_vpc_private_subnet_de
   }
 }
 
-resource "aws_ec2_client_vpn_authorization_rule" "vpn_auth_for_vpc_private_subnet_dev_general" {
+resource "aws_ec2_client_vpn_authorization_rule" "cvpn_auth_for_vpc_private_subnet_dev_general" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_new.id
   target_network_cidr    = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
   authorize_all_groups   = true
