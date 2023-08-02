@@ -78,7 +78,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn_new" {
   client_cidr_block = local.vpn_client_cidr_block
   split_tunnel      = true
 
-  server_certificate_arn = aws_acm_certificate_validation.cvpn_server_new.certificate_arn
+  server_certificate_arn = aws_acm_certificate.vpn_client_server_certificate_new.arn
 
   authentication_options {
     type                       = "certificate-authentication"
