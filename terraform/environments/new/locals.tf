@@ -97,4 +97,6 @@ locals {
   # See `cat /proc/net/sys/ipv4/ip_local_port_range`
   linux_ephemeral_port_start = 32768
   linux_ephemeral_port_end   = 60999
+
+  instance_type_dev_workstation = "t2.micro" # "r6i.2xlarge"
 }
