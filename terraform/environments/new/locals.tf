@@ -7,6 +7,7 @@ locals {
 
   public_dns_domain      = "catalogue.nationalarchives.gov.uk"
   private_omg_dns_domain = "omg.${local.public_dns_domain}"
+  private_omg_reverse_dns_domain = "129.10.in-addr.arpa"
 
   vpn_client_cidr_block = "192.168.168.0/22"
 
