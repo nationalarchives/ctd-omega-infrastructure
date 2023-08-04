@@ -54,7 +54,7 @@ module "vpc" {
   external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
   enable_dns_support   = true
-  enable_dns_hostnames = false
+  enable_dns_hostnames = true
 
   manage_default_security_group = true
   manage_default_network_acl    = true
