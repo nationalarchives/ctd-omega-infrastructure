@@ -99,4 +99,6 @@ locals {
   linux_ephemeral_port_end   = 60999
 
   instance_type_dev_workstation = "t2.micro" # "r6i.2xlarge"
+
+  instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
 }
