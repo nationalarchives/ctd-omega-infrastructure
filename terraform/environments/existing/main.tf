@@ -1469,7 +1469,7 @@ resource "aws_instance" "dev_workstation_4" {
     Name                      = "dev4"
     Type                      = "dev_workstation"
     Environment               = "dev"
-    scheduler_mon_fri_dev_ec2 = "true"
+    #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
 
