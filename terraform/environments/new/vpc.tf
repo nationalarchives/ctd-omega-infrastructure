@@ -1,6 +1,6 @@
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "4.0.1"
+  version = "5.1.1"
 
   name                  = "tna_ct_omega_vpc_new"
   cidr                  = local.vpc_cidr_block
@@ -345,6 +345,6 @@ module "vpc" {
 }
 
 resource "aws_eip" "vpc_subnet_nats" {
-  count = 1 # NOTE: must match the number of NAT Gateways in the VPC!
-  vpc   = true
+  count  = 1 # NOTE: must match the number of NAT Gateways in the VPC!
+  domain = "vpc"
 }

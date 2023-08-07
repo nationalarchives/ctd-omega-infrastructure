@@ -1,6 +1,6 @@
 module "dev_workstation_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "4.17.2"
+  version = "5.1.0"
 
   name        = "dev_workstation_security_group_new"
   description = "Security group for Development Workstation ports open within VPC"
