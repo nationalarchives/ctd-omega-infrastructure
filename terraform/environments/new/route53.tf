@@ -1,6 +1,8 @@
 resource "aws_route53_zone" "omega_public_dns" {
   name = local.public_dns_domain
 
+  force_destroy = false
+
   tags = {
     name = "dns_zone"
   }
@@ -42,6 +44,8 @@ resource "aws_route53_zone" "omega_private_omg_dns" {
   vpc {
     vpc_id = module.vpc.vpc_id
   }
+
+  force_destroy = true
 
   tags = {
     name = "dns_zone"
