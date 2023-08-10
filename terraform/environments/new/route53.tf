@@ -8,13 +8,14 @@ resource "aws_route53_zone" "omega_public_dns" {
   }
 }
 
+# delegate Private Zone (omg.catalogue.nationalarchives.gov.uk) from Public Zone (catalogue.nationalarchives.gov.uk)
 resource "aws_route53_record" "omega_public_dns_nameservers" {
-  allow_overwrite = true
-  name            = local.public_dns_domain
-  ttl             = 86400 # 24 Hours
-  type            = "NS"
   zone_id         = aws_route53_zone.omega_public_dns.zone_id
-  records         = aws_route53_zone.omega_public_dns.name_servers
+  name            = local.private_omg_dns_domain
+  type            = "NS"
+  ttl             = 86400 # 24 Hours
+  records         = aws_route53_zone.omega_private_omg_dns.name_servers
+  allow_overwrite = true
 }
 
 output "omega_public_dns_servers" {
