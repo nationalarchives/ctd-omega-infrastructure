@@ -65,6 +65,8 @@ module "vpc" {
   reuse_nat_ips          = true                         # <= Skip creation of EIPs for the NAT Gateways
   external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
+  enable_dhcp_options  = true
+  dhcp_options_domain_name = local.private_omg_dns_domain
   enable_dns_support   = true
   enable_dns_hostnames = false  # only needed for assigning Public DNS names
 
