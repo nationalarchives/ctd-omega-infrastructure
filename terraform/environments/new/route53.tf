@@ -134,9 +134,9 @@ resource "aws_route53_record" "dns_ptr_puppet_server_1_in_omg_catalogue_national
   records = ["puppet-server-1.omg.catalogue.nationalarchives.gov.uk"]
 }
 
-resource "aws_route53_record" "dns_a_dev1_in_omg_catalogue_nationalarchives_gov_uk" {
+resource "aws_route53_record" "dns_a_dev_workstation_1_in_omg_catalogue_nationalarchives_gov_uk" {
   zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
-  name    = "dev1.${local.private_omg_dns_domain}"
+  name    = "dev-workstation-1.${local.private_omg_dns_domain}"
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.dev_workstation_1_private_interface.private_ips
@@ -150,9 +150,9 @@ resource "aws_route53_record" "dns_ptr_dev1_in_omg_catalogue_nationalarchives_go
   records = ["dev1.omg.catalogue.nationalarchives.gov.uk"]
 }
 
-resource "aws_route53_record" "dns_a_dev2_in_omg_catalogue_nationalarchives_gov_uk" {
+resource "aws_route53_record" "dns_a_dev_workstation_2_in_omg_catalogue_nationalarchives_gov_uk" {
   zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
-  name    = "dev2.${local.private_omg_dns_domain}"
+  name    = "dev-workstation-2.${local.private_omg_dns_domain}"
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.dev_workstation_2_private_interface.private_ips
@@ -166,9 +166,9 @@ resource "aws_route53_record" "dns_ptr_dev2_in_omg_catalogue_nationalarchives_go
   records = ["dev2.omg.catalogue.nationalarchives.gov.uk"]
 }
 
-resource "aws_route53_record" "dns_a_mssql1_in_omg_catalogue_nationalarchives_gov_uk" {
+resource "aws_route53_record" "dns_a_dev_mssql_1_in_omg_catalogue_nationalarchives_gov_uk" {
   zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
-  name    = "mssql1.${local.private_omg_dns_domain}"
+  name    = "dev-mssql-1.${local.private_omg_dns_domain}"
   type    = "A"
   ttl     = "300"
   records = data.aws_network_interface.dev_mssql_server_1_database_interface.private_ips
