@@ -68,7 +68,7 @@ module "vpc" {
   enable_dhcp_options  = true
   dhcp_options_domain_name = local.private_omg_dns_domain
   enable_dns_support   = true
-  enable_dns_hostnames = false  # only needed for assigning Public DNS names
+  enable_dns_hostnames = true  # NOTE(AR) needed for resolving Route53 Private DNS names
 
   manage_default_security_group = true
   manage_default_network_acl    = true
