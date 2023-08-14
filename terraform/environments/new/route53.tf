@@ -75,6 +75,52 @@ resource "aws_route53_zone" "omega_private_ipv4_omg_reverse_dns" {
   }
 }
 
+resource "aws_route53_zone" "omega_private_ipv6_omg_reverse_dns" {
+
+  # NOTE(AR) convert the VPC IPv6 CIDR into the string "x.x.x.x.x.x.x.x.x.x.x.x.x.ip6.arpa"
+  name = "${substr(
+      join(".",
+        split("",
+          replace(
+            strrev(
+              replace(
+                replace(
+                  replace(
+                    replace(
+                      module.vpc.vpc_ipv6_cidr_block,
+                      "/^(.+)::/[0-9]{1,3}$/",
+                      "$1"
+                    ),
+                    "/(?::([0-9]):)|(?:^([0-9]):)|(?::([0-9])$)/",
+                    "000$1"
+                  ),
+                  "/(?::([0-9]{2}):)|(?:^([0-9]{2}):)|(?::([0-9]{2})$)/",
+                  "00$1"
+                ),
+                "(?::([0-9]{3}):)|(?:^([0-9]{3}):)|(?::([0-9]{3})$)",
+                "0$1"
+              )
+            ),
+            ":",
+            ""
+          )
+        )
+      ),
+      2,
+      37
+    )}.ip6.arpa"
+
+  vpc {
+    vpc_id = module.vpc.vpc_id
+  }
+
+  force_destroy = true
+
+  tags = {
+    name = "dns_zone"
+  }
+}
+
 output "omega_private_omg_dns_servers" {
   description = "DNS Servers for Omega internal environment"
   value       = aws_route53_zone.omega_private_omg_dns.name_servers
