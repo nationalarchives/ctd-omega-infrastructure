@@ -16,34 +16,36 @@ locals {
     ]
 
     separate_home_volume_part = var.separate_home_volume == null ? [] : [
+        # NOTE(AR) it is not clear to me why, but AWS Linux 2 seems to need the cloud-init yaml for the `mount` before the shell script for the `prepare`, otherwise nothing ever gets mounted
         {
-            content_type = local.media_type_shellscript
-            filename = "omega-02-prepare-home-volume.sh"
-            content = templatefile("${local.scripts_dir}/omega-02-prepare-home-volume.sh.tftpl", {
+            content_type = local.media_type_cloud_config
+            filename = "omega-02-mount-home-volume.yaml"
+            content = templatefile("${local.scripts_dir}/omega-02-mount-home-volume.yaml.tftpl", {
                 separate_home_volume = var.separate_home_volume
             })
         },
         {
-            content_type = local.media_type_cloud_config
-            filename = "omega-03-mount-home-volume.yaml"
-            content = templatefile("${local.scripts_dir}/omega-03-mount-home-volume.yaml.tftpl", {
+            content_type = local.media_type_shellscript
+            filename = "omega-03-prepare-home-volume.sh"
+            content = templatefile("${local.scripts_dir}/omega-03-prepare-home-volume.sh.tftpl", {
                 separate_home_volume = var.separate_home_volume
             })
-        }
+        },
     ]
 
     additional_volumes_part = length(var.additional_volumes) == 0 ? [] : [
+        # NOTE(AR) it is not clear to me why, but AWS Linux 2 seems to need the cloud-init yaml for the `mount` before the shell script for the `prepare`, otherwise nothing ever gets mounted
         {
-            content_type = local.media_type_shellscript
-            filename = "omega-04-prepare-additional-volumes.sh"
-            content = templatefile("${local.scripts_dir}/omega-04-prepare-additional-volumes.sh.tftpl", {
+            content_type = local.media_type_cloud_config
+            filename = "omega-04-mount-additional-volumes.yaml"
+            content = templatefile("${local.scripts_dir}/omega-04-mount-additional-volumes.yaml.tftpl", {
                 additional_volumes = var.additional_volumes
             })
         },
         {
-            content_type = local.media_type_cloud_config
-            filename = "omega-05-mount-additional-volumes.yaml"
-            content = templatefile("${local.scripts_dir}/omega-05-mount-additional-volumes.yaml.tftpl", {
+            content_type = local.media_type_shellscript
+            filename = "omega-05-prepare-additional-volumes.sh"
+            content = templatefile("${local.scripts_dir}/omega-05-prepare-additional-volumes.sh.tftpl", {
                 additional_volumes = var.additional_volumes
             })
         }
