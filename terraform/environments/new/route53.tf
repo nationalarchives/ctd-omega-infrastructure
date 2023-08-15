@@ -82,40 +82,15 @@ resource "aws_route53_zone" "omega_private_ipv4_omg_reverse_dns" {
   }
 }
 
-resource "aws_route53_zone" "omega_private_ipv6_omg_reverse_dns" {
+module "omega_private_ipv6_omg_reverse_dns_name" {
+  source = "./reverse-ipv6-address"
 
-  # NOTE(AR) convert the VPC IPv6 CIDR into the string "x.x.x.x.x.x.x.x.x.x.x.x.x.ip6.arpa"
-  name = "${substr(
-      join(".",
-        split("",
-          replace(
-            strrev(
-              replace(
-                replace(
-                  replace(
-                    replace(
-                      module.vpc.vpc_ipv6_cidr_block,
-                      "/^(.+)::/[0-9]{1,3}$/",
-                      "$1"
-                    ),
-                    "/(?::([0-9]):)|(?:^([0-9]):)|(?::([0-9])$)/",
-                    "000$1"
-                  ),
-                  "/(?::([0-9]{2}):)|(?:^([0-9]{2}):)|(?::([0-9]{2})$)/",
-                  "00$1"
-                ),
-                "(?::([0-9]{3}):)|(?:^([0-9]{3}):)|(?::([0-9]{3})$)",
-                "0$1"
-              )
-            ),
-            ":",
-            ""
-          )
-        )
-      ),
-      2,
-      37
-    )}.ip6.arpa"
+  ipv6_address = module.vpc.vpc_ipv6_cidr_block
+  reverse_dns_zone_name_class_count = 15
+}
+
+resource "aws_route53_zone" "omega_private_ipv6_omg_reverse_dns" {
+  name = module.omega_private_ipv6_omg_reverse_dns_name.reverse_dns_zone_name
 
   vpc {
     vpc_id = module.vpc.vpc_id
