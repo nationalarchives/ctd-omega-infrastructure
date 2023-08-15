@@ -103,7 +103,7 @@ resource "aws_network_interface" "dev_workstation_2_private_interface" {
 resource "aws_network_interface" "dev_mssql_server_1_database_interface" {
   description        = "Private Dev Database Subnet interface for Dev MS SQL Server 1"
   subnet_id          = module.vpc.database_subnets[0]
-  private_ips        = ["10.129.203.132"]
+  private_ips        = ["10.129.203.4"]
 
   tags = {
     Name        = "eth0_dev-mssql-server1"
