@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+cp -rp /home/ec2-user /tmp
+mkfs -t xfs /dev/${separate_home_volume}
+mount /dev/${separate_home_volume} /home
+mv -f /tmp/ec2-user /home
+HOME_VOLUME_UUID=$(blkid /dev/${separate_home_volume} | sed -n 's/.*UUID=\"\([^\"]*\)\".*/\1/p')
+bash -c "echo 'UUID=$HOME_VOLUME_UUID     /home       xfs    defaults 0   0' >> /etc/fstab"
