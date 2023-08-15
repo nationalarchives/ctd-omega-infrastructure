@@ -32,6 +32,23 @@ locals {
         }
     ]
 
+    additional_volumes_part = length(var.additional_volumes) == 0 ? [] : [
+        {
+            content_type = local.media_type_shellscript
+            filename = "omega-04-prepare-additional-volumes.sh"
+            content = templatefile("${local.scripts_dir}/omega-04-prepare-additional-volumes.sh.tftpl", {
+                additional_volumes = var.additional_volumes
+            })
+        },
+        {
+            content_type = local.media_type_cloud_config
+            filename = "omega-05-mount-additional-volumes.yaml"
+            content = templatefile("${local.scripts_dir}/omega-05-mount-additional-volumes.yaml.tftpl", {
+                additional_volumes = var.additional_volumes
+            })
+        }
+    ]
+
     yum_upgrade_part = [
         {
             content_type = local.media_type_cloud_config
@@ -51,6 +68,7 @@ locals {
     parts = concat(
         local.hostname_part,
         local.separate_home_volume_part,
+        local.additional_volumes_part,
         local.yum_upgrade_part,
         local.reboot_part
     )
