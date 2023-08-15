@@ -9,12 +9,19 @@ data "aws_ami" "amazon_linux_2_20230719_x86_64" {
   }
 }
 
+module "dev_workstation_1_cloud_init" {
+  source = "./cloud-init"
+
+  fqdn = "dev-workstation-1.${local.private_omg_dns_domain}"
+  separate_home_volume = "xvdb"
+}
+
 # Dev Workstation for Adam Retter
 resource "aws_instance" "dev_workstation_1" {
   ami                         = data.aws_ami.amazon_linux_2_20230719_x86_64.id
   instance_type               = local.instance_type_dev_workstation
   key_name                    = data.aws_key_pair.omega_admin_key_pair.key_name
-  user_data                   = data.cloudinit_config.dev_workstation_new.rendered
+  user_data                   = module.dev_workstation_1_cloud_init.rendered
   user_data_replace_on_change = false
 
   metadata_options {
@@ -53,12 +60,19 @@ resource "aws_instance" "dev_workstation_1" {
 }
 
 
+module "dev_workstation_2_cloud_init" {
+  source = "./cloud-init"
+
+  fqdn = "dev-workstation-2.${local.private_omg_dns_domain}"
+  separate_home_volume = "xvdb"
+}
+
 # Dev Workstation for Rob Walpole
 resource "aws_instance" "dev_workstation_2" {
   ami                         = data.aws_ami.amazon_linux_2_20230719_x86_64.id
   instance_type               = local.instance_type_dev_workstation
   key_name                    = data.aws_key_pair.omega_admin_key_pair.key_name
-  user_data                   = data.cloudinit_config.dev_workstation_new.rendered
+  user_data                   = module.dev_workstation_2_cloud_init.rendered
   user_data_replace_on_change = false
 
   metadata_options {
