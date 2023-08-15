@@ -1,0 +1,5 @@
+#cloud-config
+mounts:
+%{ for additional_volume in additional_volumes ~}
+  - [ "/dev/${additional_volume.volume}", "${additional_volume.mount_point}", "xfs", "defaults,nofail", "0", "0" ]
+%{ endfor ~}
