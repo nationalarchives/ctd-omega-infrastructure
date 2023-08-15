@@ -110,6 +110,26 @@ resource "aws_instance" "dev_workstation_2" {
   }
 }
 
+module "dev_mssql_server_1_cloud_init" {
+  source = "./cloud-init"
+
+  fqdn = "dev-mssql-server-1.${local.private_omg_dns_domain}"
+  additional_volumes = [
+    {
+      volume = "xvdb",
+      mount_point = "/mssql/data"
+    },
+    {
+      volume = "xvdc",
+      mount_point = "/mssql/log"
+    },
+    {
+      volume = "xvdd",
+      mount_point = "/mssql/backup"
+    }
+  ]
+}
+
 resource "aws_instance" "dev_mssql_server_1" {
   ami           = data.aws_ami.amazon_linux_2_20230719_x86_64.id
   instance_type = local.instance_type_dev_mssql_server
@@ -118,7 +138,7 @@ resource "aws_instance" "dev_mssql_server_1" {
 
   key_name = data.aws_key_pair.omega_admin_key_pair.key_name
 
-  user_data                   = data.cloudinit_config.mssql_server_new.rendered
+  user_data                   = module.dev_mssql_server_1_cloud_init.rendered
   user_data_replace_on_change = false
 
   metadata_options {
