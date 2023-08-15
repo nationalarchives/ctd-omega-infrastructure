@@ -76,7 +76,7 @@ resource "aws_network_interface" "dev_workstation_1_private_interface" {
   ]
 
   tags = {
-    Name        = "eth0_dev1"
+    Name        = "eth0_dev-workstation-1"
     Type        = "primary_network_interface"
     Network     = "dev_private"
     Environment = "dev"
@@ -93,7 +93,7 @@ resource "aws_network_interface" "dev_workstation_2_private_interface" {
   ]
 
   tags = {
-    Name        = "eth0_dev2"
+    Name        = "eth0_dev-workstation-2"
     Type        = "primary_network_interface"
     Network     = "dev_private"
     Environment = "dev"
@@ -106,7 +106,7 @@ resource "aws_network_interface" "dev_mssql_server_1_database_interface" {
   private_ips        = ["10.129.203.132"]
 
   tags = {
-    Name        = "eth0_mssql1"
+    Name        = "eth0_dev-mssql-server1"
     Type        = "primary_network_interface"
     Network     = "dev_database"
     Environment = "dev"
