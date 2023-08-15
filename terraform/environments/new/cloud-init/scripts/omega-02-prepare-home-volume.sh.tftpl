@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
 set -e
-cp -rp /home/ec2-user /tmp
-mkfs -t xfs /dev/${separate_home_volume}
+
+EXISTING_XFS_VOLUME=false
+if [[ "$(blkid /dev/${separate_home_volume})" == *"TYPE=\"xfs\"" ]]; then
+    EXISTING_XFS_VOLUME=true
+else
+    EXISTING_XFS_VOLUME=false
+fi
+
+if [[ $EXISTING_XFS_VOLUME != true ]]; then
+    mkfs -t xfs /dev/${separate_home_volume}
+    cp -rp /home/ec2-user /tmp
+fi
 mount /dev/${separate_home_volume} /home
-mv -f /tmp/ec2-user /home
+if [[ $EXISTING_XFS_VOLUME != true ]]; then
+    mv -f /tmp/ec2-user /home
+fi
 HOME_VOLUME_UUID=$(blkid /dev/${separate_home_volume} | sed -n 's/.*UUID=\"\([^\"]*\)\".*/\1/p')
 bash -c "echo 'UUID=$HOME_VOLUME_UUID     /home       xfs    defaults 0   0' >> /etc/fstab"
