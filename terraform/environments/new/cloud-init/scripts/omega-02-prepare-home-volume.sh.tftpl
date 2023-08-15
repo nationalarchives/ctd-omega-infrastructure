@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+counter=0
+while [ ! -e /dev/${separate_home_volume} ]; do
+    sleep 1s
+    counter=$((counter + 1))
+    if [ $counter -ge 60 ]; then
+        exit 9
+    fi
+done
+
 EXISTING_XFS_VOLUME=false
 if [[ "$(blkid /dev/${separate_home_volume})" == *"TYPE=\"xfs\"" ]]; then
     EXISTING_XFS_VOLUME=true
