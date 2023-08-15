@@ -16,5 +16,3 @@ mount /dev/${separate_home_volume} /home
 if [[ $EXISTING_XFS_VOLUME != true ]]; then
     mv -f /tmp/ec2-user /home
 fi
-HOME_VOLUME_UUID=$(blkid /dev/${separate_home_volume} | sed -n 's/.*UUID=\"\([^\"]*\)\".*/\1/p')
-bash -c "echo 'UUID=$HOME_VOLUME_UUID     /home       xfs    defaults 0   0' >> /etc/fstab"
