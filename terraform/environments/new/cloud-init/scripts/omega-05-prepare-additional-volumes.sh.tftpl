@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -e
+
+EXISTING_XFS_VOLUME=false
+
+%{ for additional_volume in additional_volumes ~}
+
+counter=0
+while [ ! -e /dev/${additional_volume.volume} ]; do
+    sleep 1s
+    counter=$((counter + 1))
+    if [ $counter -ge 60 ]; then
+        exit 9
+    fi
+done
+
+if [[ "$(blkid /dev/${additional_volume.volume})" == *"TYPE=\"xfs\"" ]]; then
+    EXISTING_XFS_VOLUME=true
+else
+    EXISTING_XFS_VOLUME=false
+fi
+
+if [[ $EXISTING_XFS_VOLUME != true ]]; then
+    mkfs -t xfs /dev/${additional_volume.volume}
+fi
+mkdir -p ${additional_volume.mount_point}
+mount /dev/${additional_volume.volume} ${additional_volume.mount_point}
+%{ endfor ~}
