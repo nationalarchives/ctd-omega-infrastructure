@@ -51,6 +51,23 @@ resource "aws_instance" "dev_workstation_1" {
     }
   }
 
+  ebs_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125
+    volume_size           = 200
+
+    device_name = "/dev/xvdb"
+
+    tags = {
+      Name        = "home_dev1_new"
+      Type        = "home_volume"
+      Environment = "dev"
+    }
+  }
+
   tags = {
     Name                      = "dev1_new"
     Type                      = "dev_workstation"
@@ -98,6 +115,23 @@ resource "aws_instance" "dev_workstation_2" {
     tags = {
       Name        = "root_dev2_new"
       Type        = "primary_volume"
+      Environment = "dev"
+    }
+  }
+
+  ebs_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125
+    volume_size           = 200
+
+    device_name = "/dev/xvdb"
+
+    tags = {
+      Name        = "home_dev2_new"
+      Type        = "home_volume"
       Environment = "dev"
     }
   }
@@ -162,8 +196,62 @@ resource "aws_instance" "dev_mssql_server_1" {
     volume_size           = 60  # GiB
 
     tags = {
-      Name        = "root_mssql1_new"
+      Name        = "root_dev-mssql-server-1_new"
       Type        = "primary_volume"
+      Environment = "dev"
+    }
+  }
+
+  # dev_mssql_server_1_data_volume
+  ebs_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125
+    volume_size           = 150
+
+    device_name = "/dev/xvdb"
+
+    tags = {
+      Name        = "data_dev-mssql-server-1_new"
+      Type        = "mssql_server_data_volume"
+      Environment = "dev"
+    }
+  }
+
+  # dev_mssql_server_1_log_volume
+  ebs_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125
+    volume_size           = 75
+
+    device_name = "/dev/xvdc"
+
+    tags = {
+      Name        = "log_dev-mssql-server-1_new"
+      Type        = "mssql_server_log_volume"
+      Environment = "dev"
+    }
+  }
+
+  # dev_mssql_server_1_backup_volume
+  ebs_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125
+    volume_size           = 150
+
+    device_name = "/dev/xvdd"
+
+    tags = {
+      Name        = "backup_dev-mssql-server-1_new"
+      Type        = "mssql_server_backup_volume"
       Environment = "dev"
     }
   }
