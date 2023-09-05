@@ -75,5 +75,5 @@ jobs:
         run: terraform -version
       - name: terraform-fmt
         working-directory: ./terraform
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
 
