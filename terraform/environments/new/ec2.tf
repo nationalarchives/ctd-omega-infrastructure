@@ -12,7 +12,7 @@ data "aws_ami" "amazon_linux_2_20230719_x86_64" {
 module "dev_workstation_1_cloud_init" {
   source = "./cloud-init"
 
-  fqdn = "dev-workstation-1.${local.private_omg_dns_domain}"
+  fqdn                 = "dev-workstation-1.${local.private_omg_dns_domain}"
   separate_home_volume = "xvdb"
 }
 
@@ -80,7 +80,7 @@ resource "aws_instance" "dev_workstation_1" {
 module "dev_workstation_2_cloud_init" {
   source = "./cloud-init"
 
-  fqdn = "dev-workstation-2.${local.private_omg_dns_domain}"
+  fqdn                 = "dev-workstation-2.${local.private_omg_dns_domain}"
   separate_home_volume = "xvdb"
 }
 
@@ -150,15 +150,15 @@ module "dev_mssql_server_1_cloud_init" {
   fqdn = "dev-mssql-server-1.${local.private_omg_dns_domain}"
   additional_volumes = [
     {
-      volume = "xvdb",
+      volume      = "xvdb",
       mount_point = "/mssql/data"
     },
     {
-      volume = "xvdc",
+      volume      = "xvdc",
       mount_point = "/mssql/log"
     },
     {
-      volume = "xvdd",
+      volume      = "xvdd",
       mount_point = "/mssql/backup"
     }
   ]
@@ -257,9 +257,9 @@ resource "aws_instance" "dev_mssql_server_1" {
   }
 
   tags = {
-    Name        = "dev-mssql-server-1_new"
-    Type        = "dev_mssql_server"
-    Environment = "dev"
+    Name                      = "dev-mssql-server-1_new"
+    Type                      = "dev_mssql_server"
+    Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
 }
