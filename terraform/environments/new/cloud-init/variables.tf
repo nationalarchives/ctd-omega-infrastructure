@@ -12,12 +12,12 @@ variable "separate_home_volume" {
 
 variable "additional_volumes" {
   description = "Additional volumes to prepare and mount (e.g. [{volume = \"xvdc\", mount_point = \"/backup\" }])"
-  type        = list
+  type        = list(any)
   default     = []
 }
 
 variable "reboot" {
-    description = "Whether to reboot after completing cloud-init"
-    type = bool
-    default = true
+  description = "Whether to reboot after completing cloud-init"
+  type        = bool
+  default     = true
 }

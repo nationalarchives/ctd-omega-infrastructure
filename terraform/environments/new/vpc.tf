@@ -2,8 +2,8 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.1.1"
 
-  name                  = "tna_ct_omega_vpc_new"
-  cidr                  = local.vpc_cidr_block
+  name = "tna_ct_omega_vpc_new"
+  cidr = local.vpc_cidr_block
 
   azs = local.aws_azs
 
@@ -16,41 +16,41 @@ module "vpc" {
   # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv6
   # Planning tool: https://tidalmigrations.com/subnet-builder/
 
-  private_subnets                                = local.vpc_private_subnets
-  private_subnet_assign_ipv6_address_on_creation = true
-  private_subnet_ipv6_prefixes                   = local.vpc_private_ipv6_subnets
-  private_subnet_private_dns_hostname_type_on_launch = "resource-name"
-  private_subnet_enable_resource_name_dns_a_record_on_launch	= true
+  private_subnets                                               = local.vpc_private_subnets
+  private_subnet_assign_ipv6_address_on_creation                = true
+  private_subnet_ipv6_prefixes                                  = local.vpc_private_ipv6_subnets
+  private_subnet_private_dns_hostname_type_on_launch            = "resource-name"
+  private_subnet_enable_resource_name_dns_a_record_on_launch    = true
   private_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
   private_subnet_tags = {
     Type = "private_subnet"
   }
 
-  database_subnets                                = local.vpc_database_subnets
-  database_subnet_assign_ipv6_address_on_creation = true
-  database_subnet_ipv6_prefixes                   = local.vpc_database_ipv6_subnets
-  database_subnet_private_dns_hostname_type_on_launch = "resource-name"
-  database_subnet_enable_resource_name_dns_a_record_on_launch	= true
+  database_subnets                                               = local.vpc_database_subnets
+  database_subnet_assign_ipv6_address_on_creation                = true
+  database_subnet_ipv6_prefixes                                  = local.vpc_database_ipv6_subnets
+  database_subnet_private_dns_hostname_type_on_launch            = "resource-name"
+  database_subnet_enable_resource_name_dns_a_record_on_launch    = true
   database_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
   database_subnet_tags = {
     Type = "database_subnet"
   }
 
-  intra_subnets                                = local.vpc_intra_subnets
-  intra_subnet_assign_ipv6_address_on_creation = true
-  intra_subnet_ipv6_prefixes                   = local.vpc_intra_ipv6_subnets
-  intra_subnet_private_dns_hostname_type_on_launch = "resource-name"
-  intra_subnet_enable_resource_name_dns_a_record_on_launch	= true
+  intra_subnets                                               = local.vpc_intra_subnets
+  intra_subnet_assign_ipv6_address_on_creation                = true
+  intra_subnet_ipv6_prefixes                                  = local.vpc_intra_ipv6_subnets
+  intra_subnet_private_dns_hostname_type_on_launch            = "resource-name"
+  intra_subnet_enable_resource_name_dns_a_record_on_launch    = true
   intra_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
   intra_subnet_tags = {
     Type = "intra_subnet"
   }
 
-  public_subnets                                = local.vpc_public_subnets
-  public_subnet_assign_ipv6_address_on_creation = true
-  public_subnet_ipv6_prefixes                   = local.vpc_public_ipv6_subnets
-  public_subnet_private_dns_hostname_type_on_launch = "resource-name"
-  public_subnet_enable_resource_name_dns_a_record_on_launch	= true
+  public_subnets                                               = local.vpc_public_subnets
+  public_subnet_assign_ipv6_address_on_creation                = true
+  public_subnet_ipv6_prefixes                                  = local.vpc_public_ipv6_subnets
+  public_subnet_private_dns_hostname_type_on_launch            = "resource-name"
+  public_subnet_enable_resource_name_dns_a_record_on_launch    = true
   public_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
   public_subnet_tags = {
     Type = "public_subnet"
@@ -65,10 +65,10 @@ module "vpc" {
   reuse_nat_ips          = true                         # <= Skip creation of EIPs for the NAT Gateways
   external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
-  enable_dhcp_options  = true
+  enable_dhcp_options      = true
   dhcp_options_domain_name = local.private_omg_dns_domain
-  enable_dns_support   = true
-  enable_dns_hostnames = true  # NOTE(AR) needed for resolving Route53 Private DNS names
+  enable_dns_support       = true
+  enable_dns_hostnames     = true # NOTE(AR) needed for resolving Route53 Private DNS names
 
   manage_default_security_group = true
   manage_default_network_acl    = true

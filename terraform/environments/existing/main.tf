@@ -493,35 +493,35 @@ module "vpc" {
   # See https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html#vpc-sizing-ipv6
   # Planning tool: https://tidalmigrations.com/subnet-builder/
 
-  private_subnets              = local.vpc_private_subnets
+  private_subnets                                = local.vpc_private_subnets
   private_subnet_assign_ipv6_address_on_creation = true
-  private_subnet_ipv6_prefixes = local.vpc_private_ipv6_subnets
+  private_subnet_ipv6_prefixes                   = local.vpc_private_ipv6_subnets
   private_subnet_tags = {
     Type = "private_subnet"
   }
 
-  database_subnets              = local.vpc_database_subnets
+  database_subnets                                = local.vpc_database_subnets
   database_subnet_assign_ipv6_address_on_creation = true
-  database_subnet_ipv6_prefixes = local.vpc_database_ipv6_subnets
+  database_subnet_ipv6_prefixes                   = local.vpc_database_ipv6_subnets
   database_subnet_tags = {
     Type = "database_subnet"
   }
 
-  intra_subnets              = local.vpc_intra_subnets
+  intra_subnets                                = local.vpc_intra_subnets
   intra_subnet_assign_ipv6_address_on_creation = true
-  intra_subnet_ipv6_prefixes = local.vpc_intra_ipv6_subnets
+  intra_subnet_ipv6_prefixes                   = local.vpc_intra_ipv6_subnets
   intra_subnet_tags = {
     Type = "intra_subnet"
   }
 
-  public_subnets              = local.vpc_public_subnets
+  public_subnets                                = local.vpc_public_subnets
   public_subnet_assign_ipv6_address_on_creation = true
-  public_subnet_ipv6_prefixes = local.vpc_public_ipv6_subnets
+  public_subnet_ipv6_prefixes                   = local.vpc_public_ipv6_subnets
   public_subnet_tags = {
     Type = "public_subnet"
   }
 
-  enable_ipv6                     = true
+  enable_ipv6             = true
   map_public_ip_on_launch = true
 
   enable_nat_gateway     = true
@@ -530,28 +530,28 @@ module "vpc" {
   reuse_nat_ips          = true                         # <= Skip creation of EIPs for the NAT Gateways
   external_nat_ip_ids    = aws_eip.vpc_subnet_nats.*.id # <= IPs specified here as input to the module
 
-  enable_dns_support = true
+  enable_dns_support   = true
   enable_dns_hostnames = false
 
   manage_default_security_group = true
-  manage_default_network_acl = true
-  manage_default_route_table = false
+  manage_default_network_acl    = true
+  manage_default_route_table    = false
 
   default_security_group_ingress = [
     {
       description = "Allow all"
-      protocol = -1
-      self = true
+      protocol    = -1
+      self        = true
     }
   ]
 
   default_security_group_egress = [
     {
-      description = "Allow all"
-      protocol = -1
-      from_port = 0
-      to_port = 0
-      cidr_blocks = "0.0.0.0/0"
+      description      = "Allow all"
+      protocol         = -1
+      from_port        = 0
+      to_port          = 0
+      cidr_blocks      = "0.0.0.0/0"
       ipv6_cidr_blocks = "::/0"
     }
   ]
@@ -1454,9 +1454,9 @@ resource "aws_instance" "dev_workstation_4" {
   }
 
   tags = {
-    Name                      = "dev4"
-    Type                      = "dev_workstation"
-    Environment               = "dev"
+    Name        = "dev4"
+    Type        = "dev_workstation"
+    Environment = "dev"
     #scheduler_mon_fri_dev_ec2 = "true"
   }
 }
@@ -1769,9 +1769,9 @@ resource "aws_instance" "mssql_server_1" {
   }
 
   tags = {
-    Name        = "mssql1"
-    Type        = "dev_mssql_server"
-    Environment = "dev"
+    Name                      = "mssql1"
+    Type                      = "dev_mssql_server"
+    Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
   }
 }
