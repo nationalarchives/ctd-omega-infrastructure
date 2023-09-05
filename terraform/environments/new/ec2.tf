@@ -69,7 +69,7 @@ resource "aws_instance" "dev_workstation_1" {
   }
 
   tags = {
-    Name                      = "dev1_new"
+    Name                      = "dev-workstation-1_new"
     Type                      = "dev_workstation"
     Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
@@ -137,7 +137,7 @@ resource "aws_instance" "dev_workstation_2" {
   }
 
   tags = {
-    Name                      = "dev2_new"
+    Name                      = "dev-workstation-2_new"
     Type                      = "dev_workstation"
     Environment               = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
@@ -257,7 +257,7 @@ resource "aws_instance" "dev_mssql_server_1" {
   }
 
   tags = {
-    Name        = "mssql1_new"
+    Name        = "dev-mssql-server-1_new"
     Type        = "dev_mssql_server"
     Environment = "dev"
     scheduler_mon_fri_dev_ec2 = "true"
