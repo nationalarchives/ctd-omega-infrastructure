@@ -21,14 +21,16 @@ locals {
             content_type = local.media_type_cloud_config
             filename = "omega-02-mount-home-volume.yaml"
             content = templatefile("${local.scripts_dir}/omega-02-mount-home-volume.yaml.tftpl", {
-                separate_home_volume = var.separate_home_volume
+                volume = var.separate_home_volume
+                mount_point = "/home"
             })
         },
         {
             content_type = local.media_type_shellscript
             filename = "omega-03-prepare-home-volume.sh"
             content = templatefile("${local.scripts_dir}/omega-03-prepare-home-volume.sh.tftpl", {
-                separate_home_volume = var.separate_home_volume
+                volume = var.separate_home_volume
+                mount_point = "/home"
             })
         },
     ]
