@@ -1,10 +1,10 @@
-# Root CA Certificate
-resource "tls_self_signed_cert" "root_ca_certificate" {
-    count = var.root_ca == null ? 1 : 0  # only run if we are creating a Root CA
+# Self-signed Certificate
+resource "tls_self_signed_cert" "ss_certificate" {
+    count = var.ca == null ? 1 : 0  # only run if we are creating a Self-signed certificate
 
-    private_key_pem = tls_private_key.ca_private_key.private_key_pem
+    private_key_pem = tls_private_key.private_key.private_key_pem
 
-    is_ca_certificate = true
+    is_ca_certificate = var.is_ca_certificate
 
     subject {
         common_name         = lookup(var.subject, "common_name", null)
@@ -18,10 +18,9 @@ resource "tls_self_signed_cert" "root_ca_certificate" {
         serial_number       = lookup(var.subject, "serial_number", null)
     }
 
-    allowed_uses = [
-        "cert_signing",
-        "crl_signing"
-    ]
+    allowed_uses = local.allowed_uses
+
+    dns_names = var.dns_names
 
     validity_period_hours = var.expiry_days * 24
     early_renewal_hours   = var.early_renewal_hours
@@ -29,10 +28,10 @@ resource "tls_self_signed_cert" "root_ca_certificate" {
     set_subject_key_id    = true
 }
 
-# Persist the Root CA Certificate
-resource "local_file" "root_ca_certificate_file" {
-    count = var.root_ca == null && var.export_path != null ? 1 : 0  # only run if we are creating a Root CA
+# Persist the Self-signed Certificate
+resource "local_file" "ss_certificate_file" {
+    count = var.ca == null && var.export_path != null ? 1 : 0  # only run if we are creating a Self-signed certificate
 
-    filename = local.ca_cert_file
-    content  = tls_self_signed_cert.root_ca_certificate[0].cert_pem
+    filename = local.cert_file
+    content  = tls_self_signed_cert.ss_certificate[0].cert_pem
 }
