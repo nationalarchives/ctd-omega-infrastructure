@@ -1,11 +1,23 @@
 variable "id" {
-  description = "The id of the certificate authority, e.g. puppet-server-1"
+  description = "The id of the certificate, e.g. puppet-server-1"
   type        = string
+}
+
+variable "is_ca_certificate" {
+  description = "Is the generated certificate representing a Certificate Authority (CA)"
+  type = bool
+  default = false
 }
 
 variable "subject" {
   description = "Subject of the certificate"
   type        = map(any)
+}
+
+variable "dns_names" {
+  description = "DNS Names for Subject Alternative Name"
+  type = list(string)
+  default = []
 }
 
 variable "expiry_days" {
@@ -26,8 +38,8 @@ variable "export_path" {
   default     = null
 }
 
-variable "root_ca" {
-  description = "The root CA to use for signing this CA certificate"
+variable "ca" {
+  description = "The CA to use for signing this certificate"
   type        = map(string)
   default     = null
 }
