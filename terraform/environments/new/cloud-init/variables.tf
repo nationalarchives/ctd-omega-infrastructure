@@ -16,6 +16,12 @@ variable "additional_volumes" {
   default     = []
 }
 
+variable "additional_parts" {
+  description = "Additional cloud-init parts"
+  type = list(map(string))
+  default = []
+}
+
 variable "reboot" {
   description = "Whether to reboot after completing cloud-init"
   type        = bool
