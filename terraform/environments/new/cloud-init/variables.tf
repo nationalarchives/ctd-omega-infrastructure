@@ -12,7 +12,7 @@ variable "separate_home_volume" {
 
 variable "additional_volumes" {
   description = "Additional volumes to prepare and mount (e.g. [{volume = \"xvdc\", mount_point = \"/backup\" }])"
-  type        = list(any)
+  type        = list(map(string))
   default     = []
 }
 
