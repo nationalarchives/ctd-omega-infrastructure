@@ -53,6 +53,14 @@ locals {
     }
   ]
 
+  additional_parts = [
+    for additional_part in var.additional_parts : {
+      content_type = additional_part.content_type
+      filename     = "omega-06-${additional_part.filename}"
+      content      = additional_part.content
+    }
+  ]
+
   yum_upgrade_part = [
     {
       content_type = local.media_type_cloud_config
@@ -69,10 +77,12 @@ locals {
     }
   ]
 
+
   parts = concat(
     local.hostname_part,
     local.separate_home_volume_part,
     local.additional_volumes_part,
+    local.additional_parts,
     local.yum_upgrade_part,
     local.reboot_part
   )
