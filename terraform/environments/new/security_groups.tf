@@ -169,3 +169,95 @@ module "dev_database_security_group" {
     Environment = "dev"
   }
 }
+
+module "puppet_server_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.1.0"
+
+  name        = "puppet_server_security_group_new"
+  description = "Security group for Puppet Server ports open within VPC"
+
+  vpc_id = module.vpc.vpc_id
+
+  computed_ingress_with_cidr_blocks = [
+    {
+      description = "SSH"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    },
+    {
+      description = "SSH from vpc_private_subnet_dev_general"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      description = "Puppet"
+      from_port   = 8140
+      to_port     = 8140
+      protocol    = "tcp"
+      cidr_blocks = join(",", [
+        module.vpc.private_subnets_cidr_blocks[2], # NOTE: restricted to vpc_private_subnet_management
+        module.vpc.private_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      ])
+    }
+  ]
+  number_of_computed_ingress_with_cidr_blocks = 3
+
+  computed_ingress_with_ipv6_cidr_blocks = [
+    {
+      description      = "SSH (IPv6)"
+      from_port        = 22
+      to_port          = 22
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management (IPv6)
+    },
+    {
+      description      = "SSH (IPv6) from vpc_private_subnet_dev_general"
+      from_port        = 22
+      to_port          = 22
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+    },
+    {
+      description      = "Puppet (IPv6)"
+      from_port        = 8140
+      to_port          = 8140
+      protocol         = "tcp"
+      ipv6_cidr_blocks = join(",", [
+        module.vpc.private_subnets_ipv6_cidr_blocks[2], # NOTE: restricted to vpc_private_subnet_management (IPv6)
+        module.vpc.private_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_general
+      ])
+    }
+  ]
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 3
+
+  egress_with_cidr_blocks = [
+    {
+      description = "All"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+
+  egress_with_ipv6_cidr_blocks = [
+    {
+      description = "All (IPv6)"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_blocks = "2001:db8::/64"
+    }
+  ]
+
+  tags = {
+    Name        = "sg_puppet_server_new"
+    Type        = "security_group"
+    Environment = "dev"
+  }
+}
