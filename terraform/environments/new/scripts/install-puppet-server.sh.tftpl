@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+set -e
+# Puppet Labs paths
+PL_APP_DIR=/opt/puppetlabs
+PL_CONF_DIR=/etc/puppetlabs
+PL_CODE_DIR=$PL_CONF_DIR/code
+PL_RUN_DIR=/var/run/puppetlabs
+PL_LOG_DIR=/var/log/puppetlabs
+# Puppet Server paths
+PS_APP_DIR=$PL_APP_DIR/server
+PS_CONF_DIR=$PL_CONF_DIR/puppetserver
+PS_CA_DIR=$PS_CONF_DIR/ca
+PS_RUN_DIR=$PL_RUN_DIR/puppetserver
+PS_LOG_DIR=$PL_LOG_DIR/puppetlabs
+# Puppet Agent paths
+PA_APP_DIR=$PL_APP_DIR/puppet
+PA_CONF_DIR=$PL_CONF_DIR/puppet
+PA_SSL_DIR=$PA_CONF_DIR/ssl
+# Facter paths
+FA_CONF_DIR=$PL_CONF_DIR/facter
+# R10K paths
+R10K_CONF_DIR=$PL_CONF_DIR/r10k
+# Install Puppet Server and Puppet Agent
+if ! yum list installed java-11-openjdk; then
+  amazon-linux-extras install java-openjdk11
+fi
+if [[ ! -f "/etc/yum.repos.d/puppet8-release.repo" ]]; then
+  rpm -Uvh https://yum.puppet.com/puppet8-release-el-7.noarch.rpm
+fi
+if ! yum list installed puppetserver; then
+  yum install -y puppetserver puppet-agent
+fi
+mkdir -p $PA_CONF_DIR
+cat <<EOF > $PA_CONF_DIR/puppet.conf
+[main]
+server = ${puppet_server_fqdn}
+# NOTE(AR) this is a temporary measure until we can pre-gen both Certs and CRL with OpenSSL via Terraform
+certificate_revocation = false
+
+[server]
+certname = ${puppet_server_fqdn}
+vardir = $PS_APP_DIR/data/puppetserver
+logdir = $PS_LOG_DIR
+rundir = $PS_RUN_DIR
+pidfile = $PS_RUN_DIR/puppetserver.pid
+codedir = $PL_CODE_DIR
+EOF
+# Create Puppet Server CA directories
+mkdir -p $PS_CA_DIR
+pushd $PS_CA_DIR
+mkdir -p requests signed
+popd
+# Create Puppet Agent SSL directories
+mkdir -p $PA_SSL_DIR
+pushd $PA_SSL_DIR
+mkdir -p certs private_keys public_keys
+ln -s $PS_CA_DIR ca || true
+popd
+
+# Disable PuppetServer Internal CA
+cat <<EOF > $PS_CONF_DIR/services.d/ca.cfg
+#puppetlabs.services.ca.certificate-authority-service/certificate-authority-service
+puppetlabs.services.ca.certificate-authority-disabled-service/certificate-authority-disabled-service
+puppetlabs.trapperkeeper.services.watcher.filesystem-watch-service/filesystem-watch-service
+EOF
+
+pushd $PS_CA_DIR
+
+## Deploy CA Certificate and Keys
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/ca/public/${ca_certificate_pem_filename} ca_crt.pem
+cp -v -p ca_crt.pem $PA_SSL_DIR/certs/ca.pem
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/ca/public/${ca_public_key_pem_filename} ca_pub.pem
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/ca/private/${ca_private_key_pem_filename} ca_key.pem
+
+## START TEMP Generate an empty CRL as Puppet Server MUST always have a valid CRL file. NOTE(AR) this is a temporary measure until we can pre-gen both Certs and CRL with OpenSSL via Terraform
+if [[ ! -f $PA_SSL_DIR/crl.pem ]]; then
+  PS_CA_OPENSSL_DIR=$PS_CA_DIR/openssl
+  mkdir -p $PS_CA_OPENSSL_DIR
+  pushd $PS_CA_OPENSSL_DIR
+  cat <<EOF > puppet_ca.openssl.conf
+default_ca = puppet_ca
+
+[ puppet_ca ]
+crlnumber = puppet_ca.openssl.crlnumber
+database = puppet_ca.openssl.index.txt
+crl_extensions = puppet_ca_crl_extensions
+default_md = sha256
+default_crl_days = 730
+
+[ puppet_ca_crl_extensions]
+authorityKeyIdentifier = keyid
+EOF
+  touch puppet_ca.openssl.index.txt
+  echo "unique_subject = yes" > puppet_ca.openssl.index.txt.attr
+  echo "00" > puppet_ca.openssl.crlnumber
+  openssl ca -config puppet_ca.openssl.conf -gencrl -cert ../ca_crt.pem -keyfile ../ca_key.pem -out $PA_SSL_DIR/crl.pem
+  popd
+fi
+## END TEMP
+
+## Deploy Puppet Agent Certificates for Puppet Server CA and Puppet Agent
+CA_SIGNED_DIR=$PS_CA_DIR/signed
+pushd $CA_SIGNED_DIR
+%{ for index, puppet_agent in puppet_agents ~}
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/certificates/public/${puppet_agent.certificate_pem_filename} ${puppet_agent.fqdn}.pem
+chmod 0644 ${puppet_agent.fqdn}.pem
+if [[ "${puppet_agent.fqdn}.crt.pem" == "${puppet_agent.certificate_pem_filename}" ]]; then
+  cp -v -p ${puppet_agent.fqdn}.pem $PA_SSL_DIR/certs/
+  aws s3 cp s3://${s3_bucket_name_puppet_certificates}/certificates/public/${puppet_agent.public_key_pem_filename} $PA_SSL_DIR/public_keys/${puppet_agent.fqdn}.pem
+  aws s3 cp s3://${s3_bucket_name_puppet_certificates}/certificates/private/${puppet_agent.private_key_pem_filename} $PA_SSL_DIR/private_keys/${puppet_agent.fqdn}.pem
+fi 
+%{ endfor ~}
+popd
+
+# Set permissions
+chown -R puppet:puppet $PS_CA_DIR $PA_SSL_DIR
+chmod 755 $PA_SSL_DIR/certs $PA_SSL_DIR/public_keys
+chmod 750 $PS_CA_DIR requests signed $PA_SSL_DIR/private_keys
+chmod 644 ca_crt.pem ca_pub.pem $PA_SSL_DIR/public_keys/* $PA_SSL_DIR/crl.pem
+chmod 640 ca_key.pem $PA_SSL_DIR/private_keys/*
+popd
+
+# Patch a bug in Puppet/Facter on AWS
+mkdir -p $FA_CONF_DIR
+cat <<EOF > $FA_CONF_DIR/facter.conf
+facts : {
+    # NOTE(AR) Block ec2_userdata due to bug in Puppet/Facter on AWS, see: https://groups.google.com/g/puppet-users/c/dpLyduMbCrE
+    blocklist : [ "ec2_userdata" ]
+}
+EOF
+
+# Install r10k
+if ! yum list installed git; then
+  yum install -y git
+fi
+$PA_APP_DIR/bin/gem install r10k
+ln -s $PA_APP_DIR/bin/r10k $PL_APP_DIR/bin/r10k || true
+mkdir -p $R10K_CONF_DIR
+cat <<EOF > $R10K_CONF_DIR/r10k.yaml
+:sources:
+  # This will clone the git repository and instantiate an environment per branch in $PL_CODE_DIR/environments
+  :omega:
+    remote: '${puppet_control_repo_url}'
+    strip_component: 'env/'
+    basedir: '$PL_CODE_DIR/environments'
+EOF
+$PL_APP_DIR/bin/r10k deploy environment ${puppet_environment} -pv
+
+# Start Puppet Server and Puppet Agent
+systemctl enable puppetserver
+systemctl start puppetserver
+systemctl enable puppet
+systemctl start puppet

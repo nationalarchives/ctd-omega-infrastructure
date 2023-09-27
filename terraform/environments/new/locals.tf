@@ -1,4 +1,7 @@
 locals {
+
+  scripts_dir = "${path.root}/${path.module}/scripts"
+
   aws_region = "eu-west-2"
   aws_azs    = ["${local.aws_region}a", "${local.aws_region}b"]
 
