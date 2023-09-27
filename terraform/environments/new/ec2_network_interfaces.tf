@@ -40,10 +40,14 @@ resource "aws_network_interface" "services_api_1_private_interface" {
 resource "aws_network_interface" "puppet_server_1_private_interface" {
   description = "Private Management Subnet interface for puppet_server-1"
   subnet_id   = module.vpc.private_subnets[2]
-  private_ips = ["10.129.195.4"]
+  private_ips = [local.ipv4_puppet_server_1]
+
+  security_groups = [
+    module.puppet_server_security_group.security_group_id
+  ]
 
   tags = {
-    Name        = "eth0_omg_puppet_server_1"
+    Name        = "eth0_puppet-server-1"
     Type        = "primary_network_interface"
     Network     = "omg_private"
     Environment = "omg"

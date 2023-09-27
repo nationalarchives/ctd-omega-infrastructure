@@ -132,6 +132,42 @@ module "vpc" {
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
+    {
+      # allow IPv4 HTTP traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
+      rule_number = 320
+      rule_action = "allow"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    },
+    {
+      # allow IPv6 HTTP traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
+      rule_number     = 326
+      rule_action     = "allow"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    },
+    {
+      # allow IPv4 HTTPS traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
+      rule_number = 321
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    },
+    {
+      # allow IPv6 HTTPS traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
+      rule_number     = 327
+      rule_action     = "allow"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    },
 
     {
       # allow results in from previously outgoing (to the web) IPv4 internet traffic
@@ -208,6 +244,24 @@ module "vpc" {
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
+    {
+      # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_management
+      rule_number = 320
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    },
+    {
+      # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_management
+      rule_number     = 326
+      rule_action     = "allow"
+      from_port       = local.unpriviledged_port_start
+      to_port         = local.unpriviledged_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    }
   ]
 
   private_dedicated_network_acl = true
@@ -397,6 +451,26 @@ module "vpc" {
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
+
+    {
+      # allow IPv4 Puppet traffic out to puppet-server-1 in vpc_private_subnet_management
+      rule_number = 800
+      rule_action = "allow"
+      from_port   = 8140
+      to_port     = 8140
+      protocol    = "tcp"
+      cidr_block  = "${local.ipv4_puppet_server_1}/32" # NOTE: restricted to puppet-server-1 in vpc_private_subnet_management
+    },
+    {
+      # allow IPv6 Puppet traffic out to vpc_private_subnet_management
+      rule_number     = 860
+      rule_action     = "allow"
+      from_port       = 8140
+      to_port         = 8140
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+    },
+
     {
       rule_number = 200
       rule_action = "allow"

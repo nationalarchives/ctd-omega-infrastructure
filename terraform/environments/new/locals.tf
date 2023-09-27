@@ -86,9 +86,6 @@ locals {
     )
   )
 
-  /* IP address of the private Route53 DNS Server in the VPC */
-  ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
-
   /* starts public ipv6 subnets after private ipv6 subnets */
   vpc_public_ipv6_subnets = [for i in local.vpc_public_subnets : length(local.vpc_private_subnets) + length(local.vpc_database_subnets) + length(local.vpc_intra_subnets) + index(local.vpc_public_subnets, i)]
 
@@ -104,7 +101,17 @@ locals {
   linux_ephemeral_port_start = 32768
   linux_ephemeral_port_end   = 60999
 
+  /* IP address of the private Route53 DNS Server in the VPC */
+  ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
+
+  /* IP addresses */
+  ipv4_puppet_server_1 = "10.129.195.4"
+
   instance_type_dev_workstation = "t2.micro" # "r6i.2xlarge"
 
   instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
+
+  instance_type_puppet_server = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
+
+  s3_bucket_name_puppet_certificates = "puppet-certificates"
 }

@@ -263,3 +263,78 @@ resource "aws_instance" "dev_mssql_server_1" {
     scheduler_mon_fri_dev_ec2 = "true"
   }
 }
+
+module "puppet_server_1_cloud_init" {
+  source = "./cloud-init"
+
+  fqdn                 = "puppet-server-1.${local.private_omg_dns_domain}"
+
+  additional_parts = [
+    {
+      content_type = "text/x-shellscript"
+      filename = "01-install-puppet-server.sh"
+      content = templatefile("${local.scripts_dir}/install-puppet-server.sh.tftpl", {
+        s3_bucket_name_puppet_certificates = local.s3_bucket_name_puppet_certificates
+        puppet_server_fqdn          = "puppet-server-1.${local.private_omg_dns_domain}"
+        ca_certificate_pem_filename = basename(module.puppet_server_1_puppet_server_certificate_authority.certificate_pem_exported_filename)
+        ca_private_key_pem_filename = basename(module.puppet_server_1_puppet_server_certificate_authority.private_key_pem_exported_filename)
+        ca_public_key_pem_filename  = basename(module.puppet_server_1_puppet_server_certificate_authority.public_key_pem_exported_filename)
+        puppet_control_repo_url = "https://github.com/nationalarchives/ctd-omega-puppet.git"
+        puppet_environment      = "production"
+        puppet_agents           = [
+          {
+            fqdn = "puppet-server-1.${local.private_omg_dns_domain}"
+            certificate_pem_filename = basename(module.puppet_server_1_puppet_agent_certificate.certificate_pem_exported_filename)
+            public_key_pem_filename  = basename(module.puppet_server_1_puppet_agent_certificate.public_key_pem_exported_filename)
+            private_key_pem_filename = basename(module.puppet_server_1_puppet_agent_certificate.private_key_pem_exported_filename)
+          }
+        ]
+      })
+    }
+  ]
+}
+
+# Puppet Server
+resource "aws_instance" "puppet_server_1" {
+  ami                         = data.aws_ami.amazon_linux_2_20230719_x86_64.id
+  instance_type               = local.instance_type_puppet_server
+  key_name                    = data.aws_key_pair.omega_admin_key_pair.key_name
+  user_data                   = module.puppet_server_1_cloud_init.rendered
+  user_data_replace_on_change = false
+
+  iam_instance_profile = aws_iam_instance_profile.puppet_server_iam_instance_profile.id
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
+  monitoring = false
+
+  network_interface {
+    network_interface_id = aws_network_interface.puppet_server_1_private_interface.id
+    device_index         = 0
+  }
+
+  root_block_device {
+    delete_on_termination = false
+    encrypted             = false
+    volume_type           = "gp3"
+    iops                  = 3000
+    throughput            = 125 # MiB/s
+    volume_size           = 20  # GiB
+
+    tags = {
+      Name        = "root_puppet-server-1_new"
+      Type        = "primary_volume"
+      Environment = "dev"
+    }
+  }
+
+  tags = {
+    Name                      = "puppet-server-1_new"
+    Type                      = "puppet_server"
+    Environment               = "mvpbeta"
+    scheduler_mon_fri_dev_ec2 = "false"
+  }
+}
