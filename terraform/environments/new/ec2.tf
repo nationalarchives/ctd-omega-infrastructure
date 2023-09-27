@@ -45,7 +45,7 @@ resource "aws_instance" "dev_workstation_1" {
     volume_size           = 20  # GiB
 
     tags = {
-      Name        = "root_dev1_new"
+      Name        = "root_dev-workstation-1_new"
       Type        = "primary_volume"
       Environment = "dev"
     }
@@ -62,7 +62,7 @@ resource "aws_instance" "dev_workstation_1" {
     device_name = "/dev/xvdb"
 
     tags = {
-      Name        = "home_dev1_new"
+      Name        = "home_dev-workstation-1_new"
       Type        = "home_volume"
       Environment = "dev"
     }
@@ -113,7 +113,7 @@ resource "aws_instance" "dev_workstation_2" {
     volume_size           = 20  # GiB
 
     tags = {
-      Name        = "root_dev2_new"
+      Name        = "root_dev-workstation-2_new"
       Type        = "primary_volume"
       Environment = "dev"
     }
@@ -130,7 +130,7 @@ resource "aws_instance" "dev_workstation_2" {
     device_name = "/dev/xvdb"
 
     tags = {
-      Name        = "home_dev2_new"
+      Name        = "home_dev-workstation-2_new"
       Type        = "home_volume"
       Environment = "dev"
     }

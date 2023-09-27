@@ -4,7 +4,7 @@ resource "aws_network_interface" "web_proxy_1_private_interface" {
   private_ips = ["10.129.199.4"]
 
   tags = {
-    Name        = "eth0_omg_web_proxy_1"
+    Name        = "eth0_web-proxy-1"
     Type        = "primary_network_interface"
     Network     = "omg_private"
     Environment = "omg"
@@ -17,7 +17,7 @@ resource "aws_network_interface" "web_app_1_private_interface" {
   private_ips = ["10.129.193.4"]
 
   tags = {
-    Name        = "eth0_omg_web_app_1"
+    Name        = "eth0_web-app-1"
     Type        = "primary_network_interface"
     Network     = "omg_private"
     Environment = "omg"
@@ -30,7 +30,7 @@ resource "aws_network_interface" "services_api_1_private_interface" {
   private_ips = ["10.129.194.4"]
 
   tags = {
-    Name        = "eth0_omg_services_api_1"
+    Name        = "eth0_services-api-1"
     Type        = "primary_network_interface"
     Network     = "omg_private"
     Environment = "omg"
