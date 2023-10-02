@@ -77,6 +77,7 @@ resource "aws_ec2_client_vpn_endpoint" "vpn_new" {
 
   client_cidr_block = local.vpn_client_cidr_block
   split_tunnel      = true
+  dns_servers       = [local.ipv4_vpc_dns_server]
 
   server_certificate_arn = aws_acm_certificate.client_vpn_server_certificate_new.arn
 
@@ -135,5 +136,11 @@ resource "aws_ec2_client_vpn_network_association" "cvpn_for_vpc_private_subnet_d
 resource "aws_ec2_client_vpn_authorization_rule" "cvpn_auth_for_vpc_private_subnet_dev_general" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_new.id
   target_network_cidr    = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+  authorize_all_groups   = true
+}
+
+resource "aws_ec2_client_vpn_authorization_rule" "cvpn_auth_for_vpc_private_dns" {
+  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_new.id
+  target_network_cidr    = "${local.ipv4_vpc_dns_server}/32" # NOTE: restricted to ipv4_vpc_dns_server
   authorize_all_groups   = true
 }
