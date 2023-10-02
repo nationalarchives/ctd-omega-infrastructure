@@ -95,9 +95,120 @@ module "vpc" {
 
   public_dedicated_network_acl = true
 
-  public_inbound_acl_rules = []
+  public_inbound_acl_rules = [
+    {
+      # allow IPv4 HTTP traffic in from vpc_private_subnet_dev_general for the purposes of accesing the web (via NAT Gateway)
+      rule_number = 300
+      rule_action = "allow"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv6 HTTP traffic in from vpc_private_subnet_dev_general for the purposes of accesing the web (via NAT Gateway)
+      rule_number     = 306
+      rule_action     = "allow"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv4 HTTPS traffic in from vpc_private_subnet_dev_general for the purposes of accesing the web (via NAT Gateway)
+      rule_number = 301
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv6 HTTPS traffic in from vpc_private_subnet_dev_general for the purposes of accesing the web (via NAT Gateway)
+      rule_number     = 307
+      rule_action     = "allow"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
 
-  public_outbound_acl_rules = []
+    {
+      # allow results in from previously outgoing (to the web) IPv4 internet traffic
+      rule_number = 900
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      # allow results in from previous outgoing (to the web) IPv6 internet traffic
+      rule_number     = 960
+      rule_action     = "allow"
+      from_port       = local.unpriviledged_port_start
+      to_port         = local.unpriviledged_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = "::/0"
+    }
+  ]
+
+  public_outbound_acl_rules = [
+    {
+      # allow IPv4 HTTP traffic out to the Web
+      rule_number = 100
+      rule_action = "allow"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      # allow IPv6 HTTP traffic out to the Web
+      rule_number     = 106
+      rule_action     = "allow"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      ipv6_cidr_block = "::/0"
+    },
+    {
+      # allow IPv4 HTTPS traffic out to the Web
+      rule_number = 101
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = "0.0.0.0/0"
+    },
+    {
+      # allow IPv6 HTTP traffic out to the Web
+      rule_number     = 107
+      rule_action     = "allow"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      ipv6_cidr_block = "::/0"
+    },
+    {
+      # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_dev_general
+      rule_number = 300
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_dev_general
+      rule_number     = 306
+      rule_action     = "allow"
+      from_port       = local.unpriviledged_port_start
+      to_port         = local.unpriviledged_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+  ]
 
   private_dedicated_network_acl = true
 
