@@ -14,6 +14,22 @@ module "dev_workstation_1_cloud_init" {
 
   fqdn                 = "dev-workstation-1.${local.private_omg_dns_domain}"
   separate_home_volume = "xvdb"
+
+  additional_parts = [
+    {
+      content_type = "text/x-shellscript"
+      filename = "01-install-puppet-agent.sh"
+      content = templatefile("${local.scripts_dir}/install-puppet-agent.sh.tftpl", {
+        s3_bucket_name_puppet_certificates = local.s3_bucket_name_puppet_certificates
+        puppet_agent_fqdn     = "dev-workstation-1.${local.private_omg_dns_domain}"
+        puppet_server_fqdn    = "puppet-server-1.${local.private_omg_dns_domain}"
+        ca_certificate_pem_filename = basename(module.puppet_server_1_puppet_server_certificate_authority.certificate_pem_exported_filename)
+        certificate_pem_filename = basename(module.dev_workstation_1_puppet_agent_certificate.certificate_pem_exported_filename)
+        public_key_pem_filename  = basename(module.dev_workstation_1_puppet_agent_certificate.public_key_pem_exported_filename)
+        private_key_pem_filename = basename(module.dev_workstation_1_puppet_agent_certificate.private_key_pem_exported_filename)
+      })
+    }
+  ]
 }
 
 # Dev Workstation for Adam Retter
@@ -23,6 +39,8 @@ resource "aws_instance" "dev_workstation_1" {
   key_name                    = data.aws_key_pair.omega_admin_key_pair.key_name
   user_data                   = module.dev_workstation_1_cloud_init.rendered
   user_data_replace_on_change = false
+
+  iam_instance_profile = aws_iam_instance_profile.dev_workstation_1_ec2_iam_instance_profile.id
 
   metadata_options {
     http_endpoint = "enabled"
@@ -287,6 +305,12 @@ module "puppet_server_1_cloud_init" {
             certificate_pem_filename = basename(module.puppet_server_1_puppet_agent_certificate.certificate_pem_exported_filename)
             public_key_pem_filename  = basename(module.puppet_server_1_puppet_agent_certificate.public_key_pem_exported_filename)
             private_key_pem_filename = basename(module.puppet_server_1_puppet_agent_certificate.private_key_pem_exported_filename)
+          },
+          {
+            fqdn = "dev-workstation-1.${local.private_omg_dns_domain}"
+            certificate_pem_filename  = basename(module.dev_workstation_1_puppet_agent_certificate.certificate_pem_exported_filename)
+            public_key_pem_filename   = basename(module.dev_workstation_1_puppet_agent_certificate.public_key_pem_exported_filename)
+            private_key_pem_filename  = basename(module.dev_workstation_1_puppet_agent_certificate.private_key_pem_exported_filename)
           }
         ]
       })
