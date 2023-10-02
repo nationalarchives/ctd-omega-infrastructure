@@ -83,6 +83,9 @@ locals {
     )
   )
 
+  /* IP address of the private Route53 DNS Server in the VPC */
+  ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
+
   /* starts public ipv6 subnets after private ipv6 subnets */
   vpc_public_ipv6_subnets = [for i in local.vpc_public_subnets : length(local.vpc_private_subnets) + length(local.vpc_database_subnets) + length(local.vpc_intra_subnets) + index(local.vpc_public_subnets, i)]
 
