@@ -6,17 +6,10 @@ module "puppet_server_1_puppet_server_certificate_authority" {
 
   is_ca_certificate = true
 
-  subject = {
+  subject = merge(local.default_certificate_subject,  {
     common_name = "Puppet CA: puppet-server-1.${local.private_omg_dns_domain}"
-    organizational_unit = "The Cataloguing, Taxonomy, and Data Team"
-    organization = "The National Archives"
-    locality = "Kew"
-    province = "London"
-    country = "GB"
-    postal_code = "TW9 4DU"
-
     serial_number = "0x1"
-  }
+  })
 
   expiry_days = 5 * 365  # 5 years
   export_path = "../../../ctd-omega-infrastructure-certificates/exported"
@@ -30,17 +23,10 @@ module "puppet_server_1_puppet_agent_certificate" {
 
   is_ca_certificate = false
 
-  subject = {
+  subject = merge(local.default_certificate_subject,  {
     common_name = "puppet-server-1.${local.private_omg_dns_domain}"
-    organizational_unit = "The Cataloguing, Taxonomy, and Data Team"
-    organization = "The National Archives"
-    locality = "Kew"
-    province = "London"
-    country = "GB"
-    postal_code = "TW9 4DU"
-
     serial_number = "0x1"
-  }
+  })
 
   dns_names = [
     "puppet-server-1.${local.private_omg_dns_domain}"
@@ -63,17 +49,10 @@ module "dev_workstation_1_puppet_agent_certificate" {
 
   is_ca_certificate = false
 
-  subject = {
+  subject = merge(local.default_certificate_subject,  {
     common_name = "dev-workstation-1.${local.private_omg_dns_domain}"
-    organizational_unit = "The Cataloguing, Taxonomy, and Data Team"
-    organization = "The National Archives"
-    locality = "Kew"
-    province = "London"
-    country = "GB"
-    postal_code = "TW9 4DU"
-
     serial_number = "0x1"
-  }
+  })
 
   dns_names = [
     "dev-workstation-1.${local.private_omg_dns_domain}"
