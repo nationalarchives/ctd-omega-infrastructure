@@ -35,7 +35,7 @@ resource "tls_locally_signed_cert" "cas_certificate" {
   set_subject_key_id    = true
 }
 
-# Persist the CA signed certificate
+# Export the CA signed certificate to a file
 resource "local_file" "cas_certificate_file" {
     count = var.ca != null && var.export_path != null ? 1 : 0  # only run if we are creating a CA signed certificate
 

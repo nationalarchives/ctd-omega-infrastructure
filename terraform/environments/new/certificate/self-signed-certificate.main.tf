@@ -28,7 +28,7 @@ resource "tls_self_signed_cert" "ss_certificate" {
     set_subject_key_id    = true
 }
 
-# Persist the Self-signed Certificate
+# Export the Self-signed Certificate to a file
 resource "local_file" "ss_certificate_file" {
     count = var.ca == null && var.export_path != null ? 1 : 0  # only run if we are creating a Self-signed certificate
 

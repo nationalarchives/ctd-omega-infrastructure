@@ -23,7 +23,7 @@ output "private_key_pem" {
 
 output "certificate_pem_exported_filename" {
     description = "The filename of the exported Certificate"
-    value       = var.export_path == null ? null : local.cert_file
+    value       = local.cert_file
 
     depends_on = [
         local_file.ss_certificate_file,
@@ -33,7 +33,7 @@ output "certificate_pem_exported_filename" {
 
 output "public_key_pem_exported_filename" {
     description = "The filename of the exported Public Key"
-    value       = var.export_path == null ? null : local.public_key_file
+    value       = local.public_key_file
 
     depends_on = [
         local_file.public_key_file
@@ -42,7 +42,7 @@ output "public_key_pem_exported_filename" {
 
 output "private_key_pem_exported_filename" {
     description = "The filename of the exported Private Key"
-    value       = var.export_path == null ? null : local.private_key_file
+    value       = local.private_key_file
 
     depends_on = [
         local_sensitive_file.private_key_file
