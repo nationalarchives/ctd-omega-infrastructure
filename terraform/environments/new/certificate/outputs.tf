@@ -19,6 +19,7 @@ output "public_key_pem" {
 output "private_key_pem" {
     description = "The Private Key"
     value       = tls_private_key.private_key.private_key_pem
+    sensitive   = true
 }
 
 output "certificate_pem_exported_filename" {
