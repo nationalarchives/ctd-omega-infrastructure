@@ -114,4 +114,13 @@ locals {
   instance_type_puppet_server = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
 
   s3_bucket_name_puppet_certificates = "puppet-certificates"
+
+  default_certificate_subject = {
+    organizational_unit = "The Cataloguing, Taxonomy, and Data Team"
+    organization        = "The National Archives"
+    locality            = "Kew"
+    province            = "London"
+    country             = "GB"
+    postal_code         = "TW9 4DU"
+  }
 }
