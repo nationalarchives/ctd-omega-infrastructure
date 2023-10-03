@@ -11,7 +11,16 @@ variable "is_ca_certificate" {
 
 variable "subject" {
   description = "Subject of the certificate"
-  type        = map(any)
+  type        = object({
+    common_name         = string,
+    organizational_unit = optional(string),
+    organization        = optional(string),
+    locality            = optional(string),
+    province            = optional(string),
+    country             = optional(string),
+    postal_code         = optional(string),
+    serial_number       = optional(string)
+  })
 }
 
 variable "dns_names" {
@@ -40,6 +49,9 @@ variable "export_path" {
 
 variable "ca" {
   description = "The CA to use for signing this certificate"
-  type        = map(string)
+  type        = object({
+    private_key_pem = string,
+    certificate_pem = string
+  })
   default     = null
 }
