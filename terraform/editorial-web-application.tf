@@ -209,7 +209,7 @@ EOF
 
 resource "aws_instance" "mvpbeta_web_proxy_1" {
   availability_zone = local.aws_azs[0]
-  ami               = data.aws_ami.amazon_linux_2_20210813_arm64.id
+  ami               = local.aws_ami_linux2_arm64.id
   instance_type     = "t4g.nano"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
@@ -428,7 +428,7 @@ EOF
 
 resource "aws_instance" "mvpbeta_web_app_1" {
   availability_zone = local.aws_azs[0]
-  ami               = data.aws_ami.amazon_linux_2_20210813_arm64.id
+  ami               = local.aws_ami_linux2_arm64.id
   instance_type     = "t4g.large" # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name

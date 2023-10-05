@@ -99,6 +99,16 @@ locals {
   # See `cat /proc/net/sys/ipv4/ip_local_port_range`
   linux_ephemeral_port_start = 32768
   linux_ephemeral_port_end   = 60999
+
+  aws_ami_linux2_x86_64 = {
+    name = "amzn2-ami-hvm-2.0.20210813.1-x86_64-gp2"
+    id   = "ami-0dbec48abfe298cab"
+  }
+
+  aws_ami_linux2_arm64 = {
+    name = "amzn2-ami-hvm-2.0.20210813.1-arm64-gp2"
+    id   = "ami-000f10227a4a749fc"
+  }
 }
 
 provider "aws" {
@@ -899,28 +909,6 @@ resource "aws_vpc_dhcp_options_association" "dns_resolver" {
   dhcp_options_id = aws_vpc_dhcp_options.vpc_dhcp_options.id
 }
 
-data "aws_ami" "amazon_linux_2_20210813_x86_64" {
-  most_recent = false
-
-  owners = ["137112412989"] # Amazon Web Services
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-2.0.20210813.1-x86_64-gp2"]
-  }
-}
-
-data "aws_ami" "amazon_linux_2_20210813_arm64" {
-  most_recent = false
-
-  owners = ["137112412989"] # Amazon Web Services
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-2.0.20210813.1-arm64-gp2"]
-  }
-}
-
 module "dev_workstation_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.17.2"
@@ -1251,7 +1239,7 @@ EOF
 
 # Dev Workstation for Adam Retter
 resource "aws_instance" "dev_workstation_1" {
-  ami           = data.aws_ami.amazon_linux_2_20210813_x86_64.id
+  ami           = local.aws_ami_linux2_x86_64.id
   instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
@@ -1309,7 +1297,7 @@ resource "aws_route53_record" "dns_a_dev1_in_cat_nationalarchives_gov_uk" {
 
 # Dev Workstation for Rob Walpole
 resource "aws_instance" "dev_workstation_2" {
-  ami           = data.aws_ami.amazon_linux_2_20210813_x86_64.id
+  ami           = local.aws_ami_linux2_x86_64.id
   instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
@@ -1367,7 +1355,7 @@ resource "aws_route53_record" "dns_a_dev2_in_cat_nationalarchives_gov_uk" {
 
 # Dev Workstation for Jaishree Davey
 resource "aws_instance" "dev_workstation_3" {
-  ami           = data.aws_ami.amazon_linux_2_20210813_x86_64.id
+  ami           = local.aws_ami_linux2_x86_64.id
   instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
@@ -1425,7 +1413,7 @@ resource "aws_route53_record" "dns_a_dev3_in_cat_nationalarchives_gov_uk" {
 
 # Dev Workstation for Enrique Manuel Del Pino
 resource "aws_instance" "dev_workstation_4" {
-  ami           = data.aws_ami.amazon_linux_2_20210813_x86_64.id
+  ami           = local.aws_ami_linux2_x86_64.id
   instance_type = "r6i.2xlarge"
 
   key_name = aws_key_pair.omega_admin_key_pair.key_name
@@ -1690,7 +1678,7 @@ resource "aws_iam_instance_profile" "dev_mssql_instance_iam_instance_profile" {
 }
 
 resource "aws_instance" "mssql_server_1" {
-  ami           = data.aws_ami.amazon_linux_2_20210813_x86_64.id
+  ami           = local.aws_ami_linux2_x86_64.id
   instance_type = "r5.xlarge"
   # m5a.2xlarge == $0.4 / hour == 8 vCPU == 32GiB RAM
   # r5.xlarge == $0.296 / hour == 4 vCPU == 32GiB RAM
