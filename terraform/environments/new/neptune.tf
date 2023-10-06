@@ -75,7 +75,7 @@ resource "aws_neptune_parameter_group" "dev_neptune_cluster_a_instance" {
 
 resource "aws_neptune_subnet_group" "dev_neptune_cluster_a" {
   name       = local.neptune_dev_cluster_a.subnet_group_name
-  subnet_ids = module.vpc.database_subnets
+  subnet_ids = module.vpc.intra_subnets
 
   tags = {
     Name        = "${local.neptune_dev_cluster_a.id}-sg"
