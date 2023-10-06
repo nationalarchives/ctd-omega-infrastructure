@@ -115,6 +115,12 @@ locals {
     postal_code         = "TW9 4DU"
   }
 
+  neptune_dev_cluster_a = {
+    id                = "dev-neptune-cluster-a"
+    subnet_group_name = "dev_neptune_cluster_a"
+    instance_prefix   = "dev-neptune-cluster-a-instance"
+  }
+
   puppet_control_repo_url = "https://github.com/nationalarchives/ctd-omega-puppet.git"
 
   instance_type_puppet_server    = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
@@ -312,3 +318,4 @@ locals {
     }
   }
 }
+
