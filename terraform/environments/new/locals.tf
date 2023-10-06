@@ -115,6 +115,8 @@ locals {
     postal_code         = "TW9 4DU"
   }
 
+  s3_bucket_name_neptune_loader = "ctd-neptune-loader"
+
   neptune_dev_cluster_a = {
     id                = "dev-neptune-cluster-a"
     subnet_group_name = "dev_neptune_cluster_a"
@@ -318,4 +320,3 @@ locals {
     }
   }
 }
-

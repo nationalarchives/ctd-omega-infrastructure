@@ -16,6 +16,10 @@ resource "aws_neptune_cluster" "dev_neptune_cluster_a" {
   iam_database_authentication_enabled = true
   storage_encrypted                   = false
 
+  iam_roles = [
+    aws_iam_role.neptune_loader_iam_role.arn
+  ]
+
   preferred_backup_window = "00:00-04:00"
   backup_retention_period = 14 # days
 
