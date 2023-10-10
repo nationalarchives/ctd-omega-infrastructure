@@ -2,7 +2,7 @@ module "ec2_instance_cloud_init" {
   source = "../cloud-init"
 
   fqdn                 = var.fqdn
-  separate_home_volume = lookup(var.home_block_device, "device_name", null)
+  separate_home_volume = try(local.home_block_device.device_name, null)
 
   # If this has puppet settings, add the Puppet cloud-init part
   additional_parts = var.puppet == null ? [] : [ local.puppet_cloud_init_part ]
