@@ -220,3 +220,130 @@ resource "aws_s3_object" "puppet_agent_private_key" {
         Environment = "management"
     }
 }
+
+# Puppet Server EC2 Instance Profile
+resource "aws_iam_instance_profile" "puppet_server_ec2_iam_instance_profile" {
+  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+
+  name = "${local.hostname}_ec2"
+  path = "/puppet/"
+
+  role = aws_iam_role.puppet_server_ec2_iam_role[0].name
+
+  tags = {
+    Environment = "management"
+  }
+}
+
+resource "aws_iam_role" "puppet_server_ec2_iam_role" {
+  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+
+  name = "${local.hostname}_ec2_role"
+  path = "/puppet/"
+  assume_role_policy = data.aws_iam_policy_document.puppet_ec2_assume_role_policy.json
+  managed_policy_arns = concat(
+    [
+      var.puppet.certificates.s3_bucket_ca_public_policy,
+      var.puppet.certificates.s3_bucket_ca_private_policy,
+      var.puppet.certificates.s3_bucket_certificates_public_policy,
+      aws_iam_policy.puppet_certificates_private_puppet_server_policy[0].arn
+    ],
+    var.additional_iam_policies
+  )
+}
+
+# Puppet Server (agent) Private key
+resource "aws_iam_policy" "puppet_certificates_private_puppet_server_policy" {
+    count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+
+    name = "puppet_certificates_private_${local.hostname}_policy"
+    path = "/puppet/"
+    policy = data.aws_iam_policy_document.puppet_certificates_private_puppet_server_policy[0].json
+}
+
+data "aws_iam_policy_document" "puppet_certificates_private_puppet_server_policy" {
+  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+
+  statement {
+    sid = "AllowReadPuppetCertificatesPrivate${local.hostname_title}"
+
+    actions = [
+        "s3:GetObject",
+        "s3:ListBucket"
+    ]
+
+    resources = [
+      "${local.s3_bucket_arn_puppet_certificates}/certificates/private/${var.fqdn}.*",
+      "${local.s3_bucket_arn_puppet_certificates}"
+    ]
+  }
+}
+
+# Puppet Agent EC2 Instance Profile
+resource "aws_iam_instance_profile" "puppet_agent_ec2_iam_instance_profile" {
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+
+  name = "${local.hostname}_ec2"
+  path = "/puppet/"
+
+  role = aws_iam_role.puppet_agent_ec2_iam_role[0].name
+
+  tags = {
+    Environment = "management"
+  }
+}
+
+resource "aws_iam_role" "puppet_agent_ec2_iam_role" {
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+
+  name = "${local.hostname}_ec2_role"
+  path = "/puppet/"
+  assume_role_policy = data.aws_iam_policy_document.puppet_ec2_assume_role_policy.json
+  managed_policy_arns = concat(
+    [
+      var.puppet.certificates.s3_bucket_ca_public_policy,
+      var.puppet.certificates.s3_bucket_certificates_public_policy,
+      aws_iam_policy.puppet_certificates_private_puppet_agent_policy[0].arn
+    ],
+    var.additional_iam_policies
+  )
+}
+
+# Puppet Agent Private key
+resource "aws_iam_policy" "puppet_certificates_private_puppet_agent_policy" {
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+
+  name = "puppet_certificates_private_${local.hostname}_policy"
+  path = "/puppet/"
+  policy = data.aws_iam_policy_document.puppet_certificates_private_puppet_agent_policy[0].json
+}
+
+data "aws_iam_policy_document" "puppet_certificates_private_puppet_agent_policy" {
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+
+  statement {
+    sid = "AllowReadPuppetCertificatesPrivate${local.hostname_title}"
+
+    actions = [
+        "s3:GetObject",
+        "s3:ListBucket"
+    ]
+
+    resources = [
+      "${local.s3_bucket_arn_puppet_certificates}/certificates/private/${var.fqdn}.*",
+      "${local.s3_bucket_arn_puppet_certificates}"
+    ]
+  }
+}
+
+# Policy to allow an EC2 instance to assume a role
+data "aws_iam_policy_document" "puppet_ec2_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
