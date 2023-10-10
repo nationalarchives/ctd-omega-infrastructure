@@ -84,7 +84,7 @@ resource "aws_s3_object" "puppet_server_1_puppet_server_certificate_authority_ce
     key = "ca/public/${basename(module.puppet_server_1_puppet_server_certificate_authority.certificate_pem_exported_filename)}"
     content = module.puppet_server_1_puppet_server_certificate_authority.certificate_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -96,7 +96,7 @@ resource "aws_s3_object" "puppet_server_1_puppet_server_certificate_authority_pu
     key = "ca/public/${basename(module.puppet_server_1_puppet_server_certificate_authority.public_key_pem_exported_filename)}"
     content = module.puppet_server_1_puppet_server_certificate_authority.public_key_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -108,7 +108,7 @@ resource "aws_s3_object" "puppet_server_1_puppet_server_certificate_authority_pr
     key = "ca/private/${basename(module.puppet_server_1_puppet_server_certificate_authority.private_key_pem_exported_filename)}"
     content = module.puppet_server_1_puppet_server_certificate_authority.private_key_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -121,7 +121,7 @@ resource "aws_s3_object" "puppet_server_1_puppet_agent_certificate" {
     key = "certificates/public/${basename(module.puppet_server_1_puppet_agent_certificate.certificate_pem_exported_filename)}"
     content = module.puppet_server_1_puppet_agent_certificate.certificate_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -133,7 +133,7 @@ resource "aws_s3_object" "puppet_server_1_puppet_agent_public_key" {
     key = "certificates/public/${basename(module.puppet_server_1_puppet_agent_certificate.public_key_pem_exported_filename)}"
     content = module.puppet_server_1_puppet_agent_certificate.public_key_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -145,7 +145,7 @@ resource "aws_s3_object" "puppet_server_1_puppet_agent_private_key" {
     key = "certificates/private/${basename(module.puppet_server_1_puppet_agent_certificate.private_key_pem_exported_filename)}"
     content = module.puppet_server_1_puppet_agent_certificate.private_key_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -157,7 +157,7 @@ resource "aws_s3_object" "dev_workstation_1_puppet_agent_certificate" {
     key = "certificates/public/${basename(module.dev_workstation_1_puppet_agent_certificate.certificate_pem_exported_filename)}"
     content = module.dev_workstation_1_puppet_agent_certificate.certificate_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -169,7 +169,7 @@ resource "aws_s3_object" "dev_workstation_1_puppet_agent_public_key" {
     key = "certificates/public/${basename(module.dev_workstation_1_puppet_agent_certificate.public_key_pem_exported_filename)}"
     content = module.dev_workstation_1_puppet_agent_certificate.public_key_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
@@ -181,7 +181,7 @@ resource "aws_s3_object" "dev_workstation_1_puppet_agent_private_key" {
     key = "certificates/private/${basename(module.dev_workstation_1_puppet_agent_certificate.private_key_pem_exported_filename)}"
     content = module.dev_workstation_1_puppet_agent_certificate.private_key_pem
     content_type = "application/x-pem-file"
-    # checksum_algorithm = "SHA256"  # TODO(AR) requires newer AWS provider
+    checksum_algorithm = "SHA256"
     tags = {
         Type        = "certificate"
         Environment = "management"
