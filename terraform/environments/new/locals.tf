@@ -121,6 +121,13 @@ locals {
   instance_type_dev_workstation  = "r6i.2xlarge"
   instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
 
+  aws_ami = {
+      linux2_x86_64 = {
+        name = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
+        id   = "ami-0443d29a4bc22b3a5"
+      }
+  }
+
   ec2_puppet_server_instances = {
 
     puppet_server_1 = {
@@ -131,7 +138,7 @@ locals {
       }
       subnet_id = module.vpc.private_subnets[2]
       ipv4_address = "10.129.195.4"
-      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      ami = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.puppet_server_security_group.security_group_id
       ]
@@ -153,7 +160,7 @@ locals {
       }
       subnet_id = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.4"
-      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      ami = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
@@ -177,7 +184,7 @@ locals {
       }
       subnet_id = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.5"
-      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      ami = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
@@ -201,7 +208,7 @@ locals {
       }
       subnet_id = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.6"
-      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      ami = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
