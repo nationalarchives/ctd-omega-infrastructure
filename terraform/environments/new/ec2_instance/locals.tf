@@ -37,7 +37,7 @@ locals {
   home_block_device       = var.home_block_device == null ? null : merge(var.home_block_device, { tags = merge(local.default_home_block_device_tags, var.home_block_device["tags"]) })
   secondary_block_devices = [for secondary_block_device in var.secondary_block_devices : merge(secondary_block_device, { tags = merge(local.default_secondary_block_device_tags, secondary_block_device["tags"]) })]
 
-  additional_block_devices = flatten([ [ local.home_block_device ] ])
+  additional_block_devices = compact(flatten([ [ local.home_block_device ], local.secondary_block_devices ]))
 
   # TODO(AR) generate one of these if it is not present
   iam_instance_profile = var.iam_instance_profile
