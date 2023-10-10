@@ -38,7 +38,7 @@ locals {
   home_block_device       = var.home_block_device == null ? null : merge(var.home_block_device, { tags = merge(local.default_home_block_device_tags, var.home_block_device["tags"]) })
   secondary_block_devices = [for secondary_block_device in var.secondary_block_devices : merge(secondary_block_device, { tags = merge(local.default_secondary_block_device_tags, secondary_block_device["tags"]) })]
 
-  additional_block_devices = compact(flatten([ [ local.home_block_device ], local.secondary_block_devices ]))
+  additional_block_devices = local.home_block_device != null ? concat([local.home_block_device], local.secondary_block_devices) : local.secondary_block_devices
 
   generate_server_ec2_iam_instance_profile = var.iam_instance_profile == null && try(var.puppet.server != null, false)
   generate_agent_ec2_iam_instance_profile = var.iam_instance_profile == null && try(var.puppet.server == null, false)
@@ -67,7 +67,7 @@ locals {
 
   s3_bucket_arn_puppet_certificates = try("arn:aws:s3:::${var.puppet.certificates.s3_bucket_name}", null)
 
-  puppet_cloud_init_part_agent_content = var.puppet == null || can(var.puppet.server) ? null : templatefile("${local.scripts_dir}/install-puppet-agent.sh.tftpl", {
+  puppet_cloud_init_part_agent_content = var.puppet == null || try(var.puppet.server != null, false) ? null : templatefile("${local.scripts_dir}/install-puppet-agent.sh.tftpl", {
       s3_bucket_name_puppet_certificates = var.puppet.certificates.s3_bucket_name
       puppet_agent_fqdn                  = var.fqdn
       puppet_server_fqdn                 = local.puppet_server_fqdn
@@ -77,7 +77,7 @@ locals {
       private_key_pem_filename           = local.private_key_filename
   })
 
-  puppet_cloud_init_part_server_content = var.puppet == null || can(var.puppet.server) == false ? null : templatefile("${local.scripts_dir}/install-puppet-server.sh.tftpl", {
+  puppet_cloud_init_part_server_content = var.puppet == null || try(var.puppet.server != null, false) == false ? null : templatefile("${local.scripts_dir}/install-puppet-server.sh.tftpl", {
       s3_bucket_name_puppet_certificates = var.puppet.certificates.s3_bucket_name
       puppet_server_fqdn                 = local.puppet_server_fqdn
       ca_certificate_pem_filename        = local.ca_certificate_filename
