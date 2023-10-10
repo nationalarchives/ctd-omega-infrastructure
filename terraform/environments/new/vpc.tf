@@ -459,7 +459,7 @@ module "vpc" {
       from_port   = 8140
       to_port     = 8140
       protocol    = "tcp"
-      cidr_block  = "${local.ipv4_puppet_server_1}/32" # NOTE: restricted to puppet-server-1 in vpc_private_subnet_management
+      cidr_block  = "${local.ec2_puppet_server_instances.puppet_server_1.ipv4_address}/32" # NOTE: restricted to puppet-server-1 in vpc_private_subnet_management
     },
     {
       # allow IPv6 Puppet traffic out to vpc_private_subnet_management
