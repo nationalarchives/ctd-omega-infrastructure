@@ -19,6 +19,7 @@ mkdir -p $PA_CONF_DIR
 cat <<EOF > $PA_CONF_DIR/puppet.conf
 [main]
 server = ${puppet_server_fqdn}
+runinterval = 10m
 # NOTE(AR) this is a temporary measure until we can pre-gen both Certs and CRL with OpenSSL via Terraform
 certificate_revocation = false
 EOF
