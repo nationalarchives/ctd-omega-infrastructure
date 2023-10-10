@@ -104,15 +104,6 @@ locals {
   /* IP address of the private Route53 DNS Server in the VPC */
   ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
 
-  /* IP addresses */
-  ipv4_puppet_server_1 = "10.129.195.4"
-
-  instance_type_dev_workstation = "t2.micro" # "r6i.2xlarge"
-
-  instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
-
-  instance_type_puppet_server = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
-
   s3_bucket_name_puppet_certificates = "puppet-certificates"
 
   default_certificate_subject = {
@@ -122,5 +113,108 @@ locals {
     province            = "London"
     country             = "GB"
     postal_code         = "TW9 4DU"
+  }
+
+  puppet_control_repo_url = "https://github.com/nationalarchives/ctd-omega-puppet.git"
+
+  instance_type_puppet_server    = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
+  instance_type_dev_workstation  = "r6i.2xlarge"
+  instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
+
+  ec2_puppet_server_instances = {
+
+    puppet_server_1 = {
+      instance_type = local.instance_type_puppet_server
+      hostname = "puppet-server-1"
+      puppet = {
+        type = "server"
+      }
+      subnet_id = module.vpc.private_subnets[2]
+      ipv4_address = "10.129.195.4"
+      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      security_groups = [
+        module.puppet_server_security_group.security_group_id
+      ]
+      tags = {
+        Type                      = "puppet_server"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+  }
+
+  ec2_instances = {
+
+    dev_workstation_1 = {
+      instance_type = local.instance_type_dev_workstation
+      hostname = "dev-workstation-1"
+      puppet = {
+        type = "agent"
+      }
+      subnet_id = module.vpc.private_subnets[0]
+      ipv4_address = "10.129.202.4"
+      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      security_groups = [
+        module.dev_workstation_security_group.security_group_id
+      ]
+      home_block_device = {
+        device_name = "xvdb"
+        volume_size = 200 #GiB
+      }
+      tags = {
+        Name                      = "dev-workstation-1_new"
+        Type                      = "dev_workstation"
+        Environment               = "dev"
+        scheduler_mon_fri_dev_ec2 = "true"
+      }
+    }
+
+    dev_workstation_2 = {
+      instance_type = local.instance_type_dev_workstation
+      hostname = "dev-workstation-2"
+      puppet = {
+        type = "agent"
+      }
+      subnet_id = module.vpc.private_subnets[0]
+      ipv4_address = "10.129.202.5"
+      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      security_groups = [
+        module.dev_workstation_security_group.security_group_id
+      ]
+      home_block_device = {
+        device_name = "xvdb"
+        volume_size = 200 #GiB
+      }
+      tags = {
+        Name                      = "dev-workstation-2_new"
+        Type                      = "dev_workstation"
+        Environment               = "dev"
+        scheduler_mon_fri_dev_ec2 = "true"
+      }
+    }
+
+    dev_workstation_3 = {
+      instance_type = local.instance_type_dev_workstation
+      hostname = "dev-workstation-3"
+      puppet = {
+        type = "agent"
+      }
+      subnet_id = module.vpc.private_subnets[0]
+      ipv4_address = "10.129.202.6"
+      ami = data.aws_ami.amazon_linux_2_20230719_x86_64.id  # TODO(AR) replace with actual id
+      security_groups = [
+        module.dev_workstation_security_group.security_group_id
+      ]
+      home_block_device = {
+        device_name = "xvdb"
+        volume_size = 200 #GiB
+      }
+      tags = {
+        Name                      = "dev-workstation-3_new"
+        Type                      = "dev_workstation"
+        Environment               = "dev"
+        scheduler_mon_fri_dev_ec2 = "true"
+      }
+    }
   }
 }

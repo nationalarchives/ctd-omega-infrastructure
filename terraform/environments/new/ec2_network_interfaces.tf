@@ -37,23 +37,6 @@ resource "aws_network_interface" "services_api_1_private_interface" {
   }
 }
 
-resource "aws_network_interface" "puppet_server_1_private_interface" {
-  description = "Private Management Subnet interface for puppet_server-1"
-  subnet_id   = module.vpc.private_subnets[2]
-  private_ips = [local.ipv4_puppet_server_1]
-
-  security_groups = [
-    module.puppet_server_security_group.security_group_id
-  ]
-
-  tags = {
-    Name        = "eth0_puppet-server-1"
-    Type        = "primary_network_interface"
-    Network     = "omg_private"
-    Environment = "omg"
-  }
-}
-
 data "aws_network_interface" "web_proxy_1_private_interface" {
   id = aws_network_interface.web_proxy_1_private_interface.id
 }
@@ -64,44 +47,6 @@ data "aws_network_interface" "web_app_1_private_interface" {
 
 data "aws_network_interface" "services_api_1_private_interface" {
   id = aws_network_interface.services_api_1_private_interface.id
-}
-
-data "aws_network_interface" "puppet_server_1_private_interface" {
-  id = aws_network_interface.puppet_server_1_private_interface.id
-}
-
-resource "aws_network_interface" "dev_workstation_1_private_interface" {
-  description = "Private Dev General Subnet interface for Dev Workstation 1"
-  subnet_id   = module.vpc.private_subnets[0]
-  private_ips = ["10.129.202.4"]
-
-  security_groups = [
-    module.dev_workstation_security_group.security_group_id
-  ]
-
-  tags = {
-    Name        = "eth0_dev-workstation-1"
-    Type        = "primary_network_interface"
-    Network     = "dev_private"
-    Environment = "dev"
-  }
-}
-
-resource "aws_network_interface" "dev_workstation_2_private_interface" {
-  description = "Private Dev General Subnet interface for Dev Workstation 2"
-  subnet_id   = module.vpc.private_subnets[0]
-  private_ips = ["10.129.202.5"]
-
-  security_groups = [
-    module.dev_workstation_security_group.security_group_id
-  ]
-
-  tags = {
-    Name        = "eth0_dev-workstation-2"
-    Type        = "primary_network_interface"
-    Network     = "dev_private"
-    Environment = "dev"
-  }
 }
 
 resource "aws_network_interface" "dev_mssql_server_1_database_interface" {
@@ -119,14 +64,6 @@ resource "aws_network_interface" "dev_mssql_server_1_database_interface" {
     Network     = "dev_database"
     Environment = "dev"
   }
-}
-
-data "aws_network_interface" "dev_workstation_1_private_interface" {
-  id = aws_network_interface.dev_workstation_1_private_interface.id
-}
-
-data "aws_network_interface" "dev_workstation_2_private_interface" {
-  id = aws_network_interface.dev_workstation_2_private_interface.id
 }
 
 data "aws_network_interface" "dev_mssql_server_1_database_interface" {

@@ -9,157 +9,93 @@ data "aws_ami" "amazon_linux_2_20230719_x86_64" {
   }
 }
 
-module "dev_workstation_1_cloud_init" {
-  source = "./cloud-init"
+module "ec2_puppet_server_instance" {
+  source = "./ec2_instance"
 
-  fqdn                 = "dev-workstation-1.${local.private_omg_dns_domain}"
-  separate_home_volume = "xvdb"
+  for_each = local.ec2_puppet_server_instances
 
-  additional_parts = [
-    {
-      content_type = "text/x-shellscript"
-      filename = "01-install-puppet-agent.sh"
-      content = templatefile("${local.scripts_dir}/install-puppet-agent.sh.tftpl", {
-        s3_bucket_name_puppet_certificates = local.s3_bucket_name_puppet_certificates
-        puppet_agent_fqdn     = "dev-workstation-1.${local.private_omg_dns_domain}"
-        puppet_server_fqdn    = "puppet-server-1.${local.private_omg_dns_domain}"
-        ca_certificate_pem_filename = basename(module.puppet_server_1_puppet_server_certificate_authority.certificate_pem_exported_filename)
-        certificate_pem_filename = basename(module.dev_workstation_1_puppet_agent_certificate.certificate_pem_exported_filename)
-        public_key_pem_filename  = basename(module.dev_workstation_1_puppet_agent_certificate.public_key_pem_exported_filename)
-        private_key_pem_filename = basename(module.dev_workstation_1_puppet_agent_certificate.private_key_pem_exported_filename)
-      })
+  fqdn = "${each.value.hostname}.${local.private_omg_dns_domain}"
+
+  ami           = each.value.ami
+  instance_type = each.value.instance_type
+  key_name      = data.aws_key_pair.omega_admin_key_pair.key_name
+
+  security_groups = each.value.security_groups
+
+  # Puppet Server settings
+  puppet = {
+    server = {
+      control_repo_url = local.puppet_control_repo_url
+      environment = "production"
     }
-  ]
+    certificates = {
+      s3_bucket_name = aws_s3_bucket.puppet_certificates.id
+      s3_bucket_certificates_public_policy = aws_iam_policy.puppet_certificates_public_policy.arn
+      s3_bucket_ca_public_policy = aws_iam_policy.puppet_ca_public_policy.arn
+      s3_bucket_ca_private_policy = aws_iam_policy.puppet_ca_private_policy.arn
+    }
+  }
+
+  root_block_device = {
+    volume_size = 20 #GiB
+  }
+
+  subnet_id   = each.value.subnet_id
+  private_ips = [each.value.ipv4_address]
+  dns = {
+    zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
+    reverse_ipv4_zone_id = aws_route53_zone.omega_private_ipv4_omg_reverse_dns.zone_id
+    reverse_ipv6_zone_id = aws_route53_zone.omega_private_ipv6_omg_reverse_dns.zone_id
+  }
+
+  tags = each.value.tags
 }
 
-# Dev Workstation for Adam Retter
-resource "aws_instance" "dev_workstation_1" {
-  ami                         = data.aws_ami.amazon_linux_2_20230719_x86_64.id
-  instance_type               = local.instance_type_dev_workstation
-  key_name                    = data.aws_key_pair.omega_admin_key_pair.key_name
-  user_data                   = module.dev_workstation_1_cloud_init.rendered
-  user_data_replace_on_change = false
+## Create EC2 instances from `local.ec2_instances`
+module "ec2_instance" {
+  source = "./ec2_instance"
 
-  iam_instance_profile = aws_iam_instance_profile.dev_workstation_1_ec2_iam_instance_profile.id
+  for_each = local.ec2_instances
 
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
+  fqdn = "${each.value.hostname}.${local.private_omg_dns_domain}"
 
-  monitoring = false
+  ami           = each.value.ami
+  instance_type = each.value.instance_type
+  key_name      = data.aws_key_pair.omega_admin_key_pair.key_name
 
-  network_interface {
-    network_interface_id = aws_network_interface.dev_workstation_1_private_interface.id
-    device_index         = 0
-  }
+  security_groups = each.value.security_groups
 
-  root_block_device {
-    delete_on_termination = false
-    encrypted             = false
-    volume_type           = "gp3"
-    iops                  = 3000
-    throughput            = 125 # MiB/s
-    volume_size           = 20  # GiB
-
-    tags = {
-      Name        = "root_dev-workstation-1_new"
-      Type        = "primary_volume"
-      Environment = "dev"
+  # Puppet Agent settings
+  puppet = each.value.puppet == null ? null : {
+    server_fqdn = "${local.ec2_puppet_server_instances.puppet_server_1.hostname}.${local.private_omg_dns_domain}"
+    certificates = {
+      s3_bucket_name = aws_s3_bucket.puppet_certificates.id
+      s3_bucket_certificates_public_policy = aws_iam_policy.puppet_certificates_public_policy.arn
+      s3_bucket_ca_public_policy = aws_iam_policy.puppet_ca_public_policy.arn
+      s3_bucket_ca_private_policy = aws_iam_policy.puppet_ca_private_policy.arn
+      subject = local.default_certificate_subject
+      ca_private_key_pem = module.ec2_puppet_server_instance["puppet_server_1"].puppet_ca_private_key_pem
+      ca_certificate_pem = module.ec2_puppet_server_instance["puppet_server_1"].puppet_ca_certificate_pem
     }
   }
 
-  ebs_block_device {
-    delete_on_termination = false
-    encrypted             = false
-    volume_type           = "gp3"
-    iops                  = 3000
-    throughput            = 125
-    volume_size           = 200
-
-    device_name = "/dev/xvdb"
-
-    tags = {
-      Name        = "home_dev-workstation-1_new"
-      Type        = "home_volume"
-      Environment = "dev"
-    }
+  root_block_device = {
+    volume_size = 20 #GiB
   }
 
-  tags = {
-    Name                      = "dev-workstation-1_new"
-    Type                      = "dev_workstation"
-    Environment               = "dev"
-    scheduler_mon_fri_dev_ec2 = "true"
-  }
-}
+  home_block_device = lookup(each.value, "home_block_device", null)
 
+  # TODO(AR) additional data volumes
 
-module "dev_workstation_2_cloud_init" {
-  source = "./cloud-init"
-
-  fqdn                 = "dev-workstation-2.${local.private_omg_dns_domain}"
-  separate_home_volume = "xvdb"
-}
-
-# Dev Workstation for Rob Walpole
-resource "aws_instance" "dev_workstation_2" {
-  ami                         = data.aws_ami.amazon_linux_2_20230719_x86_64.id
-  instance_type               = local.instance_type_dev_workstation
-  key_name                    = data.aws_key_pair.omega_admin_key_pair.key_name
-  user_data                   = module.dev_workstation_2_cloud_init.rendered
-  user_data_replace_on_change = false
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
+  subnet_id   = each.value.subnet_id
+  private_ips = [each.value.ipv4_address]
+  dns = {
+    zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
+    reverse_ipv4_zone_id = aws_route53_zone.omega_private_ipv4_omg_reverse_dns.zone_id
+    reverse_ipv6_zone_id = aws_route53_zone.omega_private_ipv6_omg_reverse_dns.zone_id
   }
 
-  monitoring = false
-
-  network_interface {
-    network_interface_id = aws_network_interface.dev_workstation_2_private_interface.id
-    device_index         = 0
-  }
-
-  root_block_device {
-    delete_on_termination = false
-    encrypted             = false
-    volume_type           = "gp3"
-    iops                  = 3000
-    throughput            = 125 # MiB/s
-    volume_size           = 20  # GiB
-
-    tags = {
-      Name        = "root_dev-workstation-2_new"
-      Type        = "primary_volume"
-      Environment = "dev"
-    }
-  }
-
-  ebs_block_device {
-    delete_on_termination = false
-    encrypted             = false
-    volume_type           = "gp3"
-    iops                  = 3000
-    throughput            = 125
-    volume_size           = 200
-
-    device_name = "/dev/xvdb"
-
-    tags = {
-      Name        = "home_dev-workstation-2_new"
-      Type        = "home_volume"
-      Environment = "dev"
-    }
-  }
-
-  tags = {
-    Name                      = "dev-workstation-2_new"
-    Type                      = "dev_workstation"
-    Environment               = "dev"
-    scheduler_mon_fri_dev_ec2 = "true"
-  }
+  tags = each.value.tags
 }
 
 module "dev_mssql_server_1_cloud_init" {
@@ -282,83 +218,13 @@ resource "aws_instance" "dev_mssql_server_1" {
   }
 }
 
-module "puppet_server_1_cloud_init" {
-  source = "./cloud-init"
+# data "aws_iam_policy_document" "ec2_assume_role_policy" {
+#   statement {
+#     actions = ["sts:AssumeRole"]
 
-  fqdn                 = "puppet-server-1.${local.private_omg_dns_domain}"
-
-  additional_parts = [
-    {
-      content_type = "text/x-shellscript"
-      filename = "01-install-puppet-server.sh"
-      content = templatefile("${local.scripts_dir}/install-puppet-server.sh.tftpl", {
-        s3_bucket_name_puppet_certificates = local.s3_bucket_name_puppet_certificates
-        puppet_server_fqdn          = "puppet-server-1.${local.private_omg_dns_domain}"
-        ca_certificate_pem_filename = basename(module.puppet_server_1_puppet_server_certificate_authority.certificate_pem_exported_filename)
-        ca_private_key_pem_filename = basename(module.puppet_server_1_puppet_server_certificate_authority.private_key_pem_exported_filename)
-        ca_public_key_pem_filename  = basename(module.puppet_server_1_puppet_server_certificate_authority.public_key_pem_exported_filename)
-        puppet_control_repo_url = "https://github.com/nationalarchives/ctd-omega-puppet.git"
-        puppet_environment      = "production"
-        puppet_agents           = [
-          {
-            fqdn = "puppet-server-1.${local.private_omg_dns_domain}"
-            certificate_pem_filename = basename(module.puppet_server_1_puppet_agent_certificate.certificate_pem_exported_filename)
-            public_key_pem_filename  = basename(module.puppet_server_1_puppet_agent_certificate.public_key_pem_exported_filename)
-            private_key_pem_filename = basename(module.puppet_server_1_puppet_agent_certificate.private_key_pem_exported_filename)
-          },
-          {
-            fqdn = "dev-workstation-1.${local.private_omg_dns_domain}"
-            certificate_pem_filename  = basename(module.dev_workstation_1_puppet_agent_certificate.certificate_pem_exported_filename)
-            public_key_pem_filename   = basename(module.dev_workstation_1_puppet_agent_certificate.public_key_pem_exported_filename)
-            private_key_pem_filename  = basename(module.dev_workstation_1_puppet_agent_certificate.private_key_pem_exported_filename)
-          }
-        ]
-      })
-    }
-  ]
-}
-
-# Puppet Server
-resource "aws_instance" "puppet_server_1" {
-  ami                         = data.aws_ami.amazon_linux_2_20230719_x86_64.id
-  instance_type               = local.instance_type_puppet_server
-  key_name                    = data.aws_key_pair.omega_admin_key_pair.key_name
-  user_data                   = module.puppet_server_1_cloud_init.rendered
-  user_data_replace_on_change = false
-
-  iam_instance_profile = aws_iam_instance_profile.puppet_server_iam_instance_profile.id
-
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
-
-  monitoring = false
-
-  network_interface {
-    network_interface_id = aws_network_interface.puppet_server_1_private_interface.id
-    device_index         = 0
-  }
-
-  root_block_device {
-    delete_on_termination = false
-    encrypted             = false
-    volume_type           = "gp3"
-    iops                  = 3000
-    throughput            = 125 # MiB/s
-    volume_size           = 20  # GiB
-
-    tags = {
-      Name        = "root_puppet-server-1_new"
-      Type        = "primary_volume"
-      Environment = "dev"
-    }
-  }
-
-  tags = {
-    Name                      = "puppet-server-1_new"
-    Type                      = "puppet_server"
-    Environment               = "mvpbeta"
-    scheduler_mon_fri_dev_ec2 = "false"
-  }
-}
+#     principals {
+#       type        = "Service"
+#       identifiers = ["ec2.amazonaws.com"]
+#     }
+#   }
+# }
