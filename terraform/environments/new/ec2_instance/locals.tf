@@ -32,6 +32,7 @@ locals {
   default_private_key_filename    = "${var.fqdn}.private.key.pem"
 
   hostname = replace(var.fqdn, "/([^.]+).*/", "$1")
+  hostname_title = replace(title(replace(local.hostname, "-", " ")), " ", "")
 
   root_block_device       = merge(var.root_block_device, { tags = merge(local.default_root_block_device_tags, var.root_block_device["tags"]) })
   home_block_device       = var.home_block_device == null ? null : merge(var.home_block_device, { tags = merge(local.default_home_block_device_tags, var.home_block_device["tags"]) })
@@ -39,8 +40,13 @@ locals {
 
   additional_block_devices = compact(flatten([ [ local.home_block_device ], local.secondary_block_devices ]))
 
-  # TODO(AR) generate one of these if it is not present
-  iam_instance_profile = var.iam_instance_profile
+  generate_server_ec2_iam_instance_profile = var.iam_instance_profile == null && try(var.puppet.server != null, false)
+  generate_agent_ec2_iam_instance_profile = var.iam_instance_profile == null && try(var.puppet.server == null, false)
+  iam_instance_profile = try(coalesce(
+    var.iam_instance_profile,
+    local.generate_server_ec2_iam_instance_profile ? aws_iam_instance_profile.puppet_server_ec2_iam_instance_profile[0].id : null,
+    local.generate_agent_ec2_iam_instance_profile ? aws_iam_instance_profile.puppet_agent_ec2_iam_instance_profile[0].id : null
+  ), null)
 
   puppet_server_fqdn = coalesce(
     can(var.puppet.server_fqdn) ? var.puppet.server_fqdn : null,
@@ -58,6 +64,8 @@ locals {
   certificate_filename    = try(var.puppet.certificates.self.certificate_filename, local.default_certificate_filename)
   public_key_filename     = try(var.puppet.certificates.self.public_key_filename, local.default_public_key_filename)
   private_key_filename    = try(var.puppet.certificates.self.private_key_filename, local.default_private_key_filename)
+
+  s3_bucket_arn_puppet_certificates = try("arn:aws:s3:::${var.puppet.certificates.s3_bucket_name}", null)
 
   puppet_cloud_init_part_agent_content = var.puppet == null || can(var.puppet.server) ? null : templatefile("${local.scripts_dir}/install-puppet-agent.sh.tftpl", {
       s3_bucket_name_puppet_certificates = var.puppet.certificates.s3_bucket_name

@@ -24,6 +24,12 @@ variable "iam_instance_profile" {
   default = null
 }
 
+variable "additional_iam_policies" {
+  description = "Additional IAM policies to add to the IAM instance profile. Only used if 'iam_instance_profile' is omitted"
+  type = list(string)
+  default = []
+}
+
 variable "security_groups" {
     description = "Security Groups for the instances network interface"
     type = list(string)
@@ -65,6 +71,9 @@ variable "puppet" {
       })),
       certificates = object({
         s3_bucket_name = string,
+        s3_bucket_certificates_public_policy = string,
+        s3_bucket_ca_public_policy = string,
+        s3_bucket_ca_private_policy = string,
         ca_certificate_filename = optional(string),
         ca_certificate_pem = optional(string),
         ca_private_key_pem = optional(string),
