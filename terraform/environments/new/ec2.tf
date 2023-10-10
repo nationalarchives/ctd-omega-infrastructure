@@ -1,14 +1,3 @@
-data "aws_ami" "amazon_linux_2_20230719_x86_64" {
-  most_recent = false
-
-  owners = ["137112412989"] # Amazon Web Services
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"]
-  }
-}
-
 module "ec2_puppet_server_instance" {
   source = "./ec2_instance"
 
@@ -119,7 +108,7 @@ module "dev_mssql_server_1_cloud_init" {
 }
 
 resource "aws_instance" "dev_mssql_server_1" {
-  ami           = data.aws_ami.amazon_linux_2_20230719_x86_64.id
+  ami           = local.aws_ami.linux2_x86_64.id
   instance_type = local.instance_type_dev_mssql_server
   # m5a.2xlarge == $0.4 / hour == 8 vCPU == 32GiB RAM
   # r5.xlarge == $0.296 / hour == 4 vCPU == 32GiB RAM
