@@ -125,27 +125,27 @@ locals {
   instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
 
   aws_ami = {
-      linux2_x86_64 = {
-        name = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
-        id   = "ami-0443d29a4bc22b3a5"
-      }
-      linux2_arm64 = {
-        name = "amzn2-ami-kernel-5.10-hvm-2.0.20230926.0-arm64-gp2"
-        id   = "ami-0fca33b55c6ea10f0"
-      }
+    linux2_x86_64 = {
+      name = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
+      id   = "ami-0443d29a4bc22b3a5"
+    }
+    linux2_arm64 = {
+      name = "amzn2-ami-kernel-5.10-hvm-2.0.20230926.0-arm64-gp2"
+      id   = "ami-0fca33b55c6ea10f0"
+    }
   }
 
   ec2_puppet_server_instances = {
 
     puppet_server_1 = {
       instance_type = local.instance_type_puppet_server
-      hostname = "puppet-server-1"
+      hostname      = "puppet-server-1"
       puppet = {
         type = "server"
       }
-      subnet_id = module.vpc.private_subnets[2]
+      subnet_id    = module.vpc.private_subnets[2]
       ipv4_address = "10.129.195.4"
-      ami = local.aws_ami.linux2_x86_64.id
+      ami          = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.puppet_server_security_group.security_group_id
       ]
@@ -161,13 +161,13 @@ locals {
 
     web_proxy_1 = {
       instance_type = local.instance_type_web_proxy
-      hostname = "web-proxy-1"
+      hostname      = "web-proxy-1"
       puppet = {
         type = "agent"
       }
-      subnet_id = module.vpc.private_subnets[8]
+      subnet_id    = module.vpc.private_subnets[8]
       ipv4_address = "10.129.199.4"
-      ami = local.aws_ami.linux2_arm64.id
+      ami          = local.aws_ami.linux2_arm64.id
       security_groups = [
         module.mvpbeta_web_proxy_security_group.security_group_id
       ]
@@ -175,22 +175,22 @@ locals {
         volume_size = 8 #GiB
       }
       tags = {
-          Name        = "web-proxy-1_new"
-          Type        = "web_proxy"
-          Environment = "mvpbeta"
-          scheduler_mon_fri_dev_ec2 = "false"
+        Name                      = "web-proxy-1_new"
+        Type                      = "web_proxy"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
       }
     }
 
     web_app_1 = {
       instance_type = local.instance_type_web_app
-      hostname = "web-app-1"
+      hostname      = "web-app-1"
       puppet = {
         type = "agent"
       }
-      subnet_id = module.vpc.private_subnets[4]
+      subnet_id    = module.vpc.private_subnets[4]
       ipv4_address = "10.129.193.4"
-      ami = local.aws_ami.linux2_arm64.id
+      ami          = local.aws_ami.linux2_arm64.id
       security_groups = [
         module.mvpbeta_web_app_security_group.security_group_id
       ]
@@ -198,22 +198,22 @@ locals {
         volume_size = 8 #GiB
       }
       tags = {
-          Name        = "web-app-1_new"
-          Type        = "web_app"
-          Environment = "mvpbeta"
-          scheduler_mon_fri_dev_ec2 = "false"
+        Name                      = "web-app-1_new"
+        Type                      = "web_app"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
       }
     }
 
     services_api_1 = {
       instance_type = local.instance_type_web_app
-      hostname = "services-api-1"
+      hostname      = "services-api-1"
       puppet = {
         type = "agent"
       }
-      subnet_id = module.vpc.private_subnets[6]
+      subnet_id    = module.vpc.private_subnets[6]
       ipv4_address = "10.129.194.4"
-      ami = local.aws_ami.linux2_arm64.id
+      ami          = local.aws_ami.linux2_arm64.id
       security_groups = [
         module.mvpbeta_services_api_security_group.security_group_id
       ]
@@ -221,10 +221,10 @@ locals {
         volume_size = 8 #GiB
       }
       tags = {
-          Name        = "services-api-1_new"
-          Type        = "services_api"
-          Environment = "mvpbeta"
-          scheduler_mon_fri_dev_ec2 = "false"
+        Name                      = "services-api-1_new"
+        Type                      = "services_api"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
       }
     }
 
@@ -232,13 +232,13 @@ locals {
 
     dev_workstation_1 = {
       instance_type = local.instance_type_dev_workstation
-      hostname = "dev-workstation-1"
+      hostname      = "dev-workstation-1"
       puppet = {
         type = "agent"
       }
-      subnet_id = module.vpc.private_subnets[0]
+      subnet_id    = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.4"
-      ami = local.aws_ami.linux2_x86_64.id
+      ami          = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
@@ -256,13 +256,13 @@ locals {
 
     dev_workstation_2 = {
       instance_type = local.instance_type_dev_workstation
-      hostname = "dev-workstation-2"
+      hostname      = "dev-workstation-2"
       puppet = {
         type = "agent"
       }
-      subnet_id = module.vpc.private_subnets[0]
+      subnet_id    = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.5"
-      ami = local.aws_ami.linux2_x86_64.id
+      ami          = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
@@ -280,13 +280,13 @@ locals {
 
     dev_workstation_3 = {
       instance_type = local.instance_type_dev_workstation
-      hostname = "dev-workstation-3"
+      hostname      = "dev-workstation-3"
       puppet = {
         type = "agent"
       }
-      subnet_id = module.vpc.private_subnets[0]
+      subnet_id    = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.6"
-      ami = local.aws_ami.linux2_x86_64.id
+      ami          = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
