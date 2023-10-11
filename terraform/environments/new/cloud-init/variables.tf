@@ -12,13 +12,20 @@ variable "separate_home_volume" {
 
 variable "additional_volumes" {
   description = "Additional volumes to prepare and mount (e.g. [{volume = \"xvdc\", mount_point = \"/backup\" }])"
-  type        = list(map(string))
+  type        = list(object({
+    volume      = string,
+    mount_point = string,
+  }))
   default     = []
 }
 
 variable "additional_parts" {
   description = "Additional cloud-init parts"
-  type = list(map(string))
+  type = list(object({
+    content_type = string,
+    filename = string,
+    content = string
+  }))
   default = []
 }
 
