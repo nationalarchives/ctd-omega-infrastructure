@@ -73,6 +73,7 @@ locals {
   s3_bucket_arn_puppet_certificates = try("arn:aws:s3:::${var.puppet.certificates.s3_bucket_name}", null)
 
   puppet_cloud_init_part_agent_content = var.puppet == null || try(var.puppet.server != null, false) ? null : templatefile("${local.scripts_dir}/install-puppet-agent.sh.tftpl", {
+      puppet_version                     = var.puppet.version
       s3_bucket_name_puppet_certificates = var.puppet.certificates.s3_bucket_name
       puppet_agent_fqdn                  = var.fqdn
       puppet_server_fqdn                 = local.puppet_server_fqdn
@@ -83,6 +84,7 @@ locals {
   })
 
   puppet_cloud_init_part_server_content = var.puppet == null || try(var.puppet.server != null, false) == false ? null : templatefile("${local.scripts_dir}/install-puppet-server.sh.tftpl", {
+      puppet_version                     = var.puppet.version
       s3_bucket_name_puppet_certificates = var.puppet.certificates.s3_bucket_name
       puppet_server_fqdn                 = local.puppet_server_fqdn
       ca_certificate_pem_filename        = local.ca_certificate_filename
