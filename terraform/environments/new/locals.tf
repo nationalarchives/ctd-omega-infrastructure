@@ -128,10 +128,12 @@ locals {
     linux2_x86_64 = {
       name = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
       id   = "ami-0443d29a4bc22b3a5"
+      compatible_puppet_version = 8
     }
     linux2_arm64 = {
       name = "amzn2-ami-kernel-5.10-hvm-2.0.20230926.0-arm64-gp2"
       id   = "ami-0fca33b55c6ea10f0"
+      compatible_puppet_version = 7  # NOTE(AR) version 8 is not compatible with arm64 on EL7
     }
   }
 
@@ -142,6 +144,7 @@ locals {
       hostname      = "puppet-server-1"
       puppet = {
         type = "server"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[2]
       ipv4_address = "10.129.195.4"
@@ -164,6 +167,7 @@ locals {
       hostname      = "web-proxy-1"
       puppet = {
         type = "agent"
+        version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[8]
       ipv4_address = "10.129.199.4"
@@ -187,6 +191,7 @@ locals {
       hostname      = "web-app-1"
       puppet = {
         type = "agent"
+        version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[4]
       ipv4_address = "10.129.193.4"
@@ -210,6 +215,7 @@ locals {
       hostname      = "services-api-1"
       puppet = {
         type = "agent"
+        version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[6]
       ipv4_address = "10.129.194.4"
@@ -235,6 +241,7 @@ locals {
       hostname      = "dev-workstation-1"
       puppet = {
         type = "agent"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.4"
@@ -259,6 +266,7 @@ locals {
       hostname      = "dev-workstation-2"
       puppet = {
         type = "agent"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.5"
@@ -283,6 +291,7 @@ locals {
       hostname      = "dev-workstation-3"
       puppet = {
         type = "agent"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[0]
       ipv4_address = "10.129.202.6"
