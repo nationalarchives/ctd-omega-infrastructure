@@ -24,8 +24,8 @@ R10K_CONF_DIR=$PL_CONF_DIR/r10k
 if ! yum list installed java-11-openjdk; then
   amazon-linux-extras install java-openjdk11
 fi
-if [[ ! -f "/etc/yum.repos.d/puppet8-release.repo" ]]; then
-  rpm -Uvh https://yum.puppet.com/puppet8-release-el-7.noarch.rpm
+if [[ ! -f "/etc/yum.repos.d/puppet${puppet_version}-release.repo" ]]; then
+  rpm -Uvh https://yum.puppet.com/puppet${puppet_version}-release-el-7.noarch.rpm
 fi
 if ! yum list installed puppetserver; then
   yum install -y puppetserver puppet-agent

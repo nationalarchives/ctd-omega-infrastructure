@@ -9,8 +9,8 @@ PA_SSL_DIR=$PA_CONF_DIR/ssl
 FA_CONF_DIR=$PL_CONF_DIR/facter
 
 # Install Puppet Agent
-if [[ ! -f "/etc/yum.repos.d/puppet8-release.repo" ]]; then
-  rpm -Uvh https://yum.puppet.com/puppet8-release-el-7.noarch.rpm
+if [[ ! -f "/etc/yum.repos.d/puppet${puppet_version}-release.repo" ]]; then
+  rpm -Uvh https://yum.puppet.com/puppet${puppet_version}-release-el-7.noarch.rpm
 fi
 if ! yum list installed puppet-agent; then
   yum install -y puppet-agent

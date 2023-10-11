@@ -13,6 +13,7 @@ module "ec2_puppet_server_instance" {
 
   # Puppet Server settings
   puppet = {
+    version = each.value.puppet.version
     server = {
       control_repo_url = local.puppet_control_repo_url
       environment      = "production"
@@ -56,6 +57,7 @@ module "ec2_instance" {
 
   # Puppet Agent settings
   puppet = each.value.puppet == null ? null : {
+    version = each.value.puppet.version
     server_fqdn = "${local.ec2_puppet_server_instances.puppet_server_1.hostname}.${local.private_omg_dns_domain}"
     certificates = {
       s3_bucket_name                       = aws_s3_bucket.puppet_certificates.id

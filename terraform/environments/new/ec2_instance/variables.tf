@@ -44,6 +44,7 @@ variable "user_data_replace_on_change" {
 variable "puppet" {
     description = "Settings for controlling if and how Puppet Server and/or Puppet Agent is installed on this instance"
     type = object({
+      version = optional(number, 8)
       server_fqdn = optional(string)  # only needed when configuring as a Puppet Agent, Puppet Server uses `var.fqdn` by default.
       server = optional(object({
         control_repo_url = string,
