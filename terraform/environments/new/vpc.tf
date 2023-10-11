@@ -572,13 +572,13 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
-      # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta
+      # allow IPv4 return traffic from vpc_private_subnet_mvpbeta_web
       rule_number = 1400
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv6 return traffic from vpc_private_subnet_mvpbeta_web
