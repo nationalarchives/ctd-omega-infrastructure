@@ -118,6 +118,9 @@ locals {
   puppet_control_repo_url = "https://github.com/nationalarchives/ctd-omega-puppet.git"
 
   instance_type_puppet_server    = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
+  instance_type_web_proxy        = "t4g.nano"
+  instance_type_web_app          = "t4g.small" # NOTE(AR): for initial testing we are using "t4g.small", however for production I anticipate we should use "t4g.large". # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
+  instance_type_services_api     = "t4g.small" # NOTE(AR): for initial testing we are using "t4g.small", however for production I anticipate we should use "t4g.large". # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
   instance_type_dev_workstation  = "r6i.2xlarge"
   instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
 
@@ -125,6 +128,10 @@ locals {
       linux2_x86_64 = {
         name = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
         id   = "ami-0443d29a4bc22b3a5"
+      }
+      linux2_arm64 = {
+        name = "amzn2-ami-kernel-5.10-hvm-2.0.20230926.0-arm64-gp2"
+        id   = "ami-0fca33b55c6ea10f0"
       }
   }
 
@@ -151,6 +158,77 @@ locals {
   }
 
   ec2_instances = {
+
+    web_proxy_1 = {
+      instance_type = local.instance_type_web_proxy
+      hostname = "web-proxy-1"
+      puppet = {
+        type = "agent"
+      }
+      subnet_id = module.vpc.private_subnets[8]
+      ipv4_address = "10.129.199.4"
+      ami = local.aws_ami.linux2_arm64.id
+      security_groups = [
+        module.mvpbeta_web_proxy_security_group.security_group_id
+      ]
+      root_block_device = {
+        volume_size = 8 #GiB
+      }
+      tags = {
+          Name        = "web-proxy-1_new"
+          Type        = "web_proxy"
+          Environment = "mvpbeta"
+          scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+
+    web_app_1 = {
+      instance_type = local.instance_type_web_app
+      hostname = "web-app-1"
+      puppet = {
+        type = "agent"
+      }
+      subnet_id = module.vpc.private_subnets[4]
+      ipv4_address = "10.129.193.4"
+      ami = local.aws_ami.linux2_arm64.id
+      security_groups = [
+        module.mvpbeta_web_app_security_group.security_group_id
+      ]
+      root_block_device = {
+        volume_size = 8 #GiB
+      }
+      tags = {
+          Name        = "web-app-1_new"
+          Type        = "web_app"
+          Environment = "mvpbeta"
+          scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+
+    services_api_1 = {
+      instance_type = local.instance_type_web_app
+      hostname = "services-api-1"
+      puppet = {
+        type = "agent"
+      }
+      subnet_id = module.vpc.private_subnets[6]
+      ipv4_address = "10.129.194.4"
+      ami = local.aws_ami.linux2_arm64.id
+      security_groups = [
+        module.mvpbeta_services_api_security_group.security_group_id
+      ]
+      root_block_device = {
+        volume_size = 8 #GiB
+      }
+      tags = {
+          Name        = "services-api-1_new"
+          Type        = "services_api"
+          Environment = "mvpbeta"
+          scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+
+    /* Dev Workstations below */
 
     dev_workstation_1 = {
       instance_type = local.instance_type_dev_workstation
