@@ -226,10 +226,10 @@ module "puppet_server_security_group" {
       ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
-      description      = "Puppet (IPv6)"
-      from_port        = 8140
-      to_port          = 8140
-      protocol         = "tcp"
+      description = "Puppet (IPv6)"
+      from_port   = 8140
+      to_port     = 8140
+      protocol    = "tcp"
       ipv6_cidr_blocks = join(",", [
         module.vpc.private_subnets_ipv6_cidr_blocks[0], # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
         module.vpc.private_subnets_ipv6_cidr_blocks[2], # NOTE: restricted to vpc_private_subnet_management (IPv6)

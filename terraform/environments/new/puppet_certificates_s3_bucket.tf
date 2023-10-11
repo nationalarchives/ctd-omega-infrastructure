@@ -11,9 +11,9 @@ resource "aws_s3_bucket" "puppet_certificates" {
 
 # Policy for accessing the CA Private Key
 resource "aws_iam_policy" "puppet_ca_private_policy" {
-    name = "puppet_ca_private_policy"
-    path = "/puppet/"
-    policy = data.aws_iam_policy_document.puppet_ca_private_policy.json
+  name   = "puppet_ca_private_policy"
+  path   = "/puppet/"
+  policy = data.aws_iam_policy_document.puppet_ca_private_policy.json
 }
 
 data "aws_iam_policy_document" "puppet_ca_private_policy" {
@@ -21,8 +21,8 @@ data "aws_iam_policy_document" "puppet_ca_private_policy" {
     sid = "AllowReadPuppetCAPrivate"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket"
+      "s3:GetObject",
+      "s3:ListBucket"
     ]
 
     resources = [
@@ -34,9 +34,9 @@ data "aws_iam_policy_document" "puppet_ca_private_policy" {
 
 # Policy for accessing the CA Public Key and Certificate
 resource "aws_iam_policy" "puppet_ca_public_policy" {
-    name = "puppet_ca_public_policy"
-    path = "/puppet/"
-    policy = data.aws_iam_policy_document.puppet_ca_public_policy.json
+  name   = "puppet_ca_public_policy"
+  path   = "/puppet/"
+  policy = data.aws_iam_policy_document.puppet_ca_public_policy.json
 }
 
 data "aws_iam_policy_document" "puppet_ca_public_policy" {
@@ -44,8 +44,8 @@ data "aws_iam_policy_document" "puppet_ca_public_policy" {
     sid = "AllowReadPuppetCAPublic"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket"
+      "s3:GetObject",
+      "s3:ListBucket"
     ]
 
     resources = [
@@ -57,9 +57,9 @@ data "aws_iam_policy_document" "puppet_ca_public_policy" {
 
 # Policy for accessing the Agent Public Keys and Certificates
 resource "aws_iam_policy" "puppet_certificates_public_policy" {
-    name = "puppet_certificates_public_policy"
-    path = "/puppet/"
-    policy = data.aws_iam_policy_document.puppet_certificates_public_policy.json
+  name   = "puppet_certificates_public_policy"
+  path   = "/puppet/"
+  policy = data.aws_iam_policy_document.puppet_certificates_public_policy.json
 }
 
 data "aws_iam_policy_document" "puppet_certificates_public_policy" {
@@ -67,8 +67,8 @@ data "aws_iam_policy_document" "puppet_certificates_public_policy" {
     sid = "AllowReadPuppetCertificatesPublic"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket"
+      "s3:GetObject",
+      "s3:ListBucket"
     ]
 
     resources = [
