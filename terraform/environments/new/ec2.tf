@@ -25,9 +25,9 @@ module "ec2_puppet_server_instance" {
     }
   }
 
-  root_block_device = {
-    volume_size = 20 #GiB
-  }
+  root_block_device = lookup(each.value, "root_block_device", { volume_size = 20 })   # default: 20 GiB
+  home_block_device = lookup(each.value, "home_block_device", null)
+  secondary_block_devices = lookup(each.value, "secondary_block_devices", [])
 
   subnet_id   = each.value.subnet_id
   private_ips = [each.value.ipv4_address]
@@ -68,11 +68,9 @@ module "ec2_instance" {
     }
   }
 
-  root_block_device = {
-    volume_size = 20 #GiB
-  }
-
+  root_block_device = lookup(each.value, "root_block_device", { volume_size = 20 })   # default: 20 GiB
   home_block_device = lookup(each.value, "home_block_device", null)
+  secondary_block_devices = lookup(each.value, "secondary_block_devices", [])
 
   # TODO(AR) additional data volumes
 

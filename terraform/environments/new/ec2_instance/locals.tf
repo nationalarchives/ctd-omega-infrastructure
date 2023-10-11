@@ -36,9 +36,14 @@ locals {
 
   root_block_device       = merge(var.root_block_device, { tags = merge(local.default_root_block_device_tags, var.root_block_device["tags"]) })
   home_block_device       = var.home_block_device == null ? null : merge(var.home_block_device, { tags = merge(local.default_home_block_device_tags, var.home_block_device["tags"]) })
+
+  # NOTE(AR) workaround for Terraform bug - https://github.com/hashicorp/terraform/issues/33259
+  fixedup_home_block_device = local.home_block_device == null ? null : merge(local.home_block_device, { mount_point = "/home" })
+
   secondary_block_devices = [for secondary_block_device in var.secondary_block_devices : merge(secondary_block_device, { tags = merge(local.default_secondary_block_device_tags, secondary_block_device["tags"]) })]
 
-  additional_block_devices = local.home_block_device != null ? concat([local.home_block_device], local.secondary_block_devices) : local.secondary_block_devices
+  # additional_block_devices = local.home_block_device != null ? concat([local.home_block_device], local.secondary_block_devices) : local.secondary_block_devices
+  additional_block_devices = local.fixedup_home_block_device != null ? concat([local.fixedup_home_block_device], local.secondary_block_devices) : local.secondary_block_devices
 
   generate_server_ec2_iam_instance_profile = var.iam_instance_profile == null && try(var.puppet.server != null, false)
   generate_agent_ec2_iam_instance_profile = var.iam_instance_profile == null && try(var.puppet.server == null, false)
