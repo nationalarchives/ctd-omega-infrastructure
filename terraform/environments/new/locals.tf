@@ -1,4 +1,7 @@
 locals {
+
+  scripts_dir = "${path.root}/${path.module}/scripts"
+
   aws_region = "eu-west-2"
   aws_azs    = ["${local.aws_region}a", "${local.aws_region}b"]
 
@@ -83,9 +86,6 @@ locals {
     )
   )
 
-  /* IP address of the private Route53 DNS Server in the VPC */
-  ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
-
   /* starts public ipv6 subnets after private ipv6 subnets */
   vpc_public_ipv6_subnets = [for i in local.vpc_public_subnets : length(local.vpc_private_subnets) + length(local.vpc_database_subnets) + length(local.vpc_intra_subnets) + index(local.vpc_public_subnets, i)]
 
@@ -101,7 +101,214 @@ locals {
   linux_ephemeral_port_start = 32768
   linux_ephemeral_port_end   = 60999
 
-  instance_type_dev_workstation = "t2.micro" # "r6i.2xlarge"
+  /* IP address of the private Route53 DNS Server in the VPC */
+  ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
 
+  s3_bucket_name_puppet_certificates = "puppet-certificates"
+
+  default_certificate_subject = {
+    organizational_unit = "The Cataloguing, Taxonomy, and Data Team"
+    organization        = "The National Archives"
+    locality            = "Kew"
+    province            = "London"
+    country             = "GB"
+    postal_code         = "TW9 4DU"
+  }
+
+  puppet_control_repo_url = "https://github.com/nationalarchives/ctd-omega-puppet.git"
+
+  instance_type_puppet_server    = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
+  instance_type_web_proxy        = "t4g.nano"
+  instance_type_web_app          = "t4g.small" # NOTE(AR): for initial testing we are using "t4g.small", however for production I anticipate we should use "t4g.large". # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
+  instance_type_services_api     = "t4g.small" # NOTE(AR): for initial testing we are using "t4g.small", however for production I anticipate we should use "t4g.large". # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
+  instance_type_dev_workstation  = "r6i.2xlarge"
   instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
+
+  aws_ami = {
+    linux2_x86_64 = {
+      name                      = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
+      id                        = "ami-0443d29a4bc22b3a5"
+      compatible_puppet_version = 8
+    }
+    linux2_arm64 = {
+      name                      = "amzn2-ami-kernel-5.10-hvm-2.0.20230926.0-arm64-gp2"
+      id                        = "ami-0fca33b55c6ea10f0"
+      compatible_puppet_version = 7 # NOTE(AR) version 8 is not compatible with arm64 on EL7
+    }
+  }
+
+  ec2_puppet_server_instances = {
+
+    puppet_server_1 = {
+      instance_type = local.instance_type_puppet_server
+      hostname      = "puppet-server-1"
+      puppet = {
+        type    = "server"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
+      }
+      subnet_id    = module.vpc.private_subnets[2]
+      ipv4_address = "10.129.195.4"
+      ami          = local.aws_ami.linux2_x86_64.id
+      security_groups = [
+        module.puppet_server_security_group.security_group_id
+      ]
+      tags = {
+        Type                      = "puppet_server"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+  }
+
+  ec2_instances = {
+
+    web_proxy_1 = {
+      instance_type = local.instance_type_web_proxy
+      hostname      = "web-proxy-1"
+      puppet = {
+        type    = "agent"
+        version = local.aws_ami.linux2_arm64.compatible_puppet_version
+      }
+      subnet_id    = module.vpc.private_subnets[8]
+      ipv4_address = "10.129.199.4"
+      ami          = local.aws_ami.linux2_arm64.id
+      security_groups = [
+        module.mvpbeta_web_proxy_security_group.security_group_id
+      ]
+      root_block_device = {
+        volume_size = 8 #GiB
+      }
+      tags = {
+        Name                      = "web-proxy-1_new"
+        Type                      = "web_proxy"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+
+    web_app_1 = {
+      instance_type = local.instance_type_web_app
+      hostname      = "web-app-1"
+      puppet = {
+        type    = "agent"
+        version = local.aws_ami.linux2_arm64.compatible_puppet_version
+      }
+      subnet_id    = module.vpc.private_subnets[4]
+      ipv4_address = "10.129.193.4"
+      ami          = local.aws_ami.linux2_arm64.id
+      security_groups = [
+        module.mvpbeta_web_app_security_group.security_group_id
+      ]
+      root_block_device = {
+        volume_size = 8 #GiB
+      }
+      tags = {
+        Name                      = "web-app-1_new"
+        Type                      = "web_app"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+
+    services_api_1 = {
+      instance_type = local.instance_type_web_app
+      hostname      = "services-api-1"
+      puppet = {
+        type    = "agent"
+        version = local.aws_ami.linux2_arm64.compatible_puppet_version
+      }
+      subnet_id    = module.vpc.private_subnets[6]
+      ipv4_address = "10.129.194.4"
+      ami          = local.aws_ami.linux2_arm64.id
+      security_groups = [
+        module.mvpbeta_services_api_security_group.security_group_id
+      ]
+      root_block_device = {
+        volume_size = 8 #GiB
+      }
+      tags = {
+        Name                      = "services-api-1_new"
+        Type                      = "services_api"
+        Environment               = "mvpbeta"
+        scheduler_mon_fri_dev_ec2 = "false"
+      }
+    }
+
+    /* Dev Workstations below */
+
+    dev_workstation_1 = {
+      instance_type = local.instance_type_dev_workstation
+      hostname      = "dev-workstation-1"
+      puppet = {
+        type    = "agent"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
+      }
+      subnet_id    = module.vpc.private_subnets[0]
+      ipv4_address = "10.129.202.4"
+      ami          = local.aws_ami.linux2_x86_64.id
+      security_groups = [
+        module.dev_workstation_security_group.security_group_id
+      ]
+      home_block_device = {
+        device_name = "xvdb"
+        volume_size = 200 #GiB
+      }
+      tags = {
+        Name                      = "dev-workstation-1_new"
+        Type                      = "dev_workstation"
+        Environment               = "dev"
+        scheduler_mon_fri_dev_ec2 = "true"
+      }
+    }
+
+    dev_workstation_2 = {
+      instance_type = local.instance_type_dev_workstation
+      hostname      = "dev-workstation-2"
+      puppet = {
+        type    = "agent"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
+      }
+      subnet_id    = module.vpc.private_subnets[0]
+      ipv4_address = "10.129.202.5"
+      ami          = local.aws_ami.linux2_x86_64.id
+      security_groups = [
+        module.dev_workstation_security_group.security_group_id
+      ]
+      home_block_device = {
+        device_name = "xvdb"
+        volume_size = 200 #GiB
+      }
+      tags = {
+        Name                      = "dev-workstation-2_new"
+        Type                      = "dev_workstation"
+        Environment               = "dev"
+        scheduler_mon_fri_dev_ec2 = "true"
+      }
+    }
+
+    dev_workstation_3 = {
+      instance_type = local.instance_type_dev_workstation
+      hostname      = "dev-workstation-3"
+      puppet = {
+        type    = "agent"
+        version = local.aws_ami.linux2_x86_64.compatible_puppet_version
+      }
+      subnet_id    = module.vpc.private_subnets[0]
+      ipv4_address = "10.129.202.6"
+      ami          = local.aws_ami.linux2_x86_64.id
+      security_groups = [
+        module.dev_workstation_security_group.security_group_id
+      ]
+      home_block_device = {
+        device_name = "xvdb"
+        volume_size = 200 #GiB
+      }
+      tags = {
+        Name                      = "dev-workstation-3_new"
+        Type                      = "dev_workstation"
+        Environment               = "dev"
+        scheduler_mon_fri_dev_ec2 = "true"
+      }
+    }
+  }
 }
