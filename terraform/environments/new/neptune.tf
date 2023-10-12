@@ -3,6 +3,7 @@ resource "aws_neptune_cluster" "dev_neptune_cluster_a" {
   availability_zones = local.aws_azs
 
   neptune_subnet_group_name = local.neptune_dev_cluster_a.subnet_group_name
+  vpc_security_group_ids = [module.dev_neptune_cluster_a_security_group.security_group_id]
 
   engine = "neptune"
   engine_version = "1.2.1.0"
@@ -85,5 +86,63 @@ resource "aws_neptune_subnet_group" "dev_neptune_cluster_a" {
     Name        = "${local.neptune_dev_cluster_a.id}-sg"
     Type        = "neptune_subnet_group"
     Environment = "dev"
+  }
+}
+
+module "dev_neptune_cluster_a_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.1.0"
+
+  name        = "dev_neptune_cluster_a_security_group_new"
+  description = "Security group for Neptune ports open within VPC"
+
+  vpc_id = module.vpc.vpc_id
+
+  computed_ingress_with_cidr_blocks = [
+    {
+      description = "Neptune from vpc_private_subnet_dev_general"
+      from_port   = 8182
+      to_port     = 8182
+      protocol    = "tcp"
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    }
+  ]
+  number_of_computed_ingress_with_cidr_blocks = 1
+
+  computed_ingress_with_ipv6_cidr_blocks = [
+    {
+      description      = "Neptune (IPv6) from vpc_private_subnet_dev_general"
+      from_port        = 8182
+      to_port          = 8182
+      protocol         = "tcp"
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+    }
+  ]
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 1
+
+  egress_with_cidr_blocks = [
+    {
+      description = "All"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
+
+  egress_with_ipv6_cidr_blocks = [
+    {
+      description = "All (IPv6)"
+      from_port   = -1
+      to_port     = -1
+      protocol    = -1
+      cidr_blocks = "2001:db8::/64"
+    }
+  ]
+
+  tags = {
+    Name        = "sg_dev_neptune_cluster_a_new"
+    Type        = "security_group"
+    Environment = "mvpbeta"
   }
 }
