@@ -147,6 +147,9 @@ cat <<EOF > $R10K_CONF_DIR/r10k.yaml
 EOF
 $PL_APP_DIR/bin/r10k deploy environment ${puppet_environment} -pv
 
+# Install dependencies for the Puppet Server
+su - puppet -s /bin/bash /opt/puppetlabs/server/bin/puppetserver gem install oga aws-sdk-secretsmanager
+
 # Start Puppet Server and Puppet Agent
 systemctl enable puppetserver
 systemctl start puppetserver
