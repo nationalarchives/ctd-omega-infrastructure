@@ -23,7 +23,7 @@ output "omega_public_dns_servers" {
   value       = aws_route53_zone.omega_public_dns.name_servers
 }
 
-// TODO(AR) reinstate the www and * lookups
+// TODO(AR) reinstate the www and * lookups when we have a public web presence
 # resource "aws_route53_record" "dns_a_wildcard_in_catalogue_nationalarchives_gov_uk" {
 #   zone_id = aws_route53_zone.omega_public_dns.zone_id
 #   name    = "*.${local.public_dns_domain}"

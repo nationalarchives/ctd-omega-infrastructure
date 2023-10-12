@@ -15,6 +15,7 @@ variable "subject" {
     common_name         = string,
     organizational_unit = optional(string),
     organization        = optional(string),
+    street_address      = optional(list(string), []),
     locality            = optional(string),
     province            = optional(string),
     country             = optional(string),

@@ -10,7 +10,7 @@ resource "tls_self_signed_cert" "ss_certificate" {
         common_name         = lookup(var.subject, "common_name", null)
         organizational_unit = lookup(var.subject, "organizational_unit", null)
         organization        = lookup(var.subject, "organization", null)
-        # street_address      = lookup(var.subject, "street_address", [])
+        street_address      = lookup(var.subject, "street_address", [])
         locality            = lookup(var.subject, "locality", null)
         province            = lookup(var.subject, "province", null)
         country             = lookup(var.subject, "country", null)
