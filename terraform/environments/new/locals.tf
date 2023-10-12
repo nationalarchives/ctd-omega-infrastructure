@@ -126,14 +126,14 @@ locals {
 
   aws_ami = {
     linux2_x86_64 = {
-      name = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
-      id   = "ami-0443d29a4bc22b3a5"
+      name                      = "amzn2-ami-kernel-5.10-hvm-2.0.20230719.0-x86_64-gp2"
+      id                        = "ami-0443d29a4bc22b3a5"
       compatible_puppet_version = 8
     }
     linux2_arm64 = {
-      name = "amzn2-ami-kernel-5.10-hvm-2.0.20230926.0-arm64-gp2"
-      id   = "ami-0fca33b55c6ea10f0"
-      compatible_puppet_version = 7  # NOTE(AR) version 8 is not compatible with arm64 on EL7
+      name                      = "amzn2-ami-kernel-5.10-hvm-2.0.20230926.0-arm64-gp2"
+      id                        = "ami-0fca33b55c6ea10f0"
+      compatible_puppet_version = 7 # NOTE(AR) version 8 is not compatible with arm64 on EL7
     }
   }
 
@@ -143,7 +143,7 @@ locals {
       instance_type = local.instance_type_puppet_server
       hostname      = "puppet-server-1"
       puppet = {
-        type = "server"
+        type    = "server"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[2]
@@ -166,7 +166,7 @@ locals {
       instance_type = local.instance_type_web_proxy
       hostname      = "web-proxy-1"
       puppet = {
-        type = "agent"
+        type    = "agent"
         version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[8]
@@ -190,7 +190,7 @@ locals {
       instance_type = local.instance_type_web_app
       hostname      = "web-app-1"
       puppet = {
-        type = "agent"
+        type    = "agent"
         version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[4]
@@ -214,7 +214,7 @@ locals {
       instance_type = local.instance_type_web_app
       hostname      = "services-api-1"
       puppet = {
-        type = "agent"
+        type    = "agent"
         version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[6]
@@ -240,7 +240,7 @@ locals {
       instance_type = local.instance_type_dev_workstation
       hostname      = "dev-workstation-1"
       puppet = {
-        type = "agent"
+        type    = "agent"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[0]
@@ -265,7 +265,7 @@ locals {
       instance_type = local.instance_type_dev_workstation
       hostname      = "dev-workstation-2"
       puppet = {
-        type = "agent"
+        type    = "agent"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[0]
@@ -290,7 +290,7 @@ locals {
       instance_type = local.instance_type_dev_workstation
       hostname      = "dev-workstation-3"
       puppet = {
-        type = "agent"
+        type    = "agent"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
       subnet_id    = module.vpc.private_subnets[0]
