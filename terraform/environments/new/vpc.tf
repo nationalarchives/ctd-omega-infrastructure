@@ -288,7 +288,7 @@ module "vpc" {
     },
     {
       # allow results in from previous outgoing (to the web) IPv6 internet traffic
-      rule_number     = 960
+      rule_number     = 906
       rule_action     = "allow"
       from_port       = local.unpriviledged_port_start
       to_port         = local.unpriviledged_port_end
@@ -472,7 +472,7 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number     = 260
+      rule_number     = 206
       rule_action     = "allow"
       from_port       = 3389
       to_port         = 3389
@@ -488,7 +488,7 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number     = 360
+      rule_number     = 306
       rule_action     = "allow"
       from_port       = 80
       to_port         = 80
@@ -504,7 +504,7 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number     = 460
+      rule_number     = 406
       rule_action     = "allow"
       from_port       = 443
       to_port         = 443
@@ -512,7 +512,8 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number = 600
+      # allow IPv4 Play (HTTPS) traffic in from vpc_private_subnet_dev_general
+      rule_number = 500
       rule_action = "allow"
       from_port   = 9443
       to_port     = 9443
@@ -520,7 +521,8 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number     = 660
+      # allow IPv6 Play (HTTPS) traffic in from vpc_private_subnet_dev_general
+      rule_number     = 506
       rule_action     = "allow"
       from_port       = 9443
       to_port         = 9443
@@ -538,7 +540,7 @@ module "vpc" {
     },
     {
       # allow results from outgoing IPv6 internet traffic
-      rule_number     = 960
+      rule_number     = 906
       rule_action     = "allow"
       from_port       = local.unpriviledged_port_start
       to_port         = local.unpriviledged_port_end
@@ -656,15 +658,15 @@ module "vpc" {
     },
     {
       # allow IPv6 Puppet traffic out to vpc_private_subnet_management
-      rule_number     = 860
+      rule_number     = 806
       rule_action     = "allow"
       from_port       = 8140
       to_port         = 8140
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
     },
-
     {
+      # allow IPv4 RDP traffic out to vpc_private_subnet_dev_general
       rule_number = 200
       rule_action = "allow"
       from_port   = 3389
@@ -673,7 +675,8 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      rule_number     = 260
+      # allow IPv6 RDP traffic out to vpc_private_subnet_dev_general
+      rule_number     = 206
       rule_action     = "allow"
       from_port       = 3389
       to_port         = 3389
@@ -689,7 +692,7 @@ module "vpc" {
       cidr_block  = "0.0.0.0/0"
     },
     {
-      rule_number     = 360
+      rule_number     = 306
       rule_action     = "allow"
       from_port       = 80
       to_port         = 80
@@ -705,7 +708,7 @@ module "vpc" {
       cidr_block  = "0.0.0.0/0"
     },
     {
-      rule_number     = 460
+      rule_number     = 406
       rule_action     = "allow"
       from_port       = 443
       to_port         = 443
@@ -713,6 +716,7 @@ module "vpc" {
       ipv6_cidr_block = "::/0"
     },
     {
+      # allow IPv4 Play (HTTPS) traffic out to vpc_private_subnet_mvpbeta_web
       rule_number = 500
       rule_action = "allow"
       from_port   = 9443
@@ -721,7 +725,8 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
-      rule_number     = 560
+      # allow IPv6 Play (HTTPS) traffic out to vpc_private_subnet_mvpbeta_web
+      rule_number     = 506
       rule_action     = "allow"
       from_port       = 9443
       to_port         = 9443
