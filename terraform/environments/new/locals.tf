@@ -132,7 +132,7 @@ locals {
   instance_type_web_app          = "t4g.small" # NOTE(AR): for initial testing we are using "t4g.small", however for production I anticipate we should use "t4g.large". # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
   instance_type_services_api     = "t4g.small" # NOTE(AR): for initial testing we are using "t4g.small", however for production I anticipate we should use "t4g.large". # NOTE(AR): My original estimate was for t3.xlarge, lets see how this smaller instance does
   instance_type_dev_workstation  = "r6i.2xlarge"
-  instance_type_dev_mssql_server = "t2.micro" # "r5.xlarge"
+  instance_type_dev_mssql_server = "r6i.xlarge" # NOTE(AR): could this be smaller? what is the load when running Pentaho ETL
 
   aws_ami = {
     linux2_x86_64 = {
@@ -161,6 +161,9 @@ locals {
       ami          = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.puppet_server_security_group.security_group_id
+      ]
+      additional_iam_policies = [
+        aws_iam_policy.puppet_server_access_secrets_iam_policy.arn
       ]
       tags = {
         Type                      = "puppet_server"
