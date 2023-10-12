@@ -530,6 +530,24 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
+      # allow IPv4 Neptune traffic in from vpc_private_subnet_dev_general
+      rule_number = 600
+      rule_action = "allow"
+      from_port   = 8182
+      to_port     = 8182
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv6 Neptune traffic out to vpc_private_subnet_dev_general
+      rule_number     = 606
+      rule_action     = "allow"
+      from_port       = 8182
+      to_port         = 8182
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
       # allow results from outgoing IPv4 internet traffic
       rule_number = 900
       rule_action = "allow"
@@ -732,6 +750,42 @@ module "vpc" {
       to_port         = 9443
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+    },
+    {
+      # allow IPv4 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: A
+      rule_number = 600
+      rule_action = "allow"
+      from_port   = 8182
+      to_port     = 8182
+      protocol    = "tcp"
+      cidr_block  = module.vpc.intra_subnets_cidr_blocks[0] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
+    },
+    {
+      # allow IPv6 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: A
+      rule_number     = 606
+      rule_action     = "allow"
+      from_port       = 8182
+      to_port         = 8182
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
+    },
+    {
+      # allow IPv4 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: B
+      rule_number = 601
+      rule_action = "allow"
+      from_port   = 8182
+      to_port     = 8182
+      protocol    = "tcp"
+      cidr_block  = module.vpc.intra_subnets_cidr_blocks[1] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
+    },
+    {
+      # allow IPv6 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: B
+      rule_number     = 607
+      rule_action     = "allow"
+      from_port       = 8182
+      to_port         = 8182
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[1] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
     },
     {
       # allow IPv4 return traffic from vpc_private_subnet_dev_general
