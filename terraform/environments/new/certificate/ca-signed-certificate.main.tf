@@ -7,7 +7,7 @@ resource "tls_cert_request" "cas_certificate_request" {
       common_name         = lookup(var.subject, "common_name", null)
       organizational_unit = lookup(var.subject, "organizational_unit", null)
       organization        = lookup(var.subject, "organization", null)
-      # street_address      = lookup(var.subject, "street_address", [])
+      street_address      = lookup(var.subject, "street_address", [])
       locality            = lookup(var.subject, "locality", null)
       province            = lookup(var.subject, "province", null)
       country             = lookup(var.subject, "country", null)
@@ -31,7 +31,6 @@ resource "tls_locally_signed_cert" "cas_certificate" {
 
   validity_period_hours = var.expiry_days * 24
   early_renewal_hours   = var.early_renewal_hours
-#   set_authority_key_id  = true
   set_subject_key_id    = true
 }
 
