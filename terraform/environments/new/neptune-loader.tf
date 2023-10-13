@@ -38,7 +38,8 @@ data "aws_iam_policy_document" "neptune_loader_policy" {
 
     actions = [
         "s3:GetObject",
-        "s3:ListBucket"
+        "s3:ListBucket",
+        "kms:Decrypt"
     ]
 
     resources = [
