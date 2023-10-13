@@ -55,6 +55,8 @@ module "ec2_instance" {
 
   security_groups = each.value.security_groups
 
+  additional_iam_policies = lookup(each.value, "additional_iam_policies", [])
+
   # Puppet Agent settings
   puppet = each.value.puppet == null ? null : {
     version     = each.value.puppet.version
