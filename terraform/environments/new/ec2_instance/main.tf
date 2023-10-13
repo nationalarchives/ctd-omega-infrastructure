@@ -345,5 +345,16 @@ data "aws_iam_policy_document" "puppet_ec2_assume_role_policy" {
       type        = "Service"
       identifiers = ["ec2.amazonaws.com"]
     }
+
+    principals {
+      type = "AWS"
+
+      # TODO(AR) I am not sure why the machines need to be able to assume their own machines role for use with Neptune via `awscurl`... perhaps create a different role that can be assumed from the EC2 instance?
+      identifiers = [
+        "arn:aws:sts::320289993971:assumed-role/dev-workstation-1_ec2_role/i-0e6927f6331a8a860",
+        "arn:aws:sts::320289993971:assumed-role/dev-workstation-2_ec2_role/i-04c94c2c368a1b134",
+        "arn:aws:sts::320289993971:assumed-role/dev-workstation-3_ec2_role/i-01e50911a31dd28f4"
+      ]
+    }
   }
 }

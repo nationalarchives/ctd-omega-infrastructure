@@ -257,6 +257,9 @@ locals {
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
+      additional_iam_policies = [
+        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
+      ]
       home_block_device = {
         device_name = "xvdb"
         volume_size = 200 #GiB
@@ -282,6 +285,9 @@ locals {
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
+      additional_iam_policies = [
+        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
+      ]
       home_block_device = {
         device_name = "xvdb"
         volume_size = 200 #GiB
@@ -306,6 +312,9 @@ locals {
       ami          = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
+      ]
+      additional_iam_policies = [
+        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
         device_name = "xvdb"
