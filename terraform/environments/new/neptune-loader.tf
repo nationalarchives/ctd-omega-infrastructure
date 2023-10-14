@@ -22,17 +22,17 @@ resource "aws_iam_role" "neptune_loader_iam_role" {
   path = "/neptune/"
   assume_role_policy = data.aws_iam_policy_document.neptune_service_assume_role_policy.json
   managed_policy_arns = [
-      aws_iam_policy.neptune_loader_policy.arn
+      aws_iam_policy.neptune_loader_read_policy.arn
   ]
 }
 
-resource "aws_iam_policy" "neptune_loader_policy" {
-    name = "neptune_loader_policy"
+resource "aws_iam_policy" "neptune_loader_read_policy" {
+    name = "neptune_loader_read_policy"
     path = "/neptune/"
-    policy = data.aws_iam_policy_document.neptune_loader_policy.json
+    policy = data.aws_iam_policy_document.neptune_loader_read_policy.json
 }
 
-data "aws_iam_policy_document" "neptune_loader_policy" {
+data "aws_iam_policy_document" "neptune_loader_read_policy" {
   statement {
     sid = "AllowReadNeptuneLoader"
 
@@ -40,6 +40,28 @@ data "aws_iam_policy_document" "neptune_loader_policy" {
         "s3:GetObject",
         "s3:ListBucket",
         "kms:Decrypt"
+    ]
+
+    resources = [
+      "${aws_s3_bucket.neptune_loader.arn}/neptune/loader/*",
+      "${aws_s3_bucket.neptune_loader.arn}"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "neptune_loader_write_policy" {
+    name = "neptune_loader_write_policy"
+    path = "/neptune/"
+    policy = data.aws_iam_policy_document.neptune_loader_write_policy.json
+}
+
+data "aws_iam_policy_document" "neptune_loader_write_policy" {
+  statement {
+    sid = "AllowWriteNeptuneLoader"
+
+    actions = [
+        "s3:PutObject",
+        "s3:DeleteObject",
     ]
 
     resources = [
