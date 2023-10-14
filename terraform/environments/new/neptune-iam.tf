@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "neptune_service_assume_role_policy" {
 }
 
 resource "aws_iam_policy" "neptune_service_role_policy" {
-    name = "neptune_service_role_poloicy"
+    name = "neptune_service_role_policy"
     path = "/neptune/"
     policy = data.aws_iam_policy_document.neptune_service_role_policy.json
 }
