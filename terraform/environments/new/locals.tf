@@ -258,6 +258,7 @@ locals {
         module.dev_workstation_security_group.security_group_id
       ]
       additional_iam_policies = [
+        aws_iam_policy.neptune_loader_write_policy.arn,
         "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
@@ -286,6 +287,7 @@ locals {
         module.dev_workstation_security_group.security_group_id
       ]
       additional_iam_policies = [
+        aws_iam_policy.neptune_loader_write_policy.arn,
         "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
@@ -314,6 +316,7 @@ locals {
         module.dev_workstation_security_group.security_group_id
       ]
       additional_iam_policies = [
+        aws_iam_policy.neptune_loader_write_policy.arn,
         "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
