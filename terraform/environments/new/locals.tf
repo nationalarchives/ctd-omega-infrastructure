@@ -115,6 +115,14 @@ locals {
     postal_code         = "TW9 4DU"
   }
 
+  s3_bucket_name_neptune_loader = "ctd-neptune-loader"
+
+  neptune_dev_cluster_a = {
+    id                = "dev-neptune-cluster-a"
+    subnet_group_name = "dev_neptune_cluster_a"
+    instance_prefix   = "dev-neptune-cluster-a-instance"
+  }
+
   puppet_control_repo_url = "https://github.com/nationalarchives/ctd-omega-puppet.git"
 
   instance_type_puppet_server    = "t3a.medium" # NOTE(AR) the "t3a.small" only has 2GiB RAM which is insufficient # NOTE(AR) ideally we would use "t4g.small", but Puppet doesn't yet officially support ARM CPU
@@ -249,6 +257,10 @@ locals {
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
+      additional_iam_policies = [
+        aws_iam_policy.neptune_loader_write_policy.arn,
+        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
+      ]
       home_block_device = {
         device_name = "xvdb"
         volume_size = 200 #GiB
@@ -274,6 +286,10 @@ locals {
       security_groups = [
         module.dev_workstation_security_group.security_group_id
       ]
+      additional_iam_policies = [
+        aws_iam_policy.neptune_loader_write_policy.arn,
+        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
+      ]
       home_block_device = {
         device_name = "xvdb"
         volume_size = 200 #GiB
@@ -298,6 +314,10 @@ locals {
       ami          = local.aws_ami.linux2_x86_64.id
       security_groups = [
         module.dev_workstation_security_group.security_group_id
+      ]
+      additional_iam_policies = [
+        aws_iam_policy.neptune_loader_write_policy.arn,
+        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
         device_name = "xvdb"
