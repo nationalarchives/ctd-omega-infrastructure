@@ -104,6 +104,8 @@ locals {
   /* IP address of the private Route53 DNS Server in the VPC */
   ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
 
+  s3_bucket_name_scratch_space = "ctd-scratch-space"
+
   s3_bucket_name_puppet_certificates = "puppet-certificates"
 
   default_certificate_subject = {
@@ -258,6 +260,8 @@ locals {
         module.dev_workstation_security_group.security_group_id
       ]
       additional_iam_policies = [
+        aws_iam_policy.scratch_space_backup_read_policy.arn,
+        aws_iam_policy.scratch_space_write_all_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,
         "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
@@ -287,6 +291,7 @@ locals {
         module.dev_workstation_security_group.security_group_id
       ]
       additional_iam_policies = [
+        aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,
         "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
@@ -316,6 +321,7 @@ locals {
         module.dev_workstation_security_group.security_group_id
       ]
       additional_iam_policies = [
+        aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,
         "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
       ]
