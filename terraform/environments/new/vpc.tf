@@ -73,6 +73,9 @@ module "vpc" {
   manage_default_security_group = true
   manage_default_network_acl    = true
   manage_default_route_table    = false
+  default_route_table_tags      = {
+    "Name" = "tna_ct_omega_vpc_new"
+  }
 
   default_security_group_ingress = [
     {
@@ -131,6 +134,42 @@ module "vpc" {
       to_port         = 443
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv4 HTTP traffic in from vpc_private_subnet_dev_databases for the purposes of accesing the web (via NAT Gateway)
+      rule_number = 302
+      rule_action = "allow"
+      from_port   = 80
+      to_port     = 80
+      protocol    = "tcp"
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    },
+    {
+      # allow IPv6 HTTP traffic in from vpc_private_subnet_dev_databases for the purposes of accesing the web (via NAT Gateway)
+      rule_number     = 308
+      rule_action     = "allow"
+      from_port       = 80
+      to_port         = 80
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    },
+    {
+      # allow IPv4 HTTPS traffic in from vpc_private_subnet_dev_databases for the purposes of accesing the web (via NAT Gateway)
+      rule_number = 303
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    },
+    {
+      # allow IPv6 HTTPS traffic in from vpc_private_subnet_dev_databases for the purposes of accesing the web (via NAT Gateway)
+      rule_number     = 309
+      rule_action     = "allow"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       # allow IPv4 HTTP traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
@@ -353,6 +392,24 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
+      # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_dev_databases
+      rule_number     = 301
+      rule_action     = "allow"
+      from_port       = local.unpriviledged_port_start
+      to_port         = local.unpriviledged_port_end
+      protocol        = "tcp"
+      cidr_block      = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    },
+    {
+      # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_dev_databases
+      rule_number     = 307
+      rule_action     = "allow"
+      from_port       = local.unpriviledged_port_start
+      to_port         = local.unpriviledged_port_end
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    },
+    {
       # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_management
       rule_number = 320
       rule_action = "allow"
@@ -530,8 +587,26 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      # allow IPv4 Neptune traffic in from vpc_private_subnet_dev_general
+      # allow IPv4 TSQL traffic in from vpc_private_subnet_dev_general
       rule_number = 600
+      rule_action = "allow"
+      from_port   = 1433
+      to_port     = 1433
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv6 TSQL traffic in to vpc_private_subnet_dev_general
+      rule_number     = 606
+      rule_action     = "allow"
+      from_port       = 1433
+      to_port         = 1433
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      # allow IPv4 Neptune traffic in from vpc_private_subnet_dev_general
+      rule_number = 601
       rule_action = "allow"
       from_port   = 8182
       to_port     = 8182
@@ -539,8 +614,8 @@ module "vpc" {
       cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      # allow IPv6 Neptune traffic out to vpc_private_subnet_dev_general
-      rule_number     = 606
+      # allow IPv6 Neptune traffic in to vpc_private_subnet_dev_general
+      rule_number     = 607
       rule_action     = "allow"
       from_port       = 8182
       to_port         = 8182
@@ -752,8 +827,26 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
-      # allow IPv4 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: A
+      # allow IPv4 TSQL traffic out to vpc_private_subnet_dev_databases
       rule_number = 600
+      rule_action = "allow"
+      from_port   = 1433
+      to_port     = 1433
+      protocol    = "tcp"
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    },
+    {
+      # allow IPv6 TSQL traffic in to vpc_private_subnet_dev_databases
+      rule_number     = 606
+      rule_action     = "allow"
+      from_port       = 1433
+      to_port         = 1433
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    },
+    {
+      # allow IPv4 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: A
+      rule_number = 601
       rule_action = "allow"
       from_port   = 8182
       to_port     = 8182
@@ -762,7 +855,7 @@ module "vpc" {
     },
     {
       # allow IPv6 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: A
-      rule_number     = 606
+      rule_number     = 607
       rule_action     = "allow"
       from_port       = 8182
       to_port         = 8182
@@ -771,7 +864,7 @@ module "vpc" {
     },
     {
       # allow IPv4 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: B
-      rule_number = 601
+      rule_number = 602
       rule_action = "allow"
       from_port   = 8182
       to_port     = 8182
@@ -780,7 +873,7 @@ module "vpc" {
     },
     {
       # allow IPv6 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: B
-      rule_number     = 607
+      rule_number     = 608
       rule_action     = "allow"
       from_port       = 8182
       to_port         = 8182
