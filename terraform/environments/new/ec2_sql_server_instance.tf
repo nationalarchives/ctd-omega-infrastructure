@@ -132,7 +132,7 @@ resource "aws_instance" "dev_mssql_server_1" {
     Name                      = "dev-mssql-server-1_new"
     Type                      = "dev_mssql_server"
     Environment               = "dev"
-    scheduler_mon_fri_dev_ec2 = "true"
+    scheduler_mon_fri_ec2     = "true"
   }
 }
 

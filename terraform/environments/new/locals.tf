@@ -168,7 +168,7 @@ locals {
       tags = {
         Type                      = "puppet_server"
         Environment               = "mvpbeta"
-        scheduler_mon_fri_dev_ec2 = "false"
+        scheduler_mon_fri_ec2     = "false"
       }
     }
   }
@@ -195,7 +195,7 @@ locals {
         Name                      = "web-proxy-1_new"
         Type                      = "web_proxy"
         Environment               = "mvpbeta"
-        scheduler_mon_fri_dev_ec2 = "false"
+        scheduler_mon_fri_ec2     = "false"
       }
     }
 
@@ -219,7 +219,7 @@ locals {
         Name                      = "web-app-1_new"
         Type                      = "web_app"
         Environment               = "mvpbeta"
-        scheduler_mon_fri_dev_ec2 = "false"
+        scheduler_mon_fri_ec2     = "false"
       }
     }
 
@@ -243,7 +243,7 @@ locals {
         Name                      = "services-api-1_new"
         Type                      = "services_api"
         Environment               = "mvpbeta"
-        scheduler_mon_fri_dev_ec2 = "false"
+        scheduler_mon_fri_ec2     = "false"
       }
     }
 
@@ -276,7 +276,7 @@ locals {
         Name                      = "dev-workstation-1_new"
         Type                      = "dev_workstation"
         Environment               = "dev"
-        scheduler_mon_fri_dev_ec2 = "true"
+        scheduler_mon_fri_ec2     = "true"
       }
     }
 
@@ -306,7 +306,7 @@ locals {
         Name                      = "dev-workstation-2_new"
         Type                      = "dev_workstation"
         Environment               = "dev"
-        scheduler_mon_fri_dev_ec2 = "true"
+        scheduler_mon_fri_ec2     = "true"
       }
     }
 
@@ -336,7 +336,7 @@ locals {
         Name                      = "dev-workstation-3_new"
         Type                      = "dev_workstation"
         Environment               = "dev"
-        scheduler_mon_fri_dev_ec2 = "true"
+        scheduler_mon_fri_ec2     = "true"
       }
     }
   }
