@@ -28,7 +28,7 @@ resource "aws_route53_record" "reverse_dns_ipv4" {
 
 # DNS for IPv6
 resource "aws_route53_record" "dns_ipv6" {
-  count =  var.ipv6 == null ? 0 : 1
+  count = var.ipv6 == null ? 0 : 1
 
   zone_id = var.zone_id
   name    = var.fqdn

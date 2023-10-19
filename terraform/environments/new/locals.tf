@@ -266,7 +266,7 @@ locals {
         aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.scratch_space_write_all_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,
-        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
+        "arn:aws:iam::aws:policy/NeptuneFullAccess", # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
         device_name = "xvdb"
@@ -296,7 +296,7 @@ locals {
       additional_iam_policies = [
         aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,
-        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
+        "arn:aws:iam::aws:policy/NeptuneFullAccess", # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
         device_name = "xvdb"
@@ -326,7 +326,7 @@ locals {
       additional_iam_policies = [
         aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,
-        "arn:aws:iam::aws:policy/NeptuneFullAccess",   # TODO(AR) restict this so that it is not FullAccess
+        "arn:aws:iam::aws:policy/NeptuneFullAccess", # TODO(AR) restict this so that it is not FullAccess
       ]
       home_block_device = {
         device_name = "xvdb"

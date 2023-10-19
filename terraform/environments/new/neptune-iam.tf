@@ -18,15 +18,15 @@ data "aws_iam_policy_document" "neptune_service_assume_role_policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["rds.amazonaws.com"]  // TODO(AR) should this be 'neptune.amazonaws.com'?
+      identifiers = ["rds.amazonaws.com"] // TODO(AR) should this be 'neptune.amazonaws.com'?
     }
   }
 }
 
 resource "aws_iam_policy" "neptune_service_role_policy" {
-    name = "neptune_service_role_policy"
-    path = "/neptune/"
-    policy = data.aws_iam_policy_document.neptune_service_role_policy.json
+  name   = "neptune_service_role_policy"
+  path   = "/neptune/"
+  policy = data.aws_iam_policy_document.neptune_service_role_policy.json
 }
 
 data "aws_iam_policy_document" "neptune_service_role_policy" {
@@ -41,7 +41,7 @@ data "aws_iam_policy_document" "neptune_service_role_policy" {
       test     = "StringLike"
       variable = "iam:AWSServiceName"
       values = [
-        "rds.amazonaws.com"  // TODO(AR) should this be 'neptune.amazonaws.com'?
+        "rds.amazonaws.com" // TODO(AR) should this be 'neptune.amazonaws.com'?
       ]
     }
   }
@@ -69,10 +69,10 @@ resource "aws_iam_user_policy" "neptune_user_rw" {
 data "aws_iam_policy_document" "neptune_user_rw_policy" {
   statement {
     actions = [
-        # aws_iam_role.neptune_service_role.name,  // TODO(AR) should this also go in here?
-        "iam:AmazonVPCFullAccess",
-        "iam:NeptuneFullAccess",
-        "iam:NeptuneConsoleFullAccess"
+      # aws_iam_role.neptune_service_role.name,  // TODO(AR) should this also go in here?
+      "iam:AmazonVPCFullAccess",
+      "iam:NeptuneFullAccess",
+      "iam:NeptuneConsoleFullAccess"
     ]
 
     resources = [

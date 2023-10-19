@@ -163,11 +163,11 @@ module "dev_mssql_server_1_dns" {
   fqdn = "dev-mssql-server-1.${local.private_omg_dns_domain}"
 
   zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
-  ipv4    = {
+  ipv4 = {
     addresses       = data.aws_network_interface.dev_mssql_server_1_database_interface.private_ips
     reverse_zone_id = aws_route53_zone.omega_private_ipv4_omg_reverse_dns.zone_id
   }
-  ipv6    = {
+  ipv6 = {
     addresses       = data.aws_network_interface.dev_mssql_server_1_database_interface.ipv6_addresses
     reverse_zone_id = aws_route53_zone.omega_private_ipv6_omg_reverse_dns.zone_id
   }
@@ -186,7 +186,7 @@ module "dev_mssql_server_1_puppet_agent_certificate" {
     "dev-mssql-server-1.${local.private_omg_dns_domain}"
   ]
 
-  expiry_days = 5 * 365  # 5 years
+  expiry_days = 5 * 365 # 5 years
 
   ca = {
     private_key_pem = module.ec2_puppet_server_instance["puppet_server_1"].puppet_ca_private_key_pem
@@ -197,39 +197,39 @@ module "dev_mssql_server_1_puppet_agent_certificate" {
 }
 
 resource "aws_s3_object" "dev_mssql_server_1_puppet_agent_certificate" {
-    bucket = aws_s3_bucket.puppet_certificates.id
-    key = "certificates/public/dev-mssql-server-1.${local.private_omg_dns_domain}.crt.pem"
-    content = module.dev_mssql_server_1_puppet_agent_certificate.certificate_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = aws_s3_bucket.puppet_certificates.id
+  key                = "certificates/public/dev-mssql-server-1.${local.private_omg_dns_domain}.crt.pem"
+  content            = module.dev_mssql_server_1_puppet_agent_certificate.certificate_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 resource "aws_s3_object" "dev_mssql_server_1_puppet_agent_public_key" {
-    bucket = aws_s3_bucket.puppet_certificates.id
-    key = "certificates/public/dev-mssql-server-1.${local.private_omg_dns_domain}.public.key.pem"
-    content = module.dev_mssql_server_1_puppet_agent_certificate.public_key_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = aws_s3_bucket.puppet_certificates.id
+  key                = "certificates/public/dev-mssql-server-1.${local.private_omg_dns_domain}.public.key.pem"
+  content            = module.dev_mssql_server_1_puppet_agent_certificate.public_key_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 resource "aws_s3_object" "dev_mssql_server_1_puppet_agent_private_key" {
-    bucket = aws_s3_bucket.puppet_certificates.id
-    key = "certificates/private/dev-mssql-server-1.${local.private_omg_dns_domain}.private.key.pem"
-    content = module.dev_mssql_server_1_puppet_agent_certificate.private_key_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = aws_s3_bucket.puppet_certificates.id
+  key                = "certificates/private/dev-mssql-server-1.${local.private_omg_dns_domain}.private.key.pem"
+  content            = module.dev_mssql_server_1_puppet_agent_certificate.private_key_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 # Puppet Agent EC2 Instance Profile
@@ -245,8 +245,8 @@ resource "aws_iam_instance_profile" "dev_mssql_server_1_ec2_iam_instance_profile
 }
 
 resource "aws_iam_role" "dev_mssql_server_1_ec2_iam_role" {
-  name = "dev-mssql-server-1_ec2_role"
-  path = "/puppet/"
+  name               = "dev-mssql-server-1_ec2_role"
+  path               = "/puppet/"
   assume_role_policy = data.aws_iam_policy_document.ec2_assume_role_policy.json
   managed_policy_arns = concat(
     [
@@ -259,8 +259,8 @@ resource "aws_iam_role" "dev_mssql_server_1_ec2_iam_role" {
 }
 
 resource "aws_iam_policy" "dev_mssql_server_1_puppet_certificates_private_puppet_agent_policy" {
-  name = "puppet_certificates_private_dev-mssql-server-1_policy"
-  path = "/puppet/"
+  name   = "puppet_certificates_private_dev-mssql-server-1_policy"
+  path   = "/puppet/"
   policy = data.aws_iam_policy_document.dev_mssql_server_1_puppet_certificates_private_puppet_agent_policy.json
 }
 
@@ -269,8 +269,8 @@ data "aws_iam_policy_document" "dev_mssql_server_1_puppet_certificates_private_p
     sid = "AllowReadPuppetCertificatesPrivateDevMssqlServer1"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket"
+      "s3:GetObject",
+      "s3:ListBucket"
     ]
 
     resources = [
@@ -296,7 +296,7 @@ resource "aws_secretsmanager_secret" "dev_mssql_server_1_sa_password_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "dev_mssql_server_1_sa_password_secret_version" {
-  secret_id     = aws_secretsmanager_secret.dev_mssql_server_1_sa_password_secret.id
+  secret_id = aws_secretsmanager_secret.dev_mssql_server_1_sa_password_secret.id
   # NOTE(AR) the additional quotes in the secret string are required for use by this Puppet/Hiera lookup function - https://github.com/krux/hiera-aws-secretsmanager#storing-secrets-as-json
   secret_string = "\"${random_password.dev_mssql_server_1_sa_password.result}\""
 }

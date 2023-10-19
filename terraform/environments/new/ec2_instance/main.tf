@@ -5,7 +5,7 @@ module "ec2_instance_cloud_init" {
   separate_home_volume = try(local.home_block_device.device_name, null)
 
   # If this has puppet settings, add the Puppet cloud-init part
-  additional_parts = var.puppet == null ? [] : [ local.puppet_cloud_init_part ]
+  additional_parts = var.puppet == null ? [] : [local.puppet_cloud_init_part]
 }
 
 resource "aws_instance" "ec2_instance" {
@@ -43,16 +43,16 @@ resource "aws_instance" "ec2_instance" {
   dynamic "ebs_block_device" {
     for_each = local.additional_block_devices
     content {
-        delete_on_termination = ebs_block_device.value["delete_on_termination"]
-        encrypted             = ebs_block_device.value["encrypted"]
-        volume_type           = ebs_block_device.value["volume_type"]
-        iops                  = ebs_block_device.value["iops"]
-        throughput            = ebs_block_device.value["throughput"]
-        volume_size           = ebs_block_device.value["volume_size"]
+      delete_on_termination = ebs_block_device.value["delete_on_termination"]
+      encrypted             = ebs_block_device.value["encrypted"]
+      volume_type           = ebs_block_device.value["volume_type"]
+      iops                  = ebs_block_device.value["iops"]
+      throughput            = ebs_block_device.value["throughput"]
+      volume_size           = ebs_block_device.value["volume_size"]
 
-        device_name = "/dev/${ebs_block_device.value["device_name"]}"
+      device_name = "/dev/${ebs_block_device.value["device_name"]}"
 
-        tags = ebs_block_device.value["tags"]
+      tags = ebs_block_device.value["tags"]
     }
   }
 
@@ -86,11 +86,11 @@ module "ec2_instance_dns" {
   fqdn = var.fqdn
 
   zone_id = var.dns.zone_id
-  ipv4    = {
+  ipv4 = {
     addresses       = data.aws_network_interface.ec2_instance_private_interface.private_ips
     reverse_zone_id = var.dns.reverse_ipv4_zone_id
   }
-  ipv6    = {
+  ipv6 = {
     addresses       = data.aws_network_interface.ec2_instance_private_interface.ipv6_addresses
     reverse_zone_id = var.dns.reverse_ipv6_zone_id
   }
@@ -100,22 +100,22 @@ module "ec2_instance_dns" {
 module "puppet_certificate_authority" {
   source = "../certificate"
 
-  count = local.generate_ca ? 1 : 0  # NOTE(AR) Only run if we are not provided with CA details
+  count = local.generate_ca ? 1 : 0 # NOTE(AR) Only run if we are not provided with CA details
 
   id = local.puppet_server_fqdn
 
   is_ca_certificate = true
 
-  subject = merge({ common_name = "Puppet CA: ${local.puppet_server_fqdn}" },  try(var.puppet.server.ca.subject, {}))
+  subject = merge({ common_name = "Puppet CA: ${local.puppet_server_fqdn}" }, try(var.puppet.server.ca.subject, {}))
 
-  expiry_days = 5 * 365  # 5 years
+  expiry_days = 5 * 365 # 5 years
 }
 
 # Generate Puppet Agent Certificates and keys (if needed)
 module "puppet_agent_certificate" {
   source = "../certificate"
 
-  count =  local.generate_certificate ? 1 : 0  # NOTE(AR) Only run if we are not provided with certificate details
+  count = local.generate_certificate ? 1 : 0 # NOTE(AR) Only run if we are not provided with certificate details
 
   id = var.fqdn
 
@@ -127,7 +127,7 @@ module "puppet_agent_certificate" {
     var.fqdn
   ]
 
-  expiry_days = 5 * 365  # 5 years
+  expiry_days = 5 * 365 # 5 years
 
   ca = {
     private_key_pem = local.generate_ca ? module.puppet_certificate_authority[0].private_key_pem : var.puppet.certificates.ca_private_key_pem
@@ -137,93 +137,93 @@ module "puppet_agent_certificate" {
 
 # Upload Puppet CA Certificates and keys (if needed) into S3 bucket
 resource "aws_s3_object" "puppet_certificate_authority_certificate" {
-    count = local.generate_ca ? 1 : 0  # NOTE(AR) Only run if we are not provided with CA details
+  count = local.generate_ca ? 1 : 0 # NOTE(AR) Only run if we are not provided with CA details
 
-    bucket = var.puppet.certificates.s3_bucket_name
-    key = "ca/public/${local.ca_certificate_filename}"
-    content = module.puppet_certificate_authority[0].certificate_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = var.puppet.certificates.s3_bucket_name
+  key                = "ca/public/${local.ca_certificate_filename}"
+  content            = module.puppet_certificate_authority[0].certificate_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 resource "aws_s3_object" "puppet_certificate_authority_public_key" {
-    count = local.generate_ca ? 1 : 0  # NOTE(AR) Only run if we are not provided with CA details
+  count = local.generate_ca ? 1 : 0 # NOTE(AR) Only run if we are not provided with CA details
 
-    bucket = var.puppet.certificates.s3_bucket_name
-    key = "ca/public/${local.ca_public_key_filename}"
-    content = module.puppet_certificate_authority[0].public_key_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = var.puppet.certificates.s3_bucket_name
+  key                = "ca/public/${local.ca_public_key_filename}"
+  content            = module.puppet_certificate_authority[0].public_key_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 resource "aws_s3_object" "puppet_certificate_authority_private_key" {
-    count = local.generate_ca ? 1 : 0  # NOTE(AR) Only run if we are not provided with CA details
+  count = local.generate_ca ? 1 : 0 # NOTE(AR) Only run if we are not provided with CA details
 
-    bucket = var.puppet.certificates.s3_bucket_name
-    key = "ca/private/${local.ca_private_key_filename}"
-    content = module.puppet_certificate_authority[0].private_key_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = var.puppet.certificates.s3_bucket_name
+  key                = "ca/private/${local.ca_private_key_filename}"
+  content            = module.puppet_certificate_authority[0].private_key_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 # Upload Puppet Agent Certificates and keys (if needed) into S3 bucket
 resource "aws_s3_object" "puppet_agent_certificate" {
-    count = local.generate_certificate ? 1 : 0  # NOTE(AR) Only run if we are not provided with CA details
+  count = local.generate_certificate ? 1 : 0 # NOTE(AR) Only run if we are not provided with CA details
 
-    bucket = var.puppet.certificates.s3_bucket_name
-    key = "certificates/public/${local.certificate_filename}"
-    content = module.puppet_agent_certificate[0].certificate_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = var.puppet.certificates.s3_bucket_name
+  key                = "certificates/public/${local.certificate_filename}"
+  content            = module.puppet_agent_certificate[0].certificate_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 resource "aws_s3_object" "puppet_agent_public_key" {
-    count = local.generate_certificate ? 1 : 0  # NOTE(AR) Only run if we are not provided with CA details
+  count = local.generate_certificate ? 1 : 0 # NOTE(AR) Only run if we are not provided with CA details
 
-    bucket = var.puppet.certificates.s3_bucket_name
-    key = "certificates/public/${local.public_key_filename}"
-    content = module.puppet_agent_certificate[0].public_key_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = var.puppet.certificates.s3_bucket_name
+  key                = "certificates/public/${local.public_key_filename}"
+  content            = module.puppet_agent_certificate[0].public_key_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 resource "aws_s3_object" "puppet_agent_private_key" {
-    count = local.generate_certificate ? 1 : 0  # NOTE(AR) Only run if we are not provided with CA details
+  count = local.generate_certificate ? 1 : 0 # NOTE(AR) Only run if we are not provided with CA details
 
-    bucket = var.puppet.certificates.s3_bucket_name
-    key = "certificates/private/${local.private_key_filename}"
-    content = module.puppet_agent_certificate[0].private_key_pem
-    content_type = "application/x-pem-file"
-    checksum_algorithm = "SHA256"
-    tags = {
-        Type        = "certificate"
-        Environment = "management"
-    }
+  bucket             = var.puppet.certificates.s3_bucket_name
+  key                = "certificates/private/${local.private_key_filename}"
+  content            = module.puppet_agent_certificate[0].private_key_pem
+  content_type       = "application/x-pem-file"
+  checksum_algorithm = "SHA256"
+  tags = {
+    Type        = "certificate"
+    Environment = "management"
+  }
 }
 
 # Puppet Server EC2 Instance Profile
 resource "aws_iam_instance_profile" "puppet_server_ec2_iam_instance_profile" {
-  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
 
   name = "${local.hostname}_ec2"
   path = "/puppet/"
@@ -236,10 +236,10 @@ resource "aws_iam_instance_profile" "puppet_server_ec2_iam_instance_profile" {
 }
 
 resource "aws_iam_role" "puppet_server_ec2_iam_role" {
-  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
 
-  name = "${local.hostname}_ec2_role"
-  path = "/puppet/"
+  name               = "${local.hostname}_ec2_role"
+  path               = "/puppet/"
   assume_role_policy = data.aws_iam_policy_document.puppet_ec2_assume_role_policy.json
   managed_policy_arns = concat(
     [
@@ -254,22 +254,22 @@ resource "aws_iam_role" "puppet_server_ec2_iam_role" {
 
 # Puppet Server (agent) Private key
 resource "aws_iam_policy" "puppet_certificates_private_puppet_server_policy" {
-    count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
 
-    name = "puppet_certificates_private_${local.hostname}_policy"
-    path = "/puppet/"
-    policy = data.aws_iam_policy_document.puppet_certificates_private_puppet_server_policy[0].json
+  name   = "puppet_certificates_private_${local.hostname}_policy"
+  path   = "/puppet/"
+  policy = data.aws_iam_policy_document.puppet_certificates_private_puppet_server_policy[0].json
 }
 
 data "aws_iam_policy_document" "puppet_certificates_private_puppet_server_policy" {
-  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
+  count = local.generate_server_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
 
   statement {
     sid = "AllowReadPuppetCertificatesPrivate${local.hostname_title}"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket"
+      "s3:GetObject",
+      "s3:ListBucket"
     ]
 
     resources = [
@@ -281,7 +281,7 @@ data "aws_iam_policy_document" "puppet_certificates_private_puppet_server_policy
 
 # Puppet Agent EC2 Instance Profile
 resource "aws_iam_instance_profile" "puppet_agent_ec2_iam_instance_profile" {
-  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
 
   name = "${local.hostname}_ec2"
   path = "/puppet/"
@@ -294,10 +294,10 @@ resource "aws_iam_instance_profile" "puppet_agent_ec2_iam_instance_profile" {
 }
 
 resource "aws_iam_role" "puppet_agent_ec2_iam_role" {
-  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
 
-  name = "${local.hostname}_ec2_role"
-  path = "/puppet/"
+  name               = "${local.hostname}_ec2_role"
+  path               = "/puppet/"
   assume_role_policy = data.aws_iam_policy_document.puppet_ec2_assume_role_policy.json
   managed_policy_arns = concat(
     [
@@ -311,22 +311,22 @@ resource "aws_iam_role" "puppet_agent_ec2_iam_role" {
 
 # Puppet Agent Private key
 resource "aws_iam_policy" "puppet_certificates_private_puppet_agent_policy" {
-  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
 
-  name = "puppet_certificates_private_${local.hostname}_policy"
-  path = "/puppet/"
+  name   = "puppet_certificates_private_${local.hostname}_policy"
+  path   = "/puppet/"
   policy = data.aws_iam_policy_document.puppet_certificates_private_puppet_agent_policy[0].json
 }
 
 data "aws_iam_policy_document" "puppet_certificates_private_puppet_agent_policy" {
-  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0  # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
+  count = local.generate_agent_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Agent
 
   statement {
     sid = "AllowReadPuppetCertificatesPrivate${local.hostname_title}"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket"
+      "s3:GetObject",
+      "s3:ListBucket"
     ]
 
     resources = [

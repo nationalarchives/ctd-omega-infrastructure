@@ -10,14 +10,14 @@ variable "zone_id" {
 
 variable "ipv4" {
   type = object({
-    addresses = list(string),
+    addresses       = list(string),
     reverse_zone_id = optional(string)
   })
 }
 
 variable "ipv6" {
   type = object({
-    addresses = list(string),
+    addresses       = list(string),
     reverse_zone_id = optional(string)
   })
   default = null
