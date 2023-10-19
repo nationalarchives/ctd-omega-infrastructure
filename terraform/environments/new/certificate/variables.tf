@@ -5,13 +5,13 @@ variable "id" {
 
 variable "is_ca_certificate" {
   description = "Is the generated certificate representing a Certificate Authority (CA)"
-  type = bool
-  default = false
+  type        = bool
+  default     = false
 }
 
 variable "subject" {
   description = "Subject of the certificate"
-  type        = object({
+  type = object({
     common_name         = string,
     organizational_unit = optional(string),
     organization        = optional(string),
@@ -26,8 +26,8 @@ variable "subject" {
 
 variable "dns_names" {
   description = "DNS Names for Subject Alternative Name"
-  type = list(string)
-  default = []
+  type        = list(string)
+  default     = []
 }
 
 variable "expiry_days" {
@@ -37,9 +37,9 @@ variable "expiry_days" {
 }
 
 variable "early_renewal_hours" {
-    description = "The resource will consider the certificate to have expired the given number of hours before its actual expiry time. This can be useful to deploy an updated certificate in advance of the expiration of the current certificate. However, the old certificate remains valid until its true expiration time, since this resource does not (and cannot) support certificate revocation. Also, this advance update can only be performed should the Terraform configuration be applied during the early renewal period."
-    type        = number
-    default     = 48
+  description = "The resource will consider the certificate to have expired the given number of hours before its actual expiry time. This can be useful to deploy an updated certificate in advance of the expiration of the current certificate. However, the old certificate remains valid until its true expiration time, since this resource does not (and cannot) support certificate revocation. Also, this advance update can only be performed should the Terraform configuration be applied during the early renewal period."
+  type        = number
+  default     = 48
 }
 
 variable "export_path" {
@@ -50,9 +50,9 @@ variable "export_path" {
 
 variable "ca" {
   description = "The CA to use for signing this certificate"
-  type        = object({
+  type = object({
     private_key_pem = string,
     certificate_pem = string
   })
-  default     = null
+  default = null
 }

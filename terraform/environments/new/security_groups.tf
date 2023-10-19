@@ -218,8 +218,8 @@ module "puppet_server_security_group" {
         module.vpc.private_subnets_cidr_blocks[2], # NOTE: restricted to vpc_private_subnet_management
         module.vpc.private_subnets_cidr_blocks[4], # NOTE: restricted to vpc_private_subnet_mvpbeta_web
         module.vpc.private_subnets_cidr_blocks[6], # NOTE: restricted to vpc_private_subnet_mvpbeta_services
-        module.vpc.private_subnets_cidr_blocks[8],  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta,
-        module.vpc.database_subnets_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_databases
+        module.vpc.private_subnets_cidr_blocks[8], # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta,
+        module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
       ])
     }
   ]
@@ -250,8 +250,8 @@ module "puppet_server_security_group" {
         module.vpc.private_subnets_ipv6_cidr_blocks[2], # NOTE: restricted to vpc_private_subnet_management (IPv6)
         module.vpc.private_subnets_ipv6_cidr_blocks[4], # NOTE: restricted to vpc_private_subnet_mvpbeta_web (IPv6)
         module.vpc.private_subnets_ipv6_cidr_blocks[6], # NOTE: restricted to vpc_private_subnet_mvpbeta_services (IPv6)
-        module.vpc.private_subnets_ipv6_cidr_blocks[8],  # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta (IPv6)
-        module.vpc.database_subnets_ipv6_cidr_blocks[0]  # NOTE: restricted to vpc_private_subnet_dev_databases (IPv6)
+        module.vpc.private_subnets_ipv6_cidr_blocks[8], # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta (IPv6)
+        module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases (IPv6)
       ])
     }
   ]

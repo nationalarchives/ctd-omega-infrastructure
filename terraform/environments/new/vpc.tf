@@ -73,7 +73,7 @@ module "vpc" {
   manage_default_security_group = true
   manage_default_network_acl    = true
   manage_default_route_table    = false
-  default_route_table_tags      = {
+  default_route_table_tags = {
     "Name" = "tna_ct_omega_vpc_new"
   }
 
@@ -393,12 +393,12 @@ module "vpc" {
     },
     {
       # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_dev_databases
-      rule_number     = 301
-      rule_action     = "allow"
-      from_port       = local.unpriviledged_port_start
-      to_port         = local.unpriviledged_port_end
-      protocol        = "tcp"
-      cidr_block      = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      rule_number = 301
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_dev_databases

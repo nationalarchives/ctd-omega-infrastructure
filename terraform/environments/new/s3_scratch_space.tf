@@ -6,13 +6,13 @@ resource "aws_s3_bucket" "scratch_space" {
     Name        = local.s3_bucket_name_scratch_space
     Type        = "data"
     Environment = "dev"
-  }  
+  }
 }
 
 resource "aws_iam_policy" "scratch_space_read_policy" {
-    name = "scratch_space_read_policy"
-    path = "/dev/"
-    policy = data.aws_iam_policy_document.scratch_space_read_policy.json
+  name   = "scratch_space_read_policy"
+  path   = "/dev/"
+  policy = data.aws_iam_policy_document.scratch_space_read_policy.json
 }
 
 data "aws_iam_policy_document" "scratch_space_read_policy" {
@@ -20,9 +20,9 @@ data "aws_iam_policy_document" "scratch_space_read_policy" {
     sid = "AllowReadScratchSpace"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket",
-        "kms:Decrypt"
+      "s3:GetObject",
+      "s3:ListBucket",
+      "kms:Decrypt"
     ]
 
     resources = [
@@ -32,9 +32,9 @@ data "aws_iam_policy_document" "scratch_space_read_policy" {
 }
 
 resource "aws_iam_policy" "scratch_space_write_all_policy" {
-    name = "scratch_space_write_all_policy"
-    path = "/dev/"
-    policy = data.aws_iam_policy_document.scratch_space_write_all_policy.json
+  name   = "scratch_space_write_all_policy"
+  path   = "/dev/"
+  policy = data.aws_iam_policy_document.scratch_space_write_all_policy.json
 }
 
 data "aws_iam_policy_document" "scratch_space_write_all_policy" {
@@ -42,9 +42,9 @@ data "aws_iam_policy_document" "scratch_space_write_all_policy" {
     sid = "AllowWriteAllScratchSpace"
 
     actions = [
-        "s3:PutObject",
-        "s3:DeleteObject",
-        "kms:Decrypt"
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "kms:Decrypt"
     ]
 
     resources = [
@@ -55,9 +55,9 @@ data "aws_iam_policy_document" "scratch_space_write_all_policy" {
 }
 
 resource "aws_iam_policy" "scratch_space_backup_read_policy" {
-    name = "scratch_space_backup_read_policy"
-    path = "/dev/"
-    policy = data.aws_iam_policy_document.scratch_space_backup_read_policy.json
+  name   = "scratch_space_backup_read_policy"
+  path   = "/dev/"
+  policy = data.aws_iam_policy_document.scratch_space_backup_read_policy.json
 }
 
 data "aws_iam_policy_document" "scratch_space_backup_read_policy" {
@@ -65,9 +65,9 @@ data "aws_iam_policy_document" "scratch_space_backup_read_policy" {
     sid = "AllowReadScratchSpaceBackup"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket",
-        "kms:Decrypt"
+      "s3:GetObject",
+      "s3:ListBucket",
+      "kms:Decrypt"
     ]
 
     resources = [

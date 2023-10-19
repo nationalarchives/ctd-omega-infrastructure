@@ -10,26 +10,26 @@ resource "aws_s3_bucket" "neptune_loader" {
 }
 
 resource "aws_vpc_endpoint" "s3" {
-  vpc_id       = module.vpc.vpc_id
+  vpc_id            = module.vpc.vpc_id
   vpc_endpoint_type = "Gateway"
-  service_name = "com.amazonaws.${local.aws_region}.s3"
-  route_table_ids = module.vpc.intra_route_table_ids
+  service_name      = "com.amazonaws.${local.aws_region}.s3"
+  route_table_ids   = module.vpc.intra_route_table_ids
 }
 
 
 resource "aws_iam_role" "neptune_loader_iam_role" {
-  name = "neptune_loader_role"
-  path = "/neptune/"
+  name               = "neptune_loader_role"
+  path               = "/neptune/"
   assume_role_policy = data.aws_iam_policy_document.neptune_service_assume_role_policy.json
   managed_policy_arns = [
-      aws_iam_policy.neptune_loader_read_policy.arn
+    aws_iam_policy.neptune_loader_read_policy.arn
   ]
 }
 
 resource "aws_iam_policy" "neptune_loader_read_policy" {
-    name = "neptune_loader_read_policy"
-    path = "/neptune/"
-    policy = data.aws_iam_policy_document.neptune_loader_read_policy.json
+  name   = "neptune_loader_read_policy"
+  path   = "/neptune/"
+  policy = data.aws_iam_policy_document.neptune_loader_read_policy.json
 }
 
 data "aws_iam_policy_document" "neptune_loader_read_policy" {
@@ -37,9 +37,9 @@ data "aws_iam_policy_document" "neptune_loader_read_policy" {
     sid = "AllowReadNeptuneLoader"
 
     actions = [
-        "s3:GetObject",
-        "s3:ListBucket",
-        "kms:Decrypt"
+      "s3:GetObject",
+      "s3:ListBucket",
+      "kms:Decrypt"
     ]
 
     resources = [
@@ -50,9 +50,9 @@ data "aws_iam_policy_document" "neptune_loader_read_policy" {
 }
 
 resource "aws_iam_policy" "neptune_loader_write_policy" {
-    name = "neptune_loader_write_policy"
-    path = "/neptune/"
-    policy = data.aws_iam_policy_document.neptune_loader_write_policy.json
+  name   = "neptune_loader_write_policy"
+  path   = "/neptune/"
+  policy = data.aws_iam_policy_document.neptune_loader_write_policy.json
 }
 
 data "aws_iam_policy_document" "neptune_loader_write_policy" {
@@ -60,8 +60,8 @@ data "aws_iam_policy_document" "neptune_loader_write_policy" {
     sid = "AllowWriteNeptuneLoader"
 
     actions = [
-        "s3:PutObject",
-        "s3:DeleteObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
     ]
 
     resources = [

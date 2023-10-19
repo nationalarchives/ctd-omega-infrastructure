@@ -3,10 +3,10 @@ resource "aws_neptune_cluster" "dev_neptune_cluster_a" {
   availability_zones = local.aws_azs
 
   neptune_subnet_group_name = local.neptune_dev_cluster_a.subnet_group_name
-  vpc_security_group_ids = [module.dev_neptune_cluster_a_security_group.security_group_id]
+  vpc_security_group_ids    = [module.dev_neptune_cluster_a_security_group.security_group_id]
 
-  engine = "neptune"
-  engine_version = "1.2.1.0"
+  engine                               = "neptune"
+  engine_version                       = "1.2.1.0"
   neptune_cluster_parameter_group_name = aws_neptune_cluster_parameter_group.dev_neptune_cluster_a.name
 
   serverless_v2_scaling_configuration {
@@ -46,15 +46,15 @@ resource "aws_neptune_cluster" "dev_neptune_cluster_a" {
 }
 
 resource "aws_neptune_cluster_parameter_group" "dev_neptune_cluster_a" {
-  name = local.neptune_dev_cluster_a.id
+  name   = local.neptune_dev_cluster_a.id
   family = "neptune1.2"
 }
 
 resource "aws_neptune_cluster_instance" "dev_neptune_cluster_a_instance" {
   cluster_identifier = aws_neptune_cluster.dev_neptune_cluster_a.id
 
-  identifier_prefix  = local.neptune_dev_cluster_a.instance_prefix
-  
+  identifier_prefix = local.neptune_dev_cluster_a.instance_prefix
+
   neptune_parameter_group_name = aws_neptune_parameter_group.dev_neptune_cluster_a_instance.name
 
   count          = 2
@@ -74,7 +74,7 @@ resource "aws_neptune_cluster_instance" "dev_neptune_cluster_a_instance" {
 }
 
 resource "aws_neptune_parameter_group" "dev_neptune_cluster_a_instance" {
-  name = local.neptune_dev_cluster_a.instance_prefix
+  name   = local.neptune_dev_cluster_a.instance_prefix
   family = "neptune1.2"
 }
 
