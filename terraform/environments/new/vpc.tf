@@ -639,7 +639,19 @@ module "vpc" {
       to_port         = local.unpriviledged_port_end
       protocol        = "tcp"
       ipv6_cidr_block = "::/0"
-    }
+    },
+
+    // START TEMP site-to-site VPN testing with Steve Hirschorn
+    {
+      # allow incoming HTTPS IPv4 traffic from Steve
+      rule_number = 1000
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = "10.112.41.0/24"
+    },
+    // END TEMP
   ]
 
   private_outbound_acl_rules = [
@@ -880,15 +892,35 @@ module "vpc" {
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[1] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
     },
+
     {
-      # allow IPv4 return traffic from vpc_private_subnet_dev_general
+      # allow IPv4 return traffic from vpc_private_subnet_dev_general and vpc_private_subnet_dev_databases
       rule_number = 1200
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = "10.129.202.0/23" # TODO(AR) don't hardcode the address here - rearrange subnets so that they are adjacent and use constants defined in locals.tf
     },
+    # {
+    #   # allow IPv4 return traffic from vpc_private_subnet_dev_general
+    #   rule_number = 1200
+    #   rule_action = "allow"
+    #   from_port   = local.linux_ephemeral_port_start
+    #   to_port     = local.linux_ephemeral_port_end
+    #   protocol    = "tcp"
+    #   cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    # },
+    #  {
+    #   # allow IPv4 return traffic from vpc_private_subnet_dev_databases
+    #   rule_number = 1201
+    #   rule_action = "allow"
+    #   from_port   = local.linux_ephemeral_port_start
+    #   to_port     = local.linux_ephemeral_port_end
+    #   protocol    = "tcp"
+    #   cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    # },
+
     {
       # allow IPv6 return traffic from vpc_private_subnet_dev_general
       rule_number     = 1206
@@ -899,15 +931,6 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
-      # allow IPv4 return traffic from vpc_private_subnet_dev_databases
-      rule_number = 1201
-      rule_action = "allow"
-      from_port   = local.linux_ephemeral_port_start
-      to_port     = local.linux_ephemeral_port_end
-      protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
-    },
-    {
       # allow IPv6 return traffic from vpc_private_subnet_dev_databases
       rule_number     = 1207
       rule_action     = "allow"
@@ -916,6 +939,7 @@ module "vpc" {
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
+
     {
       # allow IPv4 return traffic from vpc_private_subnet_mvpbeta_web
       rule_number = 1240
@@ -970,6 +994,18 @@ module "vpc" {
       protocol        = "tcp"
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
+
+    // START TEMP site-to-site VPN testing with Steve Hirschorn
+    {
+      # allow results from HTTPS IPv4 traffic back to Steve
+      rule_number = 1300
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = "10.112.41.0/24"
+    },
+    // END TEMP
   ]
 
   vpc_tags = {

@@ -314,9 +314,19 @@ module "mvpbeta_web_proxy_security_group" {
       to_port     = 443
       protocol    = "tcp"
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+
+    // START TEMP site-to-site VPN testing with Steve Hirschorn
+    {
+      description = "HTTPS testing from Steve Hirschorn"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_blocks = "10.112.41.0/24"
     }
+    // END TEMP
   ]
-  number_of_computed_ingress_with_cidr_blocks = 3
+  number_of_computed_ingress_with_cidr_blocks = 4
 
   computed_ingress_with_ipv6_cidr_blocks = [
     {
