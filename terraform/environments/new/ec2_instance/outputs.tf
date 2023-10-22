@@ -3,6 +3,16 @@ output "ec2_instance_arn" {
   value = aws_instance.ec2_instance.arn
 }
 
+output "ec2_iam_instance_profile_arn" {
+  description = "The ARN of the assigned IAM Instance Profile assigned to the EC2 host"
+  value = data.aws_iam_instance_profile.ec2_iam_instance_profile.arn
+}
+
+output "ec2_iam_instance_profile_role_arn" {
+  description = "The ARN of the role of the assigned IAM Instance Profile assigned to the EC2 host"
+  value = data.aws_iam_instance_profile.ec2_iam_instance_profile.role_arn
+}
+
 output "puppet_ca_certificate_pem" {
   description = "The Puppet CA Certificate"
   value       = one(module.puppet_certificate_authority[*].certificate_pem)

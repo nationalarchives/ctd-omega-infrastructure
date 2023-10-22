@@ -5,8 +5,6 @@
 ###
 
 # TODO(AR) - restrict access to SQS from VPC endpoints only
-# TODO(AR) - force SQS to only accept TLS connections
-# TODO(AR) - IAM policy for the dead_letter_queue
 
 # The Dead Letter Queue
 resource "aws_sqs_queue" "dead_letter_queue" {
@@ -76,35 +74,38 @@ resource "aws_sqs_queue" "pace001_reply001" {
   }
 }
 
-
-# TODO(AR) restrict "Principal": "*" to who is allowed to actually access this - IAM accounts/roles?
-
-# TODO(AR) add a 'Condition' to restrict the source to the web-app-1 (or my dev-1) e.g.
-## "ArnEquals": {											
-##     "aws:SourceArn": "${aws_sns_topic.example.arn}"
-## }
-
 resource "aws_sqs_queue_policy" "dead_letter_queue_policy" {
-  queue_url = aws_sqs_queue.dead_letter_queue_policy.id
+  queue_url = aws_sqs_queue.dead_letter_queue.id
   policy    = data.aws_iam_policy_document.dead_letter_queue_policy.json
 }
 
-# Allow Sending messages to queue `PACS001_REQUEST001` by `web-app-1` and dev workstations
 data "aws_iam_policy_document" "dead_letter_queue_policy" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.dead_letter_queue_metadata_policy.json,
+    data.aws_iam_policy_document.dead_letter_queue_receive_policy.json
+  ]
+}
+
+# Allow retrieval of metadata about dead letter queue by `services-api-1`, and dev workstations
+data "aws_iam_policy_document" "dead_letter_queue_metadata_policy" {
+
     statement {
-        sid = "First"
+        sid = "DeadLetterQueueMetadata"
         effect = "Allow"
 
-        actions   = ["sqs:ReceiveMessage"]
+        actions   = [
+          "sqs:GetQueueUrl"
+        ]
 
         principals {
-            type        = "*"
-            # identifiers = ["*"]
+            type        = "AWS"
             identifiers = [
+                module.ec2_instance["services_api_1"].ec2_iam_instance_profile_role_arn,
+
                 # TODO(AR) use a loop to produce this
-                module.ec2_instance["dev_workstation_1"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_2"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_3"].ec2_instance_arn
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
             ]
         }
 
@@ -118,29 +119,74 @@ data "aws_iam_policy_document" "dead_letter_queue_policy" {
     }
 }
 
-resource "aws_sqs_queue_policy" "pacs001_request001_send_policy" {
-  queue_url = aws_sqs_queue.pacs001_request001.id
-  policy    = data.aws_iam_policy_document.pacs001_request001_send_policy.json
-}
-
-# Allow Sending messages to queue `PACS001_REQUEST001` by `web-app-1` and dev workstations
-data "aws_iam_policy_document" "pacs001_request001_send_policy" {
+# Allow Receiving messages from dead letter queue by `services-api-1`, and dev workstations
+data "aws_iam_policy_document" "dead_letter_queue_receive_policy" {
     statement {
-        sid = "First"
+        sid = "DeadLetterQueueReceive"
         effect = "Allow"
 
-        actions   = ["sqs:SendMessage"]
+        actions   = [
+          "sqs:ReceiveMessage",
+          "sqs:ChangeMessageVisibility", // NOTE(AR) needed to ACK the message
+          "sqs:DeleteMessage" // NOTE(AR) needed to pop the message off the queue
+        ]
 
         principals {
-            type        = "*"
-            # identifiers = ["*"]
+            type        = "AWS"
             identifiers = [
-                module.ec2_instance["web_app_1"].ec2_instance_arn,
+                module.ec2_instance["services_api_1"].ec2_iam_instance_profile_role_arn,
 
                 # TODO(AR) use a loop to produce this
-                module.ec2_instance["dev_workstation_1"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_2"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_3"].ec2_instance_arn
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
+            ]
+        }
+
+        resources = [aws_sqs_queue.dead_letter_queue.arn]
+
+        condition {
+            test = "Bool"
+            variable = "aws:SecureTransport"
+            values = ["true"]
+        }
+    }
+}
+
+resource "aws_sqs_queue_policy" "pacs001_request001_policy" {
+  queue_url = aws_sqs_queue.pacs001_request001.id
+  policy    = data.aws_iam_policy_document.pacs001_request001_policy.json
+}
+
+data "aws_iam_policy_document" "pacs001_request001_policy" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.pacs001_request001_metadata_policy.json,
+    data.aws_iam_policy_document.pacs001_request001_send_policy.json,
+    data.aws_iam_policy_document.pacs001_request001_receive_policy.json
+  ]
+}
+
+# Allow retrieval of metadata about queue `PACS001_REQUEST001` by `web-app-1`, `services-api-1`, and dev workstations
+data "aws_iam_policy_document" "pacs001_request001_metadata_policy" {
+
+    statement {
+        sid = "Pacs001Request001Metadata"
+        effect = "Allow"
+
+        actions   = [
+          "sqs:GetQueueUrl"
+        ]
+
+        principals {
+            type        = "AWS"
+            identifiers = [
+                module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["services_api_1"].ec2_iam_instance_profile_role_arn,
+
+                # TODO(AR) use a loop to produce this
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
             ]
         }
 
@@ -154,29 +200,57 @@ data "aws_iam_policy_document" "pacs001_request001_send_policy" {
     }
 }
 
-resource "aws_sqs_queue_policy" "pacs001_request001_receive_policy" {
-  queue_url = aws_sqs_queue.pacs001_request001.id
-  policy    = data.aws_iam_policy_document.pacs001_request001_receive_policy.json
+# Allow Sending messages to queue `PACS001_REQUEST001` by `web-app-1`, and dev workstations
+data "aws_iam_policy_document" "pacs001_request001_send_policy" {
+    statement {
+        sid = "Pacs001Request001Send"
+        effect = "Allow"
+
+        actions   = ["sqs:SendMessage"]
+
+        principals {
+            type        = "AWS"
+            identifiers = [
+                module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+
+                # TODO(AR) use a loop to produce this
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
+            ]
+        }
+
+        resources = [aws_sqs_queue.pacs001_request001.arn]
+
+        condition {
+            test = "Bool"
+            variable = "aws:SecureTransport"
+            values = ["true"]
+        }
+    }
 }
 
 # Allow Receiving messages from queue `PACS001_REQUEST001` by `services-api-1` and dev workstations
 data "aws_iam_policy_document" "pacs001_request001_receive_policy" {
     statement {
-        sid = "First"
+        sid = "Pacs001Request001Receive"
         effect = "Allow"
 
-        actions   = ["sqs:ReceiveMessage"]
+        actions   = [
+          "sqs:ReceiveMessage",
+          "sqs:ChangeMessageVisibility", // NOTE(AR) needed to ACK the message
+          "sqs:DeleteMessage" // NOTE(AR) needed to pop the message off the queue
+        ]
 
         principals {
-            type        = "*"
-            # identifiers = ["*"]
+            type        = "AWS"
             identifiers = [
-                module.ec2_instance["services_api_1"].ec2_instance_arn,
+                module.ec2_instance["services_api_1"].ec2_iam_instance_profile_role_arn,
 
                 # TODO(AR) use a loop to produce this
-                module.ec2_instance["dev_workstation_1"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_2"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_3"].ec2_instance_arn
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
             ]
         }
 
@@ -190,29 +264,40 @@ data "aws_iam_policy_document" "pacs001_request001_receive_policy" {
     }
 }
 
-resource "aws_sqs_queue_policy" "pace001_reply001_send_policy" {
+resource "aws_sqs_queue_policy" "pace001_reply001_policy" {
   queue_url = aws_sqs_queue.pace001_reply001.id
-  policy    = data.aws_iam_policy_document.pace001_reply001_send_policy.json
+  policy    = data.aws_iam_policy_document.pace001_reply001_policy.json
 }
 
-# Allow Sending messages to queue `PACE001_REPLY001` by `services-api-1` and dev workstations
-data "aws_iam_policy_document" "pace001_reply001_send_policy" {
+data "aws_iam_policy_document" "pace001_reply001_policy" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.pace001_reply001_metadata_policy.json,
+    data.aws_iam_policy_document.pace001_reply001_send_policy.json,
+    data.aws_iam_policy_document.pace001_reply001_receive_policy.json
+  ]
+}
+
+# Allow retrieval of metadata about queue `PACE001_REPLY001` by `web-app-1`, `services-api-1`, and dev workstations
+data "aws_iam_policy_document" "pace001_reply001_metadata_policy" {
+
     statement {
-        sid = "First"
+        sid = "Pace001Reply001Metadata"
         effect = "Allow"
 
-        actions   = ["sqs:SendMessage"]
+        actions   = [
+          "sqs:GetQueueUrl"
+        ]
 
         principals {
-            type        = "*"
-            # identifiers = ["*"]
+            type        = "AWS"
             identifiers = [
-                module.ec2_instance["services_api_1"].ec2_instance_arn,
+                module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["services_api_1"].ec2_iam_instance_profile_role_arn,
 
                 # TODO(AR) use a loop to produce this
-                module.ec2_instance["dev_workstation_1"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_2"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_3"].ec2_instance_arn
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
             ]
         }
 
@@ -226,29 +311,60 @@ data "aws_iam_policy_document" "pace001_reply001_send_policy" {
     }
 }
 
-resource "aws_sqs_queue_policy" "pace001_reply001_receive_policy" {
-  queue_url = aws_sqs_queue.pace001_reply001.id
-  policy    = data.aws_iam_policy_document.pace001_reply001_receive_policy.json
-}
+# Allow Sending messages to queue `PACE001_REPLY001` by `services-api-1`, and dev workstations
+data "aws_iam_policy_document" "pace001_reply001_send_policy" {
 
-# Allow Receiving messages from queue `PACE001_REPLY001` by `web-app-1` and dev workstations
-data "aws_iam_policy_document" "pace001_reply001_receive_policy" {
     statement {
-        sid = "First"
+        sid = "Pace001Reply001Send"
         effect = "Allow"
 
-        actions   = ["sqs:ReceiveMessage"]
+        actions   = [
+          "sqs:SendMessage"
+        ]
 
         principals {
-            type        = "*"
-            # identifiers = ["*"]
+            type        = "AWS"
             identifiers = [
-                module.ec2_instance["services_api_1"].ec2_instance_arn,
+                module.ec2_instance["services_api_1"].ec2_iam_instance_profile_role_arn,
 
                 # TODO(AR) use a loop to produce this
-                module.ec2_instance["dev_workstation_1"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_2"].ec2_instance_arn,
-                module.ec2_instance["dev_workstation_3"].ec2_instance_arn
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
+            ]
+        }
+
+        resources = [aws_sqs_queue.pace001_reply001.arn]
+
+        condition {
+            test = "Bool"
+            variable = "aws:SecureTransport"
+            values = ["true"]
+        }
+    }
+}
+
+# Allow Receiving messages from queue `PACE001_REPLY001` by `web-app-1`, and dev workstations
+data "aws_iam_policy_document" "pace001_reply001_receive_policy" {
+    statement {
+        sid = "Pace001Reply001Receive"
+        effect = "Allow"
+
+        actions   = [
+          "sqs:ReceiveMessage",
+          "sqs:ChangeMessageVisibility", // NOTE(AR) needed to ACK the message
+          "sqs:DeleteMessage" // NOTE(AR) needed to pop the message off the queue
+        ]
+
+        principals {
+            type        = "AWS"
+            identifiers = [
+                module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+
+                # TODO(AR) use a loop to produce this
+                module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+                module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
             ]
         }
 

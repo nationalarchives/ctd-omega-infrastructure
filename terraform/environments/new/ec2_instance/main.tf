@@ -221,6 +221,10 @@ resource "aws_s3_object" "puppet_agent_private_key" {
   }
 }
 
+data "aws_iam_instance_profile" "ec2_iam_instance_profile" {
+    name = local.iam_instance_profile
+}
+
 # Puppet Server EC2 Instance Profile
 resource "aws_iam_instance_profile" "puppet_server_ec2_iam_instance_profile" {
   count = local.generate_server_ec2_iam_instance_profile ? 1 : 0 # NOTE(AR) Only run if we are generating an EC2 instance profile for a Puppet Server
