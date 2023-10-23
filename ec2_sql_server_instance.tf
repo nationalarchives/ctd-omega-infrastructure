@@ -28,9 +28,9 @@ module "dev_mssql_server_1_cloud_init" {
         puppet_agent_fqdn                  = "dev-mssql-server-1.${local.private_omg_dns_domain}"
         puppet_server_fqdn                 = "${local.ec2_puppet_server_instances.puppet_server_1.hostname}.${local.private_omg_dns_domain}"
         ca_certificate_pem_filename        = "${local.ec2_puppet_server_instances.puppet_server_1.hostname}.${local.private_omg_dns_domain}-ca.crt.pem"
-        certificate_pem_filename           = basename(module.dev_mssql_server_1_puppet_agent_certificate.certificate_pem_exported_filename)
-        public_key_pem_filename            = basename(module.dev_mssql_server_1_puppet_agent_certificate.public_key_pem_exported_filename)
-        private_key_pem_filename           = basename(module.dev_mssql_server_1_puppet_agent_certificate.private_key_pem_exported_filename)
+        certificate_pem_filename           = module.dev_mssql_server_1_puppet_agent_certificate.certificate_pem_filename
+        public_key_pem_filename            = module.dev_mssql_server_1_puppet_agent_certificate.public_key_pem_filename
+        private_key_pem_filename           = module.dev_mssql_server_1_puppet_agent_certificate.private_key_pem_filename
       })
     }
   ]
@@ -192,8 +192,6 @@ module "dev_mssql_server_1_puppet_agent_certificate" {
     private_key_pem = module.ec2_puppet_server_instance["puppet_server_1"].puppet_ca_private_key_pem
     certificate_pem = module.ec2_puppet_server_instance["puppet_server_1"].puppet_ca_certificate_pem
   }
-
-  export_path = "../../../ctd-omega-infrastructure-certificates/exported"
 }
 
 resource "aws_s3_object" "dev_mssql_server_1_puppet_agent_certificate" {

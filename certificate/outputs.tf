@@ -22,6 +22,11 @@ output "private_key_pem" {
   sensitive   = true
 }
 
+output "certificate_pem_filename" {
+  description = "The filename of the Certificate"
+  value       = local.cert_filename
+}
+
 output "certificate_pem_exported_filename" {
   description = "The filename of the exported Certificate"
   value       = local.cert_file
@@ -32,6 +37,11 @@ output "certificate_pem_exported_filename" {
   ]
 }
 
+output "public_key_pem_filename" {
+  description = "The filename of the Public Key"
+  value       = local.public_key_filename
+}
+
 output "public_key_pem_exported_filename" {
   description = "The filename of the exported Public Key"
   value       = local.public_key_file
@@ -39,6 +49,11 @@ output "public_key_pem_exported_filename" {
   depends_on = [
     local_file.public_key_file
   ]
+}
+
+output "private_key_pem_filename" {
+  description = "The filename of the Private Key"
+  value       = local.private_key_filename
 }
 
 output "private_key_pem_exported_filename" {
