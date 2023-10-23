@@ -1,0 +1,6 @@
+#cloud-config
+power_state:
+  delay: now
+  mode: reboot
+  message: Rebooting machine after Omega cloud-init initialisation completed
+  condition: true

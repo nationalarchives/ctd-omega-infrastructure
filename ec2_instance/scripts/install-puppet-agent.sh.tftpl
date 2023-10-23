@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+set -e
+# Puppet Labs paths
+PL_CONF_DIR=/etc/puppetlabs
+# Puppet Agent paths
+PA_CONF_DIR=$PL_CONF_DIR/puppet
+PA_SSL_DIR=$PA_CONF_DIR/ssl
+# Facter paths
+FA_CONF_DIR=$PL_CONF_DIR/facter
+
+# Install Puppet Agent
+if [[ ! -f "/etc/yum.repos.d/puppet${puppet_version}-release.repo" ]]; then
+  rpm -Uvh https://yum.puppet.com/puppet${puppet_version}-release-el-7.noarch.rpm
+fi
+if ! yum list installed puppet-agent; then
+  yum install -y puppet-agent
+fi
+mkdir -p $PA_CONF_DIR
+cat <<EOF > $PA_CONF_DIR/puppet.conf
+[main]
+server = ${puppet_server_fqdn}
+runinterval = 10m
+# NOTE(AR) this is a temporary measure until we can pre-gen both Certs and CRL with OpenSSL via Terraform
+certificate_revocation = false
+EOF
+
+# Create Puppet Agent SSL directories
+mkdir -p $PA_SSL_DIR
+pushd $PA_SSL_DIR
+mkdir -p certs private_keys public_keys
+
+## Deploy CA Certificate
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/ca/public/${ca_certificate_pem_filename} certs/ca.pem
+# Add an Empty CRL. NOTE(AR) this is a temporary measure until we can pre-gen both Certs and CRL with OpenSSL via Terraform
+touch crl.pem
+
+## Deploy Puppet Agent Certificates
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/certificates/public/${certificate_pem_filename} certs/${puppet_agent_fqdn}.pem
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/certificates/public/${public_key_pem_filename} public_keys/${puppet_agent_fqdn}.pem
+aws s3 cp s3://${s3_bucket_name_puppet_certificates}/certificates/private/${private_key_pem_filename} private_keys/${puppet_agent_fqdn}.pem
+
+# chown -R puppet:puppet certs public_keys private_keys
+chmod 755 certs public_keys
+chmod 750 private_keys
+chmod 644 public_keys/${puppet_agent_fqdn}.pem certs/${puppet_agent_fqdn}.pem crl.pem
+chmod 640 private_keys/${puppet_agent_fqdn}.pem
+popd
+
+# Patch a bug in Puppet/Facter on AWS
+mkdir -p $FA_CONF_DIR
+cat <<EOF > $FA_CONF_DIR/facter.conf
+facts : {
+    # NOTE(AR) Block ec2_userdata due to bug in Puppet/Facter on AWS, see: https://groups.google.com/g/puppet-users/c/dpLyduMbCrE
+    blocklist : [ "ec2_userdata" ]
+}
+EOF
+
+# Start Puppet Agent
+systemctl enable puppet
+systemctl start puppet

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -e
+
+existing_xfs_volume=false
+
+echo "Omega start preparing volume /dev/${volume}..."
+
+counter=0
+while [ ! -e "/dev/${volume}" ]; do
+    sleep 1s
+    counter=$((counter + 1))
+    if [ $counter -ge 60 ]; then
+        >&2 echo "Error! Timed out after 60 seconds trying to find /dev/${volume}"
+        exit 9
+    fi
+done
+
+if [[ "$(blkid /dev/${volume})" == *"TYPE=\"xfs\"" ]]; then
+    existing_xfs_volume=true
+    echo "Found existing XFS volume at /dev/${volume}, will reuse..."
+else
+    existing_xfs_volume=false
+    echo "No existing XFS volume at /dev/${volume}, will create..."
+fi
+
+if [[ $existing_xfs_volume != true ]]; then
+    mkfs -t xfs "/dev/${volume}"
+    echo "Created XFS volume at /dev/${volume}"
+    cp -rp "${mount_point}/ec2-user" /tmp
+fi
+mount "/dev/${volume}" ${mount_point}
+echo "Mounted XFS volume /dev/${volume} to ${mount_point}"
+if [[ $existing_xfs_volume != true ]]; then
+    echo "Created by Omega cloud-init: $(date -Is)" > "${mount_point}/omega-created-volume.txt"
+    chmod 644 "${mount_point}/omega-created-volume.txt"
+    mv -f /tmp/ec2-user "${mount_point}"
+    echo "Moved existing ${mount_point}/ec2-user data to new XFS volume on /dev/${volume}"
+else
+    if [ ! -f "${mount_point}/omega-created-volume.txt" ]; then
+        echo "WARN: Cannot locate ${mount_point}/omega-created-volume.txt, existing XFS volume /dev/${volume} now mounted at ${mount_point} does not appear to have previously been created by Omega cloud-init"
+    else
+        echo "Existing XFS volume /dev/${volume} now mounted at ${mount_point}, has the creation details:"
+        cat "${mount_point}/omega-created-volume.txt"
+    fi
+fi
+
+echo "Omega completed preparing volume /dev/${volume}."

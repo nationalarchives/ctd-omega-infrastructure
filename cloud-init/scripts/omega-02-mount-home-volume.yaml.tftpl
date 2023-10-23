@@ -1,0 +1,3 @@
+#cloud-config
+mounts:
+  - [ "/dev/${volume}", "${mount_point}", "xfs", "defaults,nofail", "0", "0" ]
