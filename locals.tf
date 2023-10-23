@@ -166,9 +166,9 @@ locals {
         aws_iam_policy.puppet_server_access_secrets_iam_policy.arn
       ]
       tags = {
-        Type                      = "puppet_server"
-        Environment               = "mvpbeta"
-        scheduler_mon_fri_ec2     = "false"
+        Type                  = "puppet_server"
+        Environment           = "mvpbeta"
+        scheduler_mon_fri_ec2 = "false"
       }
     }
   }
@@ -192,10 +192,10 @@ locals {
         volume_size = 8 #GiB
       }
       tags = {
-        Name                      = "web-proxy-1_new"
-        Type                      = "web_proxy"
-        Environment               = "mvpbeta"
-        scheduler_mon_fri_ec2     = "false"
+        Name                  = "web-proxy-1_new"
+        Type                  = "web_proxy"
+        Environment           = "mvpbeta"
+        scheduler_mon_fri_ec2 = "false"
       }
     }
 
@@ -216,10 +216,10 @@ locals {
         volume_size = 8 #GiB
       }
       tags = {
-        Name                      = "web-app-1_new"
-        Type                      = "web_app"
-        Environment               = "mvpbeta"
-        scheduler_mon_fri_ec2     = "false"
+        Name                  = "web-app-1_new"
+        Type                  = "web_app"
+        Environment           = "mvpbeta"
+        scheduler_mon_fri_ec2 = "false"
       }
     }
 
@@ -240,10 +240,10 @@ locals {
         volume_size = 8 #GiB
       }
       tags = {
-        Name                      = "services-api-1_new"
-        Type                      = "services_api"
-        Environment               = "mvpbeta"
-        scheduler_mon_fri_ec2     = "false"
+        Name                  = "services-api-1_new"
+        Type                  = "services_api"
+        Environment           = "mvpbeta"
+        scheduler_mon_fri_ec2 = "false"
       }
     }
 
@@ -273,10 +273,10 @@ locals {
         volume_size = 200 #GiB
       }
       tags = {
-        Name                      = "dev-workstation-1_new"
-        Type                      = "dev_workstation"
-        Environment               = "dev"
-        scheduler_mon_fri_ec2     = "true"
+        Name                  = "dev-workstation-1_new"
+        Type                  = "dev_workstation"
+        Environment           = "dev"
+        scheduler_mon_fri_ec2 = "true"
       }
     }
 
@@ -303,10 +303,10 @@ locals {
         volume_size = 200 #GiB
       }
       tags = {
-        Name                      = "dev-workstation-2_new"
-        Type                      = "dev_workstation"
-        Environment               = "dev"
-        scheduler_mon_fri_ec2     = "true"
+        Name                  = "dev-workstation-2_new"
+        Type                  = "dev_workstation"
+        Environment           = "dev"
+        scheduler_mon_fri_ec2 = "true"
       }
     }
 
@@ -333,10 +333,10 @@ locals {
         volume_size = 200 #GiB
       }
       tags = {
-        Name                      = "dev-workstation-3_new"
-        Type                      = "dev_workstation"
-        Environment               = "dev"
-        scheduler_mon_fri_ec2     = "true"
+        Name                  = "dev-workstation-3_new"
+        Type                  = "dev_workstation"
+        Environment           = "dev"
+        scheduler_mon_fri_ec2 = "true"
       }
     }
   }

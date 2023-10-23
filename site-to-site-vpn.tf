@@ -28,8 +28,8 @@ output "tna-site-to-site-vpn-tgw-attachment-id" {
 
 // START TEMP site-to-site VPN testing with Steve Hirschorn
 resource "aws_route" "tna_steve_hirschorn_test" {
-  route_table_id = module.vpc.private_route_table_ids[0]
+  route_table_id         = module.vpc.private_route_table_ids[0]
   destination_cidr_block = "10.112.41.0/24"
-  transit_gateway_id = local.tna_transit_gateway_id
+  transit_gateway_id     = local.tna_transit_gateway_id
 }
 // END TEMP

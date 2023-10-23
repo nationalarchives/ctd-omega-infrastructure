@@ -222,7 +222,7 @@ resource "aws_s3_object" "puppet_agent_private_key" {
 }
 
 data "aws_iam_instance_profile" "ec2_iam_instance_profile" {
-    name = local.iam_instance_profile
+  name = local.iam_instance_profile
 }
 
 # Puppet Server EC2 Instance Profile
