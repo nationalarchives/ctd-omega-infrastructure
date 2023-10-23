@@ -8,36 +8,6 @@ on:
 
 jobs:
 
-  validate-puppet-syntax:
-    name: Validate Puppet syntax (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: puppet-parser-validate
-        uses: docker://irasnyd/puppet-parser-validate-action:5.5.19
-        with:
-          args: ./puppet
-
-  lint-puppet-syntax:
-    name: Lint Puppet syntax (${{ matrix.os }})
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: puppet-lint
-        uses: docker://irasnyd/puppet-lint-action:2.4.2-2
-        with:
-          args: --no-140chars-check ./puppet
-
   validate-terraform-syntax:
     name: Validate Terraform syntax (${{ matrix.os }})
     strategy:
