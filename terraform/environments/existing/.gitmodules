@@ -1,3 +1,0 @@
-[submodule "terraform/ctd-omega-infrastructure-terraform-state"]
-	path = terraform/ctd-omega-infrastructure-terraform-state
-	url = https://github.com/nationalarchives/ctd-omega-infrastructure-terraform-state.git

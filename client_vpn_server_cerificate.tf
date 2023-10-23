@@ -1,13 +1,13 @@
 data "local_sensitive_file" "project_omega_private_client_vpn_server_private_key_new" {
-  filename = ("../../../ctd-omega-infrastructure-certificates/exported/project-omega-private-client-vpn-server.private.key.pem")
+  filename = ("ctd-omega-infrastructure-certificates/exported/project-omega-private-client-vpn-server.private.key.pem")
 }
 
 data "tls_certificate" "project_omega_private_client_vpn_server_chain_certificate_new" {
-  content = file("../../../ctd-omega-infrastructure-certificates/exported/project-omega-private-client-vpn-server.crt.chain.pem")
+  content = file("ctd-omega-infrastructure-certificates/exported/project-omega-private-client-vpn-server.crt.chain.pem")
 }
 
 data "tls_certificate" "project_omega_private_client_vpn_server_certificate_new" {
-  content = file("../../../ctd-omega-infrastructure-certificates/exported/project-omega-private-client-vpn-server.crt.pem")
+  content = file("ctd-omega-infrastructure-certificates/exported/project-omega-private-client-vpn-server.crt.pem")
 }
 
 resource "aws_acm_certificate" "client_vpn_server_certificate_new" {
