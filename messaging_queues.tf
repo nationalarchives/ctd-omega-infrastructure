@@ -377,3 +377,139 @@ data "aws_iam_policy_document" "pace001_reply001_receive_policy" {
     }
   }
 }
+
+
+## TODO(AR) The `STUB001_REQUEST001` queue below is needed in the short-term for the `ctd-omega-editorial-frontend` application but will soon become unecessary
+
+# The 'STUB001_REQUEST001' queue
+resource "aws_sqs_queue" "stub001_request001" {
+  name                       = "STUB001_REQUEST001"
+  delay_seconds              = 0
+  max_message_size           = 1024    # 1KB
+  message_retention_seconds  = 1209600 # 14 days
+  receive_wait_time_seconds  = 0
+  visibility_timeout_seconds = 30
+  sqs_managed_sse_enabled    = true
+
+  redrive_policy = jsonencode({
+    deadLetterTargetArn = aws_sqs_queue.dead_letter_queue.arn
+    maxReceiveCount     = 3
+  })
+
+  tags = {
+    Type        = "sqs_queue"
+    Direction   = "request"
+    Priority    = "general"
+    Environment = "mvpbeta"
+  }
+}
+
+resource "aws_sqs_queue_policy" "stub001_request001_policy" {
+  queue_url = aws_sqs_queue.stub001_request001.id
+  policy    = data.aws_iam_policy_document.stub001_request001_policy.json
+}
+
+data "aws_iam_policy_document" "stub001_request001_policy" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.stub001_request001_metadata_policy.json,
+    data.aws_iam_policy_document.stub001_request001_send_policy.json,
+    data.aws_iam_policy_document.stub001_request001_receive_policy.json
+  ]
+}
+
+# Allow retrieval of metadata about queue `STUB001_REQUEST001` by `web-app-1`, and dev workstations
+data "aws_iam_policy_document" "stub001_request001_metadata_policy" {
+
+  statement {
+    sid    = "Stub001Request001Metadata"
+    effect = "Allow"
+
+    actions = [
+      "sqs:GetQueueUrl"
+    ]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+
+        # TODO(AR) use a loop to produce this
+        module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+        module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+        module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
+      ]
+    }
+
+    resources = [aws_sqs_queue.stub001_request001.arn]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["true"]
+    }
+  }
+}
+
+# Allow Sending messages to queue `STUB001_REQUEST001` by `web-app-1`, and dev workstations
+data "aws_iam_policy_document" "stub001_request001_send_policy" {
+  statement {
+    sid    = "Stub001Request001Send"
+    effect = "Allow"
+
+    actions = ["sqs:SendMessage"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+
+        # TODO(AR) use a loop to produce this
+        module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+        module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+        module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
+      ]
+    }
+
+    resources = [aws_sqs_queue.stub001_request001.arn]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["true"]
+    }
+  }
+}
+
+# Allow Receiving messages from queue `STUB001_REQUEST001` by `web-app-1`, and dev workstations
+data "aws_iam_policy_document" "stub001_request001_receive_policy" {
+  statement {
+    sid    = "Stub001Request001Receive"
+    effect = "Allow"
+
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:ChangeMessageVisibility", // NOTE(AR) needed to ACK the message
+      "sqs:DeleteMessage"            // NOTE(AR) needed to pop the message off the queue
+    ]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+
+        # TODO(AR) use a loop to produce this
+        module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
+        module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
+        module.ec2_instance["dev_workstation_3"].ec2_iam_instance_profile_role_arn
+      ]
+    }
+
+    resources = [aws_sqs_queue.stub001_request001.arn]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["true"]
+    }
+  }
+}
