@@ -108,3 +108,27 @@ output "omega_private_omg_dns_servers" {
   description = "DNS Servers for Omega internal environment"
   value       = aws_route53_zone.omega_private_omg_dns.name_servers
 }
+
+resource "aws_route53_record" "dns_cname_www_in_omg_catalogue_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
+  name    = "www.${local.private_omg_dns_domain}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["web-proxy-1.${local.private_omg_dns_domain}"]
+}
+
+resource "aws_route53_record" "dns_cname_cms_in_omg_catalogue_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
+  name    = "cms.${local.private_omg_dns_domain}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["web-proxy-1.${local.private_omg_dns_domain}"]
+}
+
+resource "aws_route53_record" "dns_cname_www_cms_in_omg_catalogue_nationalarchives_gov_uk" {
+  zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
+  name    = "www.cms.${local.private_omg_dns_domain}"
+  type    = "CNAME"
+  ttl     = "300"
+  records = ["web-proxy-1.${local.private_omg_dns_domain}"]
+}
