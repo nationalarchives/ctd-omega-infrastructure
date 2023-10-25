@@ -587,6 +587,24 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
+      # allow IPv4 Play (HTTPS) traffic in from vpc_private_tna_net_subnet_mvpbeta
+      rule_number = 501
+      rule_action = "allow"
+      from_port   = 9443
+      to_port     = 9443
+      protocol    = "tcp"
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+    },
+    {
+      # allow IPv6 Play (HTTPS) traffic in from vpc_private_tna_net_subnet_mvpbeta
+      rule_number     = 507
+      rule_action     = "allow"
+      from_port       = 9443
+      to_port         = 9443
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+    },
+    {
       # allow IPv4 TSQL traffic in from vpc_private_subnet_dev_general
       rule_number = 600
       rule_action = "allow"
@@ -827,7 +845,7 @@ module "vpc" {
       from_port   = 9443
       to_port     = 9443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv6 Play (HTTPS) traffic out to vpc_private_subnet_mvpbeta_web
@@ -836,7 +854,7 @@ module "vpc" {
       from_port       = 9443
       to_port         = 9443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv4 TSQL traffic out to vpc_private_subnet_dev_databases
