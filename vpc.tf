@@ -840,7 +840,7 @@ module "vpc" {
     },
     {
       # allow IPv4 Play (HTTPS) traffic out to vpc_private_subnet_mvpbeta_web
-      rule_number = 500
+      rule_number = 501
       rule_action = "allow"
       from_port   = 9443
       to_port     = 9443
@@ -849,7 +849,7 @@ module "vpc" {
     },
     {
       # allow IPv6 Play (HTTPS) traffic out to vpc_private_subnet_mvpbeta_web
-      rule_number     = 506
+      rule_number     = 507
       rule_action     = "allow"
       from_port       = 9443
       to_port         = 9443
