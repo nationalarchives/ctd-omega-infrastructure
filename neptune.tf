@@ -105,9 +105,16 @@ module "dev_neptune_cluster_a_security_group" {
       to_port     = 8182
       protocol    = "tcp"
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    },
+    {
+      description = "Neptune from services-api-1"
+      from_port   = 8182
+      to_port     = 8182
+      protocol    = "tcp"
+      cidr_blocks = "${local.ec2_instances.services_api_1.ipv4_address}/32" # NOTE: restricted to services-api-1 in vpc_private_subnet_mvpbeta_services
     }
   ]
-  number_of_computed_ingress_with_cidr_blocks = 1
+  number_of_computed_ingress_with_cidr_blocks = 2
 
   computed_ingress_with_ipv6_cidr_blocks = [
     {
@@ -116,9 +123,16 @@ module "dev_neptune_cluster_a_security_group" {
       to_port          = 8182
       protocol         = "tcp"
       ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+    },
+    {
+      description      = "Neptune (IPv6) from services-api-1"
+      from_port        = 8182
+      to_port          = 8182
+      protocol         = "tcp"
+      ipv6_cidr_blocks = "${module.ec2_instance["services_api_1"].ec2_private_ipv6}/128" # NOTE: restricted to services-api-1 in vpc_private_subnet_mvpbeta_services (IPv6)
     }
   ]
-  number_of_computed_ingress_with_ipv6_cidr_blocks = 1
+  number_of_computed_ingress_with_ipv6_cidr_blocks = 2
 
   egress_with_cidr_blocks = [
     {
