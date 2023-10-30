@@ -1,7 +1,3 @@
-# resource "aws_iam_service_linked_role" "neptune_service_linked_role" {
-#   aws_service_name = "rds.amazonaws.com"  // TODO(AR) should this be 'neptune.amazonaws.com'?
-# }
-
 resource "aws_iam_role" "neptune_service_role" {
   name               = "NeptuneServiceLinked"
   assume_role_policy = data.aws_iam_policy_document.neptune_service_assume_role_policy.json
@@ -18,7 +14,7 @@ data "aws_iam_policy_document" "neptune_service_assume_role_policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["rds.amazonaws.com"] // TODO(AR) should this be 'neptune.amazonaws.com'?
+      identifiers = ["rds.amazonaws.com"]
     }
   }
 }
