@@ -47,41 +47,6 @@ data "aws_iam_policy_document" "neptune_service_role_policy" {
   }
 }
 
-
-# Create neptune user
-
-resource "aws_iam_user" "neptune_user" {
-  name = "neptune_user"
-  path = "/neptune/"
-}
-
-resource "aws_iam_access_key" "neptune_user" {
-  user = aws_iam_user.neptune_user.name
-}
-
-resource "aws_iam_user_policy" "neptune_user_rw" {
-  name = "neptuneuserpolicy"
-  user = aws_iam_user.neptune_user.name
-
-  policy = data.aws_iam_policy_document.neptune_user_rw_policy.json
-}
-
-data "aws_iam_policy_document" "neptune_user_rw_policy" {
-  statement {
-    actions = [
-      # aws_iam_role.neptune_service_role.name,  // TODO(AR) should this also go in here?
-      "iam:AmazonVPCFullAccess",
-      "iam:NeptuneFullAccess",
-      "iam:NeptuneConsoleFullAccess"
-    ]
-
-    resources = [
-      "*"
-    ]
-  }
-}
-
-
 resource "aws_iam_policy" "neptune_sparql_read_write_policy" {
   name        = "neptune_sparql_read_write_policy"
   path        = "/neptune/"
