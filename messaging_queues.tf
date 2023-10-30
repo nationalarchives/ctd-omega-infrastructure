@@ -9,12 +9,13 @@
 # The Dead Letter Queue
 resource "aws_sqs_queue" "dead_letter_queue" {
   name                       = "deadletter"
-  delay_seconds              = 0
-  max_message_size           = 262144  # 256KB
-  message_retention_seconds  = 1209600 # 14 days
-  receive_wait_time_seconds  = 0
-  visibility_timeout_seconds = 30
-  sqs_managed_sse_enabled    = true
+
+  delay_seconds              = local.default_sqs_queue_settings.delay_seconds
+  max_message_size           = local.default_sqs_queue_settings.max_message_size
+  message_retention_seconds  = local.default_sqs_queue_settings.message_retention_seconds
+  receive_wait_time_seconds  = local.default_sqs_queue_settings.receive_wait_time_seconds
+  visibility_timeout_seconds = local.default_sqs_queue_settings.visibility_timeout_seconds
+  sqs_managed_sse_enabled    = local.default_sqs_queue_settings.sqs_managed_sse_enabled
 
   redrive_allow_policy = jsonencode({
     redrivePermission = "allowAll"
@@ -31,12 +32,13 @@ resource "aws_sqs_queue" "dead_letter_queue" {
 # The 'PACS001_REQUEST001' queue
 resource "aws_sqs_queue" "pacs001_request001" {
   name                       = "PACS001_REQUEST001"
-  delay_seconds              = 0
-  max_message_size           = 1024    # 1KB
-  message_retention_seconds  = 1209600 # 14 days
-  receive_wait_time_seconds  = 0
-  visibility_timeout_seconds = 30
-  sqs_managed_sse_enabled    = true
+
+  delay_seconds              = local.default_sqs_queue_settings.delay_seconds
+  max_message_size           = local.default_sqs_queue_settings.max_message_size
+  message_retention_seconds  = local.default_sqs_queue_settings.message_retention_seconds
+  receive_wait_time_seconds  = local.default_sqs_queue_settings.receive_wait_time_seconds
+  visibility_timeout_seconds = local.default_sqs_queue_settings.visibility_timeout_seconds
+  sqs_managed_sse_enabled    = local.default_sqs_queue_settings.sqs_managed_sse_enabled
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dead_letter_queue.arn
@@ -54,12 +56,13 @@ resource "aws_sqs_queue" "pacs001_request001" {
 # The 'PACE001_REPLY001' queue
 resource "aws_sqs_queue" "pace001_reply001" {
   name                       = "PACE001_REPLY001"
-  delay_seconds              = 0
-  max_message_size           = 1024    # 1KB
-  message_retention_seconds  = 1209600 # 14 days
-  receive_wait_time_seconds  = 0
-  visibility_timeout_seconds = 30
-  sqs_managed_sse_enabled    = true
+
+  delay_seconds              = local.default_sqs_queue_settings.delay_seconds
+  max_message_size           = local.default_sqs_queue_settings.max_message_size
+  message_retention_seconds  = local.default_sqs_queue_settings.message_retention_seconds
+  receive_wait_time_seconds  = local.default_sqs_queue_settings.receive_wait_time_seconds
+  visibility_timeout_seconds = local.default_sqs_queue_settings.visibility_timeout_seconds
+  sqs_managed_sse_enabled    = local.default_sqs_queue_settings.sqs_managed_sse_enabled
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dead_letter_queue.arn
@@ -384,12 +387,13 @@ data "aws_iam_policy_document" "pace001_reply001_receive_policy" {
 # The 'STUB001_REQUEST001' queue
 resource "aws_sqs_queue" "stub001_request001" {
   name                       = "STUB001_REQUEST001"
-  delay_seconds              = 0
-  max_message_size           = 1024    # 1KB
-  message_retention_seconds  = 1209600 # 14 days
-  receive_wait_time_seconds  = 0
-  visibility_timeout_seconds = 30
-  sqs_managed_sse_enabled    = true
+
+  delay_seconds              = local.default_sqs_queue_settings.delay_seconds
+  max_message_size           = local.default_sqs_queue_settings.max_message_size
+  message_retention_seconds  = local.default_sqs_queue_settings.message_retention_seconds
+  receive_wait_time_seconds  = local.default_sqs_queue_settings.receive_wait_time_seconds
+  visibility_timeout_seconds = local.default_sqs_queue_settings.visibility_timeout_seconds
+  sqs_managed_sse_enabled    = local.default_sqs_queue_settings.sqs_managed_sse_enabled
 
   redrive_policy = jsonencode({
     deadLetterTargetArn = aws_sqs_queue.dead_letter_queue.arn

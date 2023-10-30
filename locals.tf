@@ -112,6 +112,15 @@ locals {
   s3_bucket_name_puppet_certificates = "puppet-certificates"
   s3_bucket_name_scratch_space = "ctd-scratch-space"
 
+  default_sqs_queue_settings = {
+      delay_seconds              = 0
+      max_message_size           = 262144  # 256 KB
+      message_retention_seconds  = 1209600 # 14 days
+      receive_wait_time_seconds  = 0
+      visibility_timeout_seconds = 30
+      sqs_managed_sse_enabled    = true
+  }
+
   default_certificate_subject = {
     organizational_unit = "The Cataloguing, Taxonomy, and Data Team"
     organization        = "The National Archives"
