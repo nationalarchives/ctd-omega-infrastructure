@@ -66,3 +66,5 @@ data "aws_key_pair" "omega_admin_key_pair" {
     values = ["key_pair"]
   }
 }
+
+data "aws_caller_identity" "current" {}

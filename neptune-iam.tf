@@ -80,3 +80,76 @@ data "aws_iam_policy_document" "neptune_user_rw_policy" {
     ]
   }
 }
+
+
+resource "aws_iam_policy" "neptune_sparql_read_write_policy" {
+  name        = "neptune_sparql_read_write_policy"
+  path        = "/neptune/"
+  description = "SPARQL Read-Write policy"
+
+  policy = data.aws_iam_policy_document.neptune_sparql_read_write_policy.json
+}
+
+resource "aws_iam_policy" "neptune_sparql_read_only_policy" {
+  name        = "neptune_sparql_read_only_policy"
+  path        = "/neptune/"
+  description = "SPARQL Read-only policy"
+
+  policy = data.aws_iam_policy_document.neptune_sparql_read_only_policy.json
+}
+
+resource "aws_iam_policy" "neptune_sparql_write_only_policy" {
+  name        = "neptune_sparql_write_only_policy"
+  path        = "/neptune/"
+  description = "SPARQL Write-only policy"
+
+  policy = data.aws_iam_policy_document.neptune_sparql_write_only_policy.json
+}
+
+# Neptune Read-Write SPARQL Query Policy
+data "aws_iam_policy_document" "neptune_sparql_read_write_policy" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.neptune_sparql_read_only_policy.json,
+    data.aws_iam_policy_document.neptune_sparql_write_only_policy.json,
+  ]
+}
+
+# Neptune Read Only SPARQL Query Policy
+data "aws_iam_policy_document" "neptune_sparql_read_only_policy" {
+    statement {
+      actions = [
+        "neptune-db:ReadDataViaQuery",
+        "neptune-db:GetQueryStatus"
+      ]
+
+      resources = [
+        "arn:aws:neptune-db:${local.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_neptune_cluster.dev_neptune_cluster_a.cluster_resource_id}/*"
+      ]
+
+      condition {
+        test = "StringEquals"
+        variable = "neptune-db:QueryLanguage"
+        values = ["Sparql"]
+      }
+    }
+}
+
+# Neptune Write Only SPARQL Query Policy
+data "aws_iam_policy_document" "neptune_sparql_write_only_policy" {
+    statement {
+      actions = [
+        "neptune-db:WriteDataViaQuery",
+        "neptune-db:GetQueryStatus"
+      ]
+
+      resources = [
+        "arn:aws:neptune-db:${local.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_neptune_cluster.dev_neptune_cluster_a.cluster_resource_id}/*"
+      ]
+
+      condition {
+        test = "StringEquals"
+        variable = "neptune-db:QueryLanguage"
+        values = ["Sparql"]
+      }
+    }
+}

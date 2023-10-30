@@ -247,6 +247,9 @@ locals {
       security_groups = [
         module.mvpbeta_services_api_security_group.security_group_id
       ]
+      additional_iam_policies = [
+        aws_iam_policy.neptune_sparql_read_write_policy.arn
+      ]
       root_block_device = {
         volume_size = 8 #GiB
       }
