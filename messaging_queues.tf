@@ -330,6 +330,9 @@ data "aws_iam_policy_document" "pace001_reply001_send_policy" {
       identifiers = [
         module.ec2_instance["services_api_1"].ec2_iam_instance_profile_role_arn,
 
+        ## TODO(AR) This is needed in the short-term for the `ctd-omega-editorial-frontend` application's StubServer but will soon become unecessary
+        module.ec2_instance["web_app_1"].ec2_iam_instance_profile_role_arn,
+
         # TODO(AR) use a loop to produce this
         module.ec2_instance["dev_workstation_1"].ec2_iam_instance_profile_role_arn,
         module.ec2_instance["dev_workstation_2"].ec2_iam_instance_profile_role_arn,
