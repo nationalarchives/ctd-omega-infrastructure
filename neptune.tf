@@ -48,6 +48,11 @@ resource "aws_neptune_cluster" "dev_neptune_cluster_a" {
 resource "aws_neptune_cluster_parameter_group" "dev_neptune_cluster_a" {
   name   = local.neptune_dev_cluster_a.id
   family = "neptune1.2"
+
+  parameter {
+    name  = "neptune_enable_audit_log"
+    value = 1
+  }
 }
 
 resource "aws_neptune_cluster_instance" "dev_neptune_cluster_a_instance" {
