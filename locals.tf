@@ -108,17 +108,17 @@ locals {
   ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
 
   # S3 Buckets
-  s3_bucket_name_neptune_loader = "ctd-neptune-loader"
+  s3_bucket_name_neptune_loader      = "ctd-neptune-loader"
   s3_bucket_name_puppet_certificates = "puppet-certificates"
-  s3_bucket_name_scratch_space = "ctd-scratch-space"
+  s3_bucket_name_scratch_space       = "ctd-scratch-space"
 
   default_sqs_queue_settings = {
-      delay_seconds              = 0
-      max_message_size           = 262144  # 256 KB
-      message_retention_seconds  = 1209600 # 14 days
-      receive_wait_time_seconds  = 0
-      visibility_timeout_seconds = 30
-      sqs_managed_sse_enabled    = true
+    delay_seconds              = 0
+    max_message_size           = 262144  # 256 KB
+    message_retention_seconds  = 1209600 # 14 days
+    receive_wait_time_seconds  = 0
+    visibility_timeout_seconds = 30
+    sqs_managed_sse_enabled    = true
   }
 
   default_certificate_subject = {

@@ -8,7 +8,7 @@
 
 # The Dead Letter Queue
 resource "aws_sqs_queue" "dead_letter_queue" {
-  name                       = "deadletter"
+  name = "deadletter"
 
   delay_seconds              = local.default_sqs_queue_settings.delay_seconds
   max_message_size           = local.default_sqs_queue_settings.max_message_size
@@ -31,7 +31,7 @@ resource "aws_sqs_queue" "dead_letter_queue" {
 
 # The 'PACS001_REQUEST001' queue
 resource "aws_sqs_queue" "pacs001_request001" {
-  name                       = "PACS001_REQUEST001"
+  name = "PACS001_REQUEST001"
 
   delay_seconds              = local.default_sqs_queue_settings.delay_seconds
   max_message_size           = local.default_sqs_queue_settings.max_message_size
@@ -55,7 +55,7 @@ resource "aws_sqs_queue" "pacs001_request001" {
 
 # The 'PACE001_REPLY001' queue
 resource "aws_sqs_queue" "pace001_reply001" {
-  name                       = "PACE001_REPLY001"
+  name = "PACE001_REPLY001"
 
   delay_seconds              = local.default_sqs_queue_settings.delay_seconds
   max_message_size           = local.default_sqs_queue_settings.max_message_size
@@ -389,7 +389,7 @@ data "aws_iam_policy_document" "pace001_reply001_receive_policy" {
 
 # The 'STUB001_REQUEST001' queue
 resource "aws_sqs_queue" "stub001_request001" {
-  name                       = "STUB001_REQUEST001"
+  name = "STUB001_REQUEST001"
 
   delay_seconds              = local.default_sqs_queue_settings.delay_seconds
   max_message_size           = local.default_sqs_queue_settings.max_message_size

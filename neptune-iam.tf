@@ -77,40 +77,40 @@ data "aws_iam_policy_document" "neptune_sparql_read_write_policy" {
 
 # Neptune Read Only SPARQL Query Policy
 data "aws_iam_policy_document" "neptune_sparql_read_only_policy" {
-    statement {
-      actions = [
-        "neptune-db:ReadDataViaQuery",
-        "neptune-db:GetQueryStatus"
-      ]
+  statement {
+    actions = [
+      "neptune-db:ReadDataViaQuery",
+      "neptune-db:GetQueryStatus"
+    ]
 
-      resources = [
-        "arn:aws:neptune-db:${local.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_neptune_cluster.dev_neptune_cluster_a.cluster_resource_id}/*"
-      ]
+    resources = [
+      "arn:aws:neptune-db:${local.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_neptune_cluster.dev_neptune_cluster_a.cluster_resource_id}/*"
+    ]
 
-      condition {
-        test = "StringEquals"
-        variable = "neptune-db:QueryLanguage"
-        values = ["Sparql"]
-      }
+    condition {
+      test     = "StringEquals"
+      variable = "neptune-db:QueryLanguage"
+      values   = ["Sparql"]
     }
+  }
 }
 
 # Neptune Write Only SPARQL Query Policy
 data "aws_iam_policy_document" "neptune_sparql_write_only_policy" {
-    statement {
-      actions = [
-        "neptune-db:WriteDataViaQuery",
-        "neptune-db:GetQueryStatus"
-      ]
+  statement {
+    actions = [
+      "neptune-db:WriteDataViaQuery",
+      "neptune-db:GetQueryStatus"
+    ]
 
-      resources = [
-        "arn:aws:neptune-db:${local.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_neptune_cluster.dev_neptune_cluster_a.cluster_resource_id}/*"
-      ]
+    resources = [
+      "arn:aws:neptune-db:${local.aws_region}:${data.aws_caller_identity.current.account_id}:${aws_neptune_cluster.dev_neptune_cluster_a.cluster_resource_id}/*"
+    ]
 
-      condition {
-        test = "StringEquals"
-        variable = "neptune-db:QueryLanguage"
-        values = ["Sparql"]
-      }
+    condition {
+      test     = "StringEquals"
+      variable = "neptune-db:QueryLanguage"
+      values   = ["Sparql"]
     }
+  }
 }
