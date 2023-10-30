@@ -107,9 +107,10 @@ locals {
   /* IP address of the private Route53 DNS Server in the VPC */
   ipv4_vpc_dns_server = cidrhost(local.vpc_cidr_block, 2) # see: https://docs.aws.amazon.com/vpc/latest/userguide/subnet-sizing.html
 
-  s3_bucket_name_scratch_space = "ctd-scratch-space"
-
+  # S3 Buckets
+  s3_bucket_name_neptune_loader = "ctd-neptune-loader"
   s3_bucket_name_puppet_certificates = "puppet-certificates"
+  s3_bucket_name_scratch_space = "ctd-scratch-space"
 
   default_certificate_subject = {
     organizational_unit = "The Cataloguing, Taxonomy, and Data Team"
@@ -119,8 +120,6 @@ locals {
     country             = "GB"
     postal_code         = "TW9 4DU"
   }
-
-  s3_bucket_name_neptune_loader = "ctd-neptune-loader"
 
   neptune_dev_cluster_a = {
     id                = "dev-neptune-cluster-a"
