@@ -5,7 +5,10 @@ locals {
   aws_region = "eu-west-2"
   aws_azs    = ["${local.aws_region}a", "${local.aws_region}b"]
 
-  /* ID of the The National Archives Transit Gateway which we use for site-to-site VPN */
+  /* ID of The National Archives 'intersite' VPC which we use for relaying Route53 DNS to on-premise */
+  tna_intersite_vpc_id = "vpc-09fdc740f422062f5"
+
+  /* ID of The National Archives Transit Gateway which we use for site-to-site VPN */
   tna_transit_gateway_id = "tgw-0213325c898e4df09"
 
   public_dns_domain      = "catalogue.nationalarchives.gov.uk"

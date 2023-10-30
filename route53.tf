@@ -62,6 +62,12 @@ resource "aws_route53_zone" "omega_private_omg_dns" {
   }
 }
 
+# NOTE(AR) - Authorises TNA's 'intersite' VPC to associate with our `omg.catalogue.nationalarchives.gov.uk` DNS zone
+resource "aws_route53_vpc_association_authorization" "omega_private_omg_dns_to_tna_intersite" {
+  zone_id = aws_route53_zone.omega_private_omg_dns.zone_id
+  vpc_id  = local.tna_intersite_vpc_id
+}
+
 module "omega_private_ipv4_omg_reverse_dns_name" {
   source = "./reverse-ipv4-address"
 
