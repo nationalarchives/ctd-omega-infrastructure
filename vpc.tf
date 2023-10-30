@@ -780,13 +780,13 @@ module "vpc" {
       cidr_block  = "${local.ec2_puppet_server_instances.puppet_server_1.ipv4_address}/32" # NOTE: restricted to puppet-server-1 in vpc_private_subnet_management
     },
     {
-      # allow IPv6 Puppet traffic out to vpc_private_subnet_management
+      # allow IPv6 Puppet traffic out to puppet-server-1 in vpc_private_subnet_management
       rule_number     = 806
       rule_action     = "allow"
       from_port       = 8140
       to_port         = 8140
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      ipv6_cidr_block = "${module.ec2_puppet_server_instance["puppet_server_1"].ec2_private_ipv6}/128" # NOTE: restricted to puppet-server-1 in vpc_private_subnet_management
     },
     {
       # allow IPv4 RDP traffic out to vpc_private_subnet_dev_general

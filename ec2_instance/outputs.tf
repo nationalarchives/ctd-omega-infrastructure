@@ -3,6 +3,16 @@ output "ec2_instance_arn" {
   value       = aws_instance.ec2_instance.arn
 }
 
+output "ec2_private_ip" {
+  description = "The IPv4 address of the created EC2 instance"
+  value = data.aws_network_interface.ec2_instance_private_interface.private_ip
+}
+
+output "ec2_private_ipv6" {
+  description = "The IPv6 address of the created EC2 instance"
+  value = tolist(data.aws_network_interface.ec2_instance_private_interface.ipv6_addresses)[0]
+}
+
 output "ec2_iam_instance_profile_arn" {
   description = "The ARN of the assigned IAM Instance Profile assigned to the EC2 host"
   value       = data.aws_iam_instance_profile.ec2_iam_instance_profile.arn
