@@ -22,6 +22,7 @@ module "vpc" {
   private_subnet_private_dns_hostname_type_on_launch            = "resource-name"
   private_subnet_enable_resource_name_dns_a_record_on_launch    = true
   private_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
+  private_subnet_enable_dns64                                   = true
   private_subnet_tags = {
     Type = "private_subnet"
   }
@@ -32,6 +33,7 @@ module "vpc" {
   database_subnet_private_dns_hostname_type_on_launch            = "resource-name"
   database_subnet_enable_resource_name_dns_a_record_on_launch    = true
   database_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
+  database_subnet_enable_dns64                                   = true
   database_subnet_tags = {
     Type = "database_subnet"
   }
@@ -42,6 +44,7 @@ module "vpc" {
   intra_subnet_private_dns_hostname_type_on_launch            = "resource-name"
   intra_subnet_enable_resource_name_dns_a_record_on_launch    = true
   intra_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
+  intra_subnet_enable_dns64                                   = true
   intra_subnet_tags = {
     Type = "intra_subnet"
   }
@@ -52,6 +55,7 @@ module "vpc" {
   public_subnet_private_dns_hostname_type_on_launch            = "resource-name"
   public_subnet_enable_resource_name_dns_a_record_on_launch    = true
   public_subnet_enable_resource_name_dns_aaaa_record_on_launch = true
+  public_subnet_enable_dns64                                   = true
   public_subnet_tags = {
     Type = "public_subnet"
   }
