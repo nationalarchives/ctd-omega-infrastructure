@@ -732,103 +732,62 @@ module "vpc" {
   ]
 
   private_outbound_acl_rules = [
+/* START - SSH rules */
     {
+      # Deny SSH (IPv4) access to Intra subnets containing Databases (AZ: a)
       rule_number = 100
-      rule_action = "allow"
+      rule_action = "deny"
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.intra_subnets_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_a]
     },
     {
-      rule_number     = 106
-      rule_action     = "allow"
-      from_port       = 22
-      to_port         = 22
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
-    },
-    {
+      # Deny SSH (IPv4) access to Intra subnets containing Databases (AZ: b)
       rule_number = 101
-      rule_action = "allow"
+      rule_action = "deny"
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
+      cidr_block  = module.vpc.intra_subnets_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_b]
     },
     {
+      # Deny SSH (IPv6) access to Intra subnet containing Databases (AZ: a)
+      rule_number     = 106
+      rule_action     = "deny"
+      from_port       = 22
+      to_port         = 22
+      protocol        = "tcp"
+      ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_a]
+    },
+    {
+      # Deny SSH (IPv6) access to Intra subnet containing Databases (AZ: b)
       rule_number     = 107
-      rule_action     = "allow"
+      rule_action     = "deny"
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_b]
     },
     {
-      rule_number = 120
+      # Allow SSH (IPv4) access to all other VPC subnets
+      rule_number = 102
       rule_action = "allow"
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
+      cidr_block  = module.vpc.vpc_cidr_block
     },
     {
-      rule_number     = 126
+      # Allow SSH (IPv6) access to all other VPC subnets
+      rule_number     = 108
       rule_action     = "allow"
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
+      ipv6_cidr_block = module.vpc.vpc_ipv6_cidr_block
     },
-    {
-      rule_number = 140
-      rule_action = "allow"
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
-    },
-    {
-      rule_number     = 146
-      rule_action     = "allow"
-      from_port       = 22
-      to_port         = 22
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
-    },
-    {
-      rule_number = 160
-      rule_action = "allow"
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
-    },
-    {
-      rule_number     = 166
-      rule_action     = "allow"
-      from_port       = 22
-      to_port         = 22
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
-    },
-    {
-      rule_number = 180
-      rule_action = "allow"
-      from_port   = 22
-      to_port     = 22
-      protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
-    },
-    {
-      rule_number     = 186
-      rule_action     = "allow"
-      from_port       = 22
-      to_port         = 22
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
-    },
-
+/* END - SSH rules */
     {
       # allow IPv4 Puppet traffic out to puppet-server-1 in vpc_private_subnet_management
       rule_number = 800
@@ -897,6 +856,27 @@ module "vpc" {
       protocol        = "tcp"
       ipv6_cidr_block = "::/0"
     },
+
+    ## TODO(AR) we have hit the limit on the number of NACL rules permitted by AWS, we will need to renumber our subnets for adjacency
+    # {
+    #   # allow IPv4 Play (HTTPS) traffic out to vpc_private_subnet_dev_general
+    #   rule_number = 500
+    #   rule_action = "allow"
+    #   from_port   = 9443
+    #   to_port     = 9443
+    #   protocol    = "tcp"
+    #   cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
+    # },
+    # {
+    #   # allow IPv6 Play (HTTPS) traffic out to vpc_private_subnet_dev_general
+    #   rule_number     = 506
+    #   rule_action     = "allow"
+    #   from_port       = 9443
+    #   to_port         = 9443
+    #   protocol        = "tcp"
+    #   ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
+    # },
+
     {
       # allow IPv4 Play (HTTPS) traffic out to vpc_private_subnet_mvpbeta_web
       rule_number = 501
@@ -970,107 +950,63 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[1] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
     },
 
-    {
-      # allow IPv4 return traffic from vpc_private_subnet_dev_general and vpc_private_subnet_dev_databases
-      rule_number = 1200
-      rule_action = "allow"
-      from_port   = local.linux_ephemeral_port_start
-      to_port     = local.linux_ephemeral_port_end
-      protocol    = "tcp"
-      cidr_block  = "10.129.202.0/23" # TODO(AR) don't hardcode the address here - rearrange subnets so that they are adjacent and use constants defined in locals.tf
-    },
+/* START - Ephemeral return traffic rules */
+    ## TODO(AR) we have hit the limit on the number of NACL rules permitted by AWS, we will need to renumber our subnets for adjacency
     # {
-    #   # allow IPv4 return traffic from vpc_private_subnet_dev_general
+    #   # Deny Ephemeral return traffic (IPv4) from Intra subnets containing Databases (AZ: a)
     #   rule_number = 1200
-    #   rule_action = "allow"
+    #   rule_action = "deny"
     #   from_port   = local.linux_ephemeral_port_start
     #   to_port     = local.linux_ephemeral_port_end
     #   protocol    = "tcp"
-    #   cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
+    #   cidr_block  = module.vpc.intra_subnets_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_a]
     # },
-    #  {
-    #   # allow IPv4 return traffic from vpc_private_subnet_dev_databases
+    # {
+    #   # Deny Ephemeral return traffic (IPv4) from Intra subnets containing Databases (AZ: b)
     #   rule_number = 1201
-    #   rule_action = "allow"
+    #   rule_action = "deny"
     #   from_port   = local.linux_ephemeral_port_start
     #   to_port     = local.linux_ephemeral_port_end
     #   protocol    = "tcp"
-    #   cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
+    #   cidr_block  = module.vpc.intra_subnets_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_b]
     # },
-
+    # {
+    #   # Deny Ephemeral return traffic (IPv6) from Intra subnets containing Databases (AZ: a)
+    #   rule_number     = 1206
+    #   rule_action     = "deny"
+    #   from_port       = local.linux_ephemeral_port_start
+    #   to_port         = local.linux_ephemeral_port_end
+    #   protocol        = "tcp"
+    #   ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_a]
+    # },
+    # {
+    #   # Deny Ephemeral return traffic (IPv6) from Intra subnets containing Databases (AZ: b)
+    #   rule_number     = 1207
+    #   rule_action     = "deny"
+    #   from_port       = local.linux_ephemeral_port_start
+    #   to_port         = local.linux_ephemeral_port_end
+    #   protocol        = "tcp"
+    #   ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_b]
+    # },
     {
-      # allow IPv6 return traffic from vpc_private_subnet_dev_general
-      rule_number     = 1206
-      rule_action     = "allow"
-      from_port       = local.linux_ephemeral_port_start
-      to_port         = local.linux_ephemeral_port_end
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
-    },
-    {
-      # allow IPv6 return traffic from vpc_private_subnet_dev_databases
-      rule_number     = 1207
-      rule_action     = "allow"
-      from_port       = local.linux_ephemeral_port_start
-      to_port         = local.linux_ephemeral_port_end
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.database_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
-    },
-
-    {
-      # allow IPv4 return traffic from vpc_private_subnet_mvpbeta_web
-      rule_number = 1240
+      # Allow Ephemeral return traffic (IPv4) from all other VPC subnets
+      rule_number = 1203
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.vpc_cidr_block
     },
     {
-      # allow IPv6 return traffic from vpc_private_subnet_mvpbeta_web
-      rule_number     = 1246
-      rule_action     = "allow"
-      from_port       = local.linux_ephemeral_port_start
-      to_port         = local.linux_ephemeral_port_end
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
-    },
-    {
-      # allow IPv4 return traffic from vpc_private_subnet_mvpbeta_services
-      rule_number = 1260
+      # Allow Ephemeral return traffic (IPv6) from all other VPC subnets
+      rule_number = 1208
       rule_action = "allow"
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      ipv6_cidr_block  = module.vpc.vpc_ipv6_cidr_block
     },
-    {
-      # allow IPv6 return traffic from vpc_private_subnet_mvpbeta_services
-      rule_number     = 1266
-      rule_action     = "allow"
-      from_port       = local.linux_ephemeral_port_start
-      to_port         = local.linux_ephemeral_port_end
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
-    },
-    {
-      # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta
-      rule_number = 1280
-      rule_action = "allow"
-      from_port   = local.linux_ephemeral_port_start
-      to_port     = local.linux_ephemeral_port_end
-      protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
-    },
-    {
-      # allow IPv6 return traffic from vpc_private_tna_net_subnet_mvpbeta
-      rule_number     = 1286
-      rule_action     = "allow"
-      from_port       = local.linux_ephemeral_port_start
-      to_port         = local.linux_ephemeral_port_end
-      protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
-    },
+/* END - Ephemeral return traffic rules */
 
 /* START - TNA Staff Networks (via Transit Gateway - Site-to-Site VPN) */
     {
