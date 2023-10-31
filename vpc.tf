@@ -663,17 +663,72 @@ module "vpc" {
       ipv6_cidr_block = "::/0"
     },
 
-    // START TEMP site-to-site VPN testing with Steve Hirschorn
+/* START - TNA Staff Networks (via Transit Gateway - Site-to-Site VPN) */
     {
-      # allow incoming HTTPS IPv4 traffic from Steve
-      rule_number = 1000
+      rule_number = 1300
       rule_action = "allow"
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = "10.112.41.0/24"
+      cidr_block  = local.tna_staff_network_citrix_cidr
     },
-    // END TEMP
+    {
+      rule_number = 1301
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_in_domain_cidr
+    },
+    {
+      rule_number = 1302
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_staff_wifi_cidr
+    },
+    {
+      rule_number = 1303
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_servers_cidr
+    },
+    {
+      rule_number = 1304
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_1_cidr
+    },
+    {
+      rule_number = 1305
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_2_cidr
+    },
+    {
+      rule_number = 1306
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_3_cidr
+    },
+    {
+      rule_number = 1307
+      rule_action = "allow"
+      from_port   = 443
+      to_port     = 443
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_staff_vpn_cidr
+    }
+/* END - TNA Staff Networks (via Transit Gateway - Site-to-Site VPN) */
   ]
 
   private_outbound_acl_rules = [
@@ -1017,17 +1072,72 @@ module "vpc" {
       ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
 
-    // START TEMP site-to-site VPN testing with Steve Hirschorn
+/* START - TNA Staff Networks (via Transit Gateway - Site-to-Site VPN) */
     {
-      # allow results from HTTPS IPv4 traffic back to Steve
       rule_number = 1300
       rule_action = "allow"
       from_port   = local.unpriviledged_port_start
       to_port     = local.unpriviledged_port_end
       protocol    = "tcp"
-      cidr_block  = "10.112.41.0/24"
+      cidr_block  = local.tna_staff_network_citrix_cidr
     },
-    // END TEMP
+    {
+      rule_number = 1301
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_in_domain_cidr
+    },
+    {
+      rule_number = 1302
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_staff_wifi_cidr
+    },
+    {
+      rule_number = 1303
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_servers_cidr
+    },
+    {
+      rule_number = 1304
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_1_cidr
+    },
+    {
+      rule_number = 1305
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_2_cidr
+    },
+    {
+      rule_number = 1306
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_web_domain_3_cidr
+    },
+    {
+      rule_number = 1307
+      rule_action = "allow"
+      from_port   = local.unpriviledged_port_start
+      to_port     = local.unpriviledged_port_end
+      protocol    = "tcp"
+      cidr_block  = local.tna_staff_network_staff_vpn_cidr
+    }
+/* END - TNA Staff Networks (via Transit Gateway - Site-to-Site VPN) */
   ]
 
   vpc_tags = {

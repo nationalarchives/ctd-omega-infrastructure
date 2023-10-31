@@ -26,10 +26,11 @@ output "tna-site-to-site-vpn-tgw-attachment-id" {
   description = "The ID of Project Omega's Transit Gateway Attachment to the TNA Site-to-Site VPN"
 }
 
-// START TEMP site-to-site VPN testing with Steve Hirschorn
-resource "aws_route" "tna_steve_hirschorn_test" {
+/* TNA Staff Networks (via Transit Gateway - Site-to-Site VPN) */
+resource "aws_route" "tna_staff_network" {
+  count = length(local.tna_staff_network_cidrs)
+
   route_table_id         = module.vpc.private_route_table_ids[0]
-  destination_cidr_block = "10.112.41.0/24"
+  destination_cidr_block = local.tna_staff_network_cidrs[count.index]
   transit_gateway_id     = local.tna_transit_gateway_id
 }
-// END TEMP

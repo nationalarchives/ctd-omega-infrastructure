@@ -315,16 +315,13 @@ module "mvpbeta_web_proxy_security_group" {
       protocol    = "tcp"
       cidr_blocks = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
-
-    // START TEMP site-to-site VPN testing with Steve Hirschorn
     {
-      description = "HTTPS testing from Steve Hirschorn"
+      description = "HTTPS from TNA Staff Networks (via Transit Gateway - Site-to-Site VPN)"
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_blocks = "10.112.41.0/24"
+      cidr_blocks = join(",", local.tna_staff_network_cidrs)
     }
-    // END TEMP
   ]
   number_of_computed_ingress_with_cidr_blocks = 4
 

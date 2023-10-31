@@ -11,6 +11,26 @@ locals {
   /* ID of The National Archives Transit Gateway which we use for site-to-site VPN */
   tna_transit_gateway_id = "tgw-0213325c898e4df09"
 
+  /* CIDR network addresses to cover networks used by Staff at The National Archives */
+  tna_staff_network_citrix_cidr             = "10.96.46.0/24"   # Citrix
+  tna_staff_network_in_domain_cidr          = "10.104.0.0/16"   # IN Domain
+  tna_staff_network_staff_wifi_cidr         = "10.106.16.0/21"  # Staff Wi-Fi
+  tna_staff_network_web_domain_servers_cidr = "10.112.41.0/24"  # WEB Domain Servers
+  tna_staff_network_web_domain_1_cidr       = "10.120.2.0/23"   # WEB Domain Part 1
+  tna_staff_network_web_domain_2_cidr       = "10.121.0.0/18"   # WEB Domain Part 2
+  tna_staff_network_web_domain_3_cidr       = "10.136.0.0/20"   # WEB Domain Part 3
+  tna_staff_network_staff_vpn_cidr          = "10.252.0.0/16"   # Staff VPN
+  tna_staff_network_cidrs = [
+    local.tna_staff_network_citrix_cidr,
+    local.tna_staff_network_in_domain_cidr,
+    local.tna_staff_network_staff_wifi_cidr,
+    local.tna_staff_network_web_domain_servers_cidr,
+    local.tna_staff_network_web_domain_1_cidr,
+    local.tna_staff_network_web_domain_2_cidr,
+    local.tna_staff_network_web_domain_3_cidr,
+    local.tna_staff_network_staff_vpn_cidr
+  ]
+
   public_dns_domain      = "catalogue.nationalarchives.gov.uk"
   private_omg_dns_domain = "omg.${local.public_dns_domain}"
 
