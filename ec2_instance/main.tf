@@ -24,14 +24,6 @@ resource "aws_instance" "ec2_instance" {
 
   monitoring = false
 
-  dynamic "network_interface" {
-    for_each = var.network_interfaces
-    content {
-      network_interface_id = aws_network_interface.ec2_instance_private_interface[network_interface.key].id
-      device_index = network_interface.key
-    }
-  }
-
   root_block_device {
     delete_on_termination = local.root_block_device["delete_on_termination"]
     encrypted             = local.root_block_device["encrypted"]
@@ -71,8 +63,9 @@ resource "aws_network_interface" "ec2_instance_private_interface" {
 
   security_groups =  var.network_interfaces[count.index].security_groups
 
-  lifecycle {
-    create_before_destroy = true
+  attachment {
+    instance = aws_instance.ec2_instance.id
+    device_index = count.index
   }
 
   tags = {
