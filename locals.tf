@@ -167,12 +167,16 @@ locals {
         type    = "server"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
-      subnet_id    = module.vpc.private_subnets[2]
-      ipv4_address = "10.129.195.4"
-      ami          = local.aws_ami.linux2_x86_64.id
-      security_groups = [
-        module.puppet_server_security_group.security_group_id
+      network_interfaces = [
+        {
+          subnet_id       = module.vpc.private_subnets[2]
+          private_ips     = ["10.129.195.4"]
+          security_groups = [
+            module.puppet_server_security_group.security_group_id
+          ]
+        }
       ]
+      ami          = local.aws_ami.linux2_x86_64.id
       additional_iam_policies = [
         aws_iam_policy.puppet_server_access_secrets_iam_policy.arn
       ]
@@ -193,12 +197,16 @@ locals {
         type    = "agent"
         version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
-      subnet_id    = module.vpc.private_subnets[8]
-      ipv4_address = "10.129.199.4"
-      ami          = local.aws_ami.linux2_arm64.id
-      security_groups = [
-        module.mvpbeta_web_proxy_security_group.security_group_id
+      network_interfaces = [
+        {
+          subnet_id       = module.vpc.private_subnets[8]
+          private_ips     = ["10.129.199.4"],
+          security_groups = [
+            module.mvpbeta_web_proxy_security_group.security_group_id
+          ]
+        }
       ]
+      ami          = local.aws_ami.linux2_arm64.id
       root_block_device = {
         volume_size = 8 #GiB
       }
@@ -217,12 +225,16 @@ locals {
         type    = "agent"
         version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
-      subnet_id    = module.vpc.private_subnets[4]
-      ipv4_address = "10.129.193.4"
-      ami          = local.aws_ami.linux2_arm64.id
-      security_groups = [
-        module.mvpbeta_web_app_security_group.security_group_id
+      network_interfaces = [
+        {
+          subnet_id       = module.vpc.private_subnets[4]
+          private_ips     = ["10.129.193.4"]
+          security_groups = [
+            module.mvpbeta_web_app_security_group.security_group_id
+          ]
+        }
       ]
+      ami          = local.aws_ami.linux2_arm64.id
       root_block_device = {
         volume_size = 8 #GiB
       }
@@ -241,12 +253,16 @@ locals {
         type    = "agent"
         version = local.aws_ami.linux2_arm64.compatible_puppet_version
       }
-      subnet_id    = module.vpc.private_subnets[6]
-      ipv4_address = "10.129.194.4"
-      ami          = local.aws_ami.linux2_arm64.id
-      security_groups = [
-        module.mvpbeta_services_api_security_group.security_group_id
+      network_interfaces = [
+        {
+          subnet_id       = module.vpc.private_subnets[6]
+          private_ips     = ["10.129.194.4"]
+          security_groups = [
+            module.mvpbeta_services_api_security_group.security_group_id
+          ]
+        }
       ]
+      ami          = local.aws_ami.linux2_arm64.id
       additional_iam_policies = [
         aws_iam_policy.neptune_sparql_read_write_policy.arn
       ]
@@ -270,12 +286,16 @@ locals {
         type    = "agent"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
-      subnet_id    = module.vpc.private_subnets[0]
-      ipv4_address = "10.129.202.4"
-      ami          = local.aws_ami.linux2_x86_64.id
-      security_groups = [
-        module.dev_workstation_security_group.security_group_id
+      network_interfaces = [
+        {
+          subnet_id       = module.vpc.private_subnets[0]
+          private_ips     = ["10.129.202.4"]
+          security_groups = [
+            module.dev_workstation_security_group.security_group_id
+          ]
+        }
       ]
+      ami          = local.aws_ami.linux2_x86_64.id
       additional_iam_policies = [
         aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.scratch_space_write_all_policy.arn,
@@ -301,12 +321,16 @@ locals {
         type    = "agent"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
-      subnet_id    = module.vpc.private_subnets[0]
-      ipv4_address = "10.129.202.5"
-      ami          = local.aws_ami.linux2_x86_64.id
-      security_groups = [
-        module.dev_workstation_security_group.security_group_id
+      network_interfaces = [
+        {
+          subnet_id       = module.vpc.private_subnets[0]
+          private_ips     = ["10.129.202.5"]
+          security_groups = [
+            module.dev_workstation_security_group.security_group_id
+          ]
+        }
       ]
+      ami          = local.aws_ami.linux2_x86_64.id
       additional_iam_policies = [
         aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,
@@ -331,12 +355,16 @@ locals {
         type    = "agent"
         version = local.aws_ami.linux2_x86_64.compatible_puppet_version
       }
-      subnet_id    = module.vpc.private_subnets[0]
-      ipv4_address = "10.129.202.6"
-      ami          = local.aws_ami.linux2_x86_64.id
-      security_groups = [
-        module.dev_workstation_security_group.security_group_id
+      network_interfaces = [
+        {
+          subnet_id        = module.vpc.private_subnets[0]
+          private_ips     = ["10.129.202.6"]
+          security_groups = [
+            module.dev_workstation_security_group.security_group_id
+          ]
+        }
       ]
+      ami          = local.aws_ami.linux2_x86_64.id
       additional_iam_policies = [
         aws_iam_policy.scratch_space_backup_read_policy.arn,
         aws_iam_policy.neptune_loader_write_policy.arn,

@@ -116,7 +116,7 @@ module "dev_neptune_cluster_a_security_group" {
       from_port   = 8182
       to_port     = 8182
       protocol    = "tcp"
-      cidr_blocks = "${local.ec2_instances.services_api_1.ipv4_address}/32" # NOTE: restricted to services-api-1 in vpc_private_subnet_mvpbeta_services
+      cidr_blocks = "${local.ec2_instances.services_api_1.network_interfaces[0].private_ips[0]}/32" # NOTE: restricted to services-api-1 in vpc_private_subnet_mvpbeta_services
     }
   ]
   number_of_computed_ingress_with_cidr_blocks = 2

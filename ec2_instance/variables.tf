@@ -30,11 +30,6 @@ variable "additional_iam_policies" {
   default     = []
 }
 
-variable "security_groups" {
-  description = "Security Groups for the instances network interface"
-  type        = list(string)
-}
-
 variable "user_data_replace_on_change" {
   description = "User data to provide when launching the instance"
   type        = bool
@@ -144,14 +139,13 @@ variable "secondary_block_devices" {
   default = []
 }
 
-variable "subnet_id" {
-  description = "Subnet to place the instance in"
-  type        = string
-}
-
-variable "private_ips" {
-  description = "Private IP addresses"
-  type        = list(string)
+variable network_interfaces {
+  description = "List of network interfaces to create and their network details"
+  type = list(object({
+    subnet_id = string,
+    private_ips = list(string),
+    security_groups = optional(list(string), null)
+  }))
 }
 
 variable "dns" {

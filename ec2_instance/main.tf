@@ -24,9 +24,12 @@ resource "aws_instance" "ec2_instance" {
 
   monitoring = false
 
-  network_interface {
-    network_interface_id = aws_network_interface.ec2_instance_private_interface.id
-    device_index         = 0
+  dynamic "network_interface" {
+    for_each = var.network_interfaces
+    content {
+      network_interface_id = aws_network_interface.ec2_instance_private_interface[network_interface.key].id
+      device_index = network_interface.key
+    }
   }
 
   root_block_device {
@@ -60,21 +63,29 @@ resource "aws_instance" "ec2_instance" {
 }
 
 resource "aws_network_interface" "ec2_instance_private_interface" {
-  description = "Network Interface ${local.hostname}"
-  subnet_id   = var.subnet_id
-  private_ips = var.private_ips
+  count = length(var.network_interfaces)
 
-  security_groups = var.security_groups
+  description = "Network Interface ${local.hostname}"
+  subnet_id   = var.network_interfaces[count.index].subnet_id
+  private_ips = var.network_interfaces[count.index].private_ips
+
+  security_groups =  var.network_interfaces[count.index].security_groups
+
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tags = {
-    Name        = "eth0_${local.hostname}"
-    Type        = "primary_network_interface"
+    Name        = "eth${count.index}_${local.hostname}"
+    Type        = count.index == 0 ? "primary_network_interface" : "secondary_network_interface"
     Environment = var.tags["Environment"]
   }
 }
 
 data "aws_network_interface" "ec2_instance_private_interface" {
-  id = aws_network_interface.ec2_instance_private_interface.id
+  count = length(var.network_interfaces)
+
+  id = aws_network_interface.ec2_instance_private_interface[count.index].id
 }
 
 # Setup DNS
@@ -87,11 +98,11 @@ module "ec2_instance_dns" {
 
   zone_id = var.dns.zone_id
   ipv4 = {
-    addresses       = data.aws_network_interface.ec2_instance_private_interface.private_ips
+    addresses       = data.aws_network_interface.ec2_instance_private_interface[0].private_ips
     reverse_zone_id = var.dns.reverse_ipv4_zone_id
   }
   ipv6 = {
-    addresses       = data.aws_network_interface.ec2_instance_private_interface.ipv6_addresses
+    addresses       = data.aws_network_interface.ec2_instance_private_interface[0].ipv6_addresses
     reverse_zone_id = var.dns.reverse_ipv6_zone_id
   }
 }

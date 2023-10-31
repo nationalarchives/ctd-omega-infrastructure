@@ -9,8 +9,6 @@ module "ec2_puppet_server_instance" {
   instance_type = each.value.instance_type
   key_name      = data.aws_key_pair.omega_admin_key_pair.key_name
 
-  security_groups = each.value.security_groups
-
   additional_iam_policies = lookup(each.value, "additional_iam_policies", [])
 
   # Puppet Server settings
@@ -32,8 +30,8 @@ module "ec2_puppet_server_instance" {
   home_block_device       = lookup(each.value, "home_block_device", null)
   secondary_block_devices = lookup(each.value, "secondary_block_devices", [])
 
-  subnet_id   = each.value.subnet_id
-  private_ips = [each.value.ipv4_address]
+  network_interfaces = lookup(each.value, "network_interfaces", [])
+
   dns = {
     zone_id              = aws_route53_zone.omega_private_omg_dns.zone_id
     reverse_ipv4_zone_id = aws_route53_zone.omega_private_ipv4_omg_reverse_dns.zone_id
@@ -54,8 +52,6 @@ module "ec2_instance" {
   ami           = each.value.ami
   instance_type = each.value.instance_type
   key_name      = data.aws_key_pair.omega_admin_key_pair.key_name
-
-  security_groups = each.value.security_groups
 
   additional_iam_policies = lookup(each.value, "additional_iam_policies", [])
 
@@ -80,8 +76,8 @@ module "ec2_instance" {
 
   # TODO(AR) additional data volumes - see https://github.com/hashicorp/terraform/issues/33259
 
-  subnet_id   = each.value.subnet_id
-  private_ips = [each.value.ipv4_address]
+  network_interfaces = lookup(each.value, "network_interfaces", [])
+
   dns = {
     zone_id              = aws_route53_zone.omega_private_omg_dns.zone_id
     reverse_ipv4_zone_id = aws_route53_zone.omega_private_ipv4_omg_reverse_dns.zone_id
