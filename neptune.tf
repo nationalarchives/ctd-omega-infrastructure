@@ -109,7 +109,7 @@ module "dev_neptune_cluster_a_security_group" {
       from_port   = 8182
       to_port     = 8182
       protocol    = "tcp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       description = "Neptune from services-api-1"
@@ -127,7 +127,7 @@ module "dev_neptune_cluster_a_security_group" {
       from_port        = 8182
       to_port          = 8182
       protocol         = "tcp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general (IPv6)
     },
     {
       description      = "Neptune (IPv6) from services-api-1"

@@ -13,7 +13,7 @@ module "cvpn_access_security_group" {
       from_port   = 443
       to_port     = 443
       protocol    = "udp"
-      cidr_blocks = module.vpc.private_subnets_cidr_blocks[0] # This is vpc_private_subnet_dev_general
+      cidr_blocks = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # This is vpc_private_subnet_dev_general
     }
   ]
   number_of_computed_ingress_with_cidr_blocks = 1
@@ -24,7 +24,7 @@ module "cvpn_access_security_group" {
       from_port        = 443
       to_port          = 443
       protocol         = "udp"
-      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[0] # This is vpc_private_subnet_dev_general (IPv6)
+      ipv6_cidr_blocks = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # This is vpc_private_subnet_dev_general (IPv6)
     }
   ]
   number_of_computed_ingress_with_ipv6_cidr_blocks = 1
@@ -111,12 +111,12 @@ output "omega_client_vpn_endpoint" {
 
 data "aws_subnet" "vpc_private_subnet_dev_general_id" {
   vpc_id     = module.vpc.vpc_id
-  cidr_block = module.vpc.private_subnets_cidr_blocks[0] # This is vpc_private_subnet_dev_general
+  cidr_block = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # This is vpc_private_subnet_dev_general
 }
 
 data "aws_subnet" "vpc_private_subnet_dev_general_ipv6_id" {
   vpc_id          = module.vpc.vpc_id
-  ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # This is vpc_private_subnet_dev_general (IPv6)
+  ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # This is vpc_private_subnet_dev_general (IPv6)
 }
 
 resource "aws_ec2_client_vpn_network_association" "cvpn_for_vpc_private_subnet_dev_general" {
@@ -135,7 +135,7 @@ resource "aws_ec2_client_vpn_network_association" "cvpn_for_vpc_private_subnet_d
 
 resource "aws_ec2_client_vpn_authorization_rule" "cvpn_auth_for_vpc_private_subnet_dev_general" {
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_new.id
-  target_network_cidr    = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+  target_network_cidr    = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
   authorize_all_groups   = true
 }
 

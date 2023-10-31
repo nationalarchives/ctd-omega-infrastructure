@@ -110,7 +110,7 @@ module "vpc" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 HTTP traffic in from vpc_private_subnet_dev_general for the purposes of accesing the web (via NAT Gateway)
@@ -119,7 +119,7 @@ module "vpc" {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv4 HTTPS traffic in from vpc_private_subnet_dev_general for the purposes of accesing the web (via NAT Gateway)
@@ -128,7 +128,7 @@ module "vpc" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 HTTPS traffic in from vpc_private_subnet_dev_general for the purposes of accesing the web (via NAT Gateway)
@@ -137,7 +137,7 @@ module "vpc" {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv4 HTTP traffic in from vpc_private_subnet_dev_databases for the purposes of accesing the web (via NAT Gateway)
@@ -146,7 +146,7 @@ module "vpc" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       # allow IPv6 HTTP traffic in from vpc_private_subnet_dev_databases for the purposes of accesing the web (via NAT Gateway)
@@ -164,7 +164,7 @@ module "vpc" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       # allow IPv6 HTTPS traffic in from vpc_private_subnet_dev_databases for the purposes of accesing the web (via NAT Gateway)
@@ -182,7 +182,7 @@ module "vpc" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       # allow IPv6 HTTP traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
@@ -191,7 +191,7 @@ module "vpc" {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       # allow IPv4 HTTPS traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
@@ -200,7 +200,7 @@ module "vpc" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       # allow IPv6 HTTPS traffic in from vpc_private_subnet_management for the purposes of accesing the web (via NAT Gateway)
@@ -209,7 +209,7 @@ module "vpc" {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       # allow IPv4 HTTP traffic in from vpc_private_subnet_mvpbeta_web for the purposes of accesing the web (via NAT Gateway)
@@ -218,7 +218,7 @@ module "vpc" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv6 HTTP traffic in from vpc_private_subnet_mvpbeta_web for the purposes of accesing the web (via NAT Gateway)
@@ -227,7 +227,7 @@ module "vpc" {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv4 HTTPS traffic in from vpc_private_subnet_mvpbeta_web for the purposes of accesing the web (via NAT Gateway)
@@ -236,7 +236,7 @@ module "vpc" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv6 HTTPS traffic in from vpc_private_subnet_mvpbeta_web for the purposes of accesing the web (via NAT Gateway)
@@ -245,7 +245,7 @@ module "vpc" {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv4 HTTP traffic in from vpc_private_subnet_mvpbeta_services for the purposes of accesing the web (via NAT Gateway)
@@ -254,7 +254,7 @@ module "vpc" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow IPv6 HTTP traffic in from vpc_private_subnet_mvpbeta_services for the purposes of accesing the web (via NAT Gateway)
@@ -263,7 +263,7 @@ module "vpc" {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow IPv4 HTTPS traffic in from vpc_private_subnet_mvpbeta_services for the purposes of accesing the web (via NAT Gateway)
@@ -272,7 +272,7 @@ module "vpc" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow IPv6 HTTPS traffic in from vpc_private_subnet_mvpbeta_services for the purposes of accesing the web (via NAT Gateway)
@@ -281,7 +281,7 @@ module "vpc" {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow IPv4 HTTP traffic in from vpc_private_tna_net_subnet_mvpbeta for the purposes of accesing the web (via NAT Gateway)
@@ -290,7 +290,7 @@ module "vpc" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow IPv6 HTTP traffic in from vpc_private_tna_net_subnet_mvpbeta for the purposes of accesing the web (via NAT Gateway)
@@ -299,7 +299,7 @@ module "vpc" {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow IPv4 HTTPS traffic in from vpc_private_tna_net_subnet_mvpbeta for the purposes of accesing the web (via NAT Gateway)
@@ -308,7 +308,7 @@ module "vpc" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow IPv6 HTTPS traffic in from vpc_private_tna_net_subnet_mvpbeta for the purposes of accesing the web (via NAT Gateway)
@@ -317,7 +317,7 @@ module "vpc" {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
 
     {
@@ -384,7 +384,7 @@ module "vpc" {
       from_port   = local.unpriviledged_port_start
       to_port     = local.unpriviledged_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_dev_general
@@ -393,7 +393,7 @@ module "vpc" {
       from_port       = local.unpriviledged_port_start
       to_port         = local.unpriviledged_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_dev_databases
@@ -402,7 +402,7 @@ module "vpc" {
       from_port   = local.unpriviledged_port_start
       to_port     = local.unpriviledged_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_dev_databases
@@ -420,7 +420,7 @@ module "vpc" {
       from_port   = local.unpriviledged_port_start
       to_port     = local.unpriviledged_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_management
@@ -429,7 +429,7 @@ module "vpc" {
       from_port       = local.unpriviledged_port_start
       to_port         = local.unpriviledged_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_mvpbeta_web
@@ -438,7 +438,7 @@ module "vpc" {
       from_port   = local.unpriviledged_port_start
       to_port     = local.unpriviledged_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_mvpbeta_web
@@ -447,7 +447,7 @@ module "vpc" {
       from_port       = local.unpriviledged_port_start
       to_port         = local.unpriviledged_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_subnet_mvpbeta_services
@@ -456,7 +456,7 @@ module "vpc" {
       from_port   = local.unpriviledged_port_start
       to_port     = local.unpriviledged_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_subnet_mvpbeta_services
@@ -465,7 +465,7 @@ module "vpc" {
       from_port       = local.unpriviledged_port_start
       to_port         = local.unpriviledged_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow results out from previous outgoing (to the web) IPv4 internet traffic back to vpc_private_tna_net_subnet_mvpbeta
@@ -474,7 +474,7 @@ module "vpc" {
       from_port   = local.unpriviledged_port_start
       to_port     = local.unpriviledged_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow results out from previous outgoing (to the web) IPv6 internet traffic back to vpc_private_tna_net_subnet_mvpbeta
@@ -483,7 +483,7 @@ module "vpc" {
       from_port       = local.unpriviledged_port_start
       to_port         = local.unpriviledged_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     }
   ]
 
@@ -496,7 +496,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number     = 106
@@ -504,7 +504,7 @@ module "vpc" {
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 101
@@ -512,7 +512,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       rule_number     = 107
@@ -530,7 +530,7 @@ module "vpc" {
       from_port   = 3389
       to_port     = 3389
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number     = 206
@@ -538,7 +538,7 @@ module "vpc" {
       from_port       = 3389
       to_port         = 3389
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 300
@@ -546,7 +546,7 @@ module "vpc" {
       from_port   = 80
       to_port     = 80
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number     = 306
@@ -554,7 +554,7 @@ module "vpc" {
       from_port       = 80
       to_port         = 80
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 400
@@ -562,7 +562,7 @@ module "vpc" {
       from_port   = 443
       to_port     = 443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number     = 406
@@ -570,7 +570,7 @@ module "vpc" {
       from_port       = 443
       to_port         = 443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv4 Play (HTTPS) traffic in from vpc_private_subnet_dev_general
@@ -579,7 +579,7 @@ module "vpc" {
       from_port   = 9443
       to_port     = 9443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 Play (HTTPS) traffic in from vpc_private_subnet_dev_general
@@ -588,7 +588,7 @@ module "vpc" {
       from_port       = 9443
       to_port         = 9443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv4 Play (HTTPS) traffic in from vpc_private_tna_net_subnet_mvpbeta
@@ -597,7 +597,7 @@ module "vpc" {
       from_port   = 9443
       to_port     = 9443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow IPv6 Play (HTTPS) traffic in from vpc_private_tna_net_subnet_mvpbeta
@@ -606,7 +606,7 @@ module "vpc" {
       from_port       = 9443
       to_port         = 9443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow IPv4 TSQL traffic in from vpc_private_subnet_dev_general
@@ -615,7 +615,7 @@ module "vpc" {
       from_port   = 1433
       to_port     = 1433
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 TSQL traffic in to vpc_private_subnet_dev_general
@@ -624,7 +624,7 @@ module "vpc" {
       from_port       = 1433
       to_port         = 1433
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv4 Neptune traffic in from vpc_private_subnet_dev_general
@@ -633,7 +633,7 @@ module "vpc" {
       from_port   = 8182
       to_port     = 8182
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 Neptune traffic in to vpc_private_subnet_dev_general
@@ -642,7 +642,7 @@ module "vpc" {
       from_port       = 8182
       to_port         = 8182
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow results from outgoing IPv4 internet traffic
@@ -683,7 +683,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number     = 106
@@ -691,7 +691,7 @@ module "vpc" {
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 101
@@ -699,7 +699,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       rule_number     = 107
@@ -715,7 +715,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       rule_number     = 126
@@ -723,7 +723,7 @@ module "vpc" {
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[2] # NOTE: restricted to vpc_private_subnet_management
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_management_a] # NOTE: restricted to vpc_private_subnet_management
     },
     {
       rule_number = 140
@@ -731,7 +731,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       rule_number     = 146
@@ -739,7 +739,7 @@ module "vpc" {
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       rule_number = 160
@@ -747,7 +747,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       rule_number     = 166
@@ -755,7 +755,7 @@ module "vpc" {
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       rule_number = 180
@@ -763,7 +763,7 @@ module "vpc" {
       from_port   = 22
       to_port     = 22
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       rule_number     = 186
@@ -771,7 +771,7 @@ module "vpc" {
       from_port       = 22
       to_port         = 22
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
 
     {
@@ -799,7 +799,7 @@ module "vpc" {
       from_port   = 3389
       to_port     = 3389
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 RDP traffic out to vpc_private_subnet_dev_general
@@ -808,7 +808,7 @@ module "vpc" {
       from_port       = 3389
       to_port         = 3389
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       rule_number = 300
@@ -849,7 +849,7 @@ module "vpc" {
       from_port   = 9443
       to_port     = 9443
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv6 Play (HTTPS) traffic out to vpc_private_subnet_mvpbeta_web
@@ -858,7 +858,7 @@ module "vpc" {
       from_port       = 9443
       to_port         = 9443
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv4 TSQL traffic out to vpc_private_subnet_dev_databases
@@ -867,7 +867,7 @@ module "vpc" {
       from_port   = 1433
       to_port     = 1433
       protocol    = "tcp"
-      cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+      cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
     },
     {
       # allow IPv6 TSQL traffic in to vpc_private_subnet_dev_databases
@@ -885,7 +885,7 @@ module "vpc" {
       from_port   = 8182
       to_port     = 8182
       protocol    = "tcp"
-      cidr_block  = module.vpc.intra_subnets_cidr_blocks[0] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
+      cidr_block  = module.vpc.intra_subnets_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_a] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
     },
     {
       # allow IPv6 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: A
@@ -894,7 +894,7 @@ module "vpc" {
       from_port       = 8182
       to_port         = 8182
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
+      ipv6_cidr_block = module.vpc.intra_subnets_ipv6_cidr_blocks[local.idx_vpc_intra_subnet_mvpbeta_databases_a] # NOTE: restricted to vpc_intra_subnet_mvpbeta_databases
     },
     {
       # allow IPv4 Neptune traffic out to vpc_intra_subnet_mvpbeta_databases, Availability Zone: B
@@ -931,7 +931,7 @@ module "vpc" {
     #   from_port   = local.linux_ephemeral_port_start
     #   to_port     = local.linux_ephemeral_port_end
     #   protocol    = "tcp"
-    #   cidr_block  = module.vpc.private_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+    #   cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     # },
     #  {
     #   # allow IPv4 return traffic from vpc_private_subnet_dev_databases
@@ -940,7 +940,7 @@ module "vpc" {
     #   from_port   = local.linux_ephemeral_port_start
     #   to_port     = local.linux_ephemeral_port_end
     #   protocol    = "tcp"
-    #   cidr_block  = module.vpc.database_subnets_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_databases
+    #   cidr_block  = module.vpc.database_subnets_cidr_blocks[local.idx_vpc_database_subnet_dev_databases_a] # NOTE: restricted to vpc_private_subnet_dev_databases
     # },
 
     {
@@ -950,7 +950,7 @@ module "vpc" {
       from_port       = local.linux_ephemeral_port_start
       to_port         = local.linux_ephemeral_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[0] # NOTE: restricted to vpc_private_subnet_dev_general
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_dev_general_a] # NOTE: restricted to vpc_private_subnet_dev_general
     },
     {
       # allow IPv6 return traffic from vpc_private_subnet_dev_databases
@@ -969,7 +969,7 @@ module "vpc" {
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv6 return traffic from vpc_private_subnet_mvpbeta_web
@@ -978,7 +978,7 @@ module "vpc" {
       from_port       = local.linux_ephemeral_port_start
       to_port         = local.linux_ephemeral_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[4] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_web_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_web
     },
     {
       # allow IPv4 return traffic from vpc_private_subnet_mvpbeta_services
@@ -987,7 +987,7 @@ module "vpc" {
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow IPv6 return traffic from vpc_private_subnet_mvpbeta_services
@@ -996,7 +996,7 @@ module "vpc" {
       from_port       = local.linux_ephemeral_port_start
       to_port         = local.linux_ephemeral_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[6] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_subnet_mvpbeta_services_a] # NOTE: restricted to vpc_private_subnet_mvpbeta_services
     },
     {
       # allow IPv4 return traffic from vpc_private_tna_net_subnet_mvpbeta
@@ -1005,7 +1005,7 @@ module "vpc" {
       from_port   = local.linux_ephemeral_port_start
       to_port     = local.linux_ephemeral_port_end
       protocol    = "tcp"
-      cidr_block  = module.vpc.private_subnets_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      cidr_block  = module.vpc.private_subnets_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
     {
       # allow IPv6 return traffic from vpc_private_tna_net_subnet_mvpbeta
@@ -1014,7 +1014,7 @@ module "vpc" {
       from_port       = local.linux_ephemeral_port_start
       to_port         = local.linux_ephemeral_port_end
       protocol        = "tcp"
-      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[8] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
+      ipv6_cidr_block = module.vpc.private_subnets_ipv6_cidr_blocks[local.idx_vpc_private_tna_net_subnet_mvpbeta_a] # NOTE: restricted to vpc_private_tna_net_subnet_mvpbeta
     },
 
     // START TEMP site-to-site VPN testing with Steve Hirschorn

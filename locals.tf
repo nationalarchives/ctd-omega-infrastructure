@@ -34,7 +34,7 @@ locals {
   }
 
   /* Private Subnet for databases used in Development */
-  vpc_private_subnet_dev_databases = {
+  vpc_database_subnet_dev_databases = {
     ipv4          = ["10.129.203.0/24",        "10.129.223.0/24"]
     # ipv6        = ["2a05:d01c:7:1a0a::/64",  "2a05:d01c:7:1a0b::/64"]
     ipv6_prefixes = [10, 11]
@@ -105,19 +105,35 @@ locals {
     )
   )
 
+  // NOTE(AR) these are indexes into `module.vpc.private_subnets_cidr_blocks` and `module.vpc.private_subnets_ipv6_cidr_blocks`
+  idx_vpc_private_subnet_dev_general_a      = 0
+  idx_vpc_private_subnet_dev_general_b      = 1
+  idx_vpc_private_subnet_management_a       = 2
+  idx_vpc_private_subnet_management_b       = 3
+  idx_vpc_private_subnet_mvpbeta_web_a      = 4
+  idx_vpc_private_subnet_mvpbeta_web_b      = 5
+  idx_vpc_private_subnet_mvpbeta_services_a = 6
+  idx_vpc_private_subnet_mvpbeta_services_b = 7
+  idx_vpc_private_tna_net_subnet_mvpbeta_a  = 8
+  idx_vpc_private_tna_net_subnet_mvpbeta_b  = 9
+
   vpc_database_subnets = tolist(
     concat(
       /* Development database subnets */
-      local.vpc_private_subnet_dev_databases.ipv4
+      local.vpc_database_subnet_dev_databases.ipv4
     )
   )
 
   vpc_database_ipv6_subnets = tolist(
     concat(
       /* Development database subnets */
-      local.vpc_private_subnet_dev_databases.ipv6_prefixes
+      local.vpc_database_subnet_dev_databases.ipv6_prefixes
     )
   )
+
+  // NOTE(AR) these are indexes into `module.vpc.database_subnets_cidr_blocks` and `module.vpc.database_subnets_ipv6_cidr_blocks`
+  idx_vpc_database_subnet_dev_databases_a = 0
+  idx_vpc_database_subnet_dev_databases_b = 1
 
   vpc_intra_subnets = tolist(
     concat(
@@ -133,6 +149,10 @@ locals {
     )
   )
 
+  // NOTE(AR) these are indexes into `module.vpc.intra_subnets_cidr_blocks` and `module.vpc.intra_subnets_ipv6_cidr_blocks`
+  idx_vpc_intra_subnet_mvpbeta_databases_a = 0
+  idx_vpc_intra_subnet_mvpbeta_databases_b = 1
+
   vpc_public_subnets = tolist(
     concat(
       /* General Use subnet (NAT Gateway etc.) */
@@ -147,6 +167,10 @@ locals {
       local.vpc_public_subnet_general.ipv6_prefixes
     )
   )
+
+  // NOTE(AR) these are indexes into `module.vpc.public_subnets_cidr_blocks` and `module.vpc.public_subnets_ipv6_cidr_blocks`
+  idx_vpc_public_subnet_general_a = 0
+  idx_vpc_public_subnet_general_b = 1
 
   # See https://datatracker.ietf.org/doc/html/rfc6056.html#section-2
   unpriviledged_port_start = 1024
